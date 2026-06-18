@@ -42,15 +42,7 @@
             </div>
             <p class="item-name">{{ allBoats[player.boatIndex].name }}</p>
 
-            <!-- SÉLECTEUR DE CHAT -->
-            <div class="selector">
-              <button @click.stop="prevCat(index)" :disabled="player.ready">◀</button>
-              <div class="preview-box">
-                <img :src="`/chats/${allCats[player.catIndex].file}`" class="preview-img cat-preview" />
-              </div>
-              <button @click.stop="nextCat(index)" :disabled="player.ready">▶</button>
-            </div>
-            <p class="item-name">{{ allCats[player.catIndex].name }}</p>
+
 
             <button 
               class="ready-button" 
@@ -151,14 +143,32 @@
                 {{ $t('game.turn.finish') }}
               </button>
               <button 
-                class="action-button attack-btn" 
-                :class="{ 'active': isAttacking }"
-                @click.stop="triggerAttackMode"
+                v-if="allBoats[player.boatIndex].type === 'actif' && !player.abilityUsed"
+                class="action-button ability-btn" 
+                @click.stop="useBoatAbility(index)"
               >
-                {{ $t('game.turn.attack') }}
+                Pouvoir Navire
               </button>
             </div>
             
+            <!-- AFFICHAGE DES CARTES EN MAIN -->
+            <div v-if="currentTurn === index && player.hand.length > 0" class="player-hand-container">
+              <div class="player-hand">
+                <div 
+                  v-for="card in player.hand" 
+                  :key="card.uid" 
+                  class="playing-card"
+                  :class="card.type"
+                  @click.stop="playCard(index, card)"
+                >
+                  <div class="card-icon">{{ card.icon }}</div>
+                  <div class="card-name">{{ card.name }}</div>
+                  <div v-if="card.type === 'attack'" class="card-value">-{{ card.damage }} PV</div>
+                  <div v-else-if="card.type === 'heal'" class="card-value">+{{ card.value }} PV</div>
+                </div>
+              </div>
+            </div>
+
             <div v-if="isAttacking && currentTurn === index" class="attack-prompt">
               {{ $t('game.turn.selectTarget') }} (-{{ selectedDamage }})
             </div>
@@ -201,6 +211,33 @@
       <div class="deck-area-controls bottom-area">
         <div class="turn-display bottom-turn">{{ $t('game.turn.activePlayer') }} {{ currentTurn + 1 }}</div>
         <button class="shop-button bottom-shop" @click="openShop(0)">{{ $t('header.shop') }}</button>
+      </div>
+
+      <!-- --- MODALE ÉVÉNEMENT DE MER --- -->
+      <div v-if="showEventPhase && currentEvent" class="event-overlay">
+        <div class="event-content">
+          <h2 class="event-round">Round {{ currentRound }}</h2>
+          <div class="event-icon">{{ currentEvent.icon }}</div>
+          <h3 class="event-title">{{ currentEvent.name }}</h3>
+          <p class="event-desc">{{ currentEvent.desc }}</p>
+          <button class="event-button" @click="acknowledgeEvent">Prendre le large</button>
+        </div>
+      </div>
+
+      <!-- --- MODALE PHASE DE RESSOURCES --- -->
+      <div v-if="showResourcePhase" class="resource-overlay">
+        <div class="resource-content">
+          <h2 class="resource-title">Phase de Ressources</h2>
+          <p class="resource-desc">Joueur {{ currentTurn + 1 }}, c'est à vous ! Choisissez votre bonus :</p>
+          <div class="resource-actions">
+            <button class="resource-button gold-btn" @click="chooseGold">
+              <img src="/coin.png" class="btn-icon" /> Prendre 2 Pièces
+            </button>
+            <button class="resource-button cards-btn" @click="chooseCards">
+              <span class="btn-icon">🎴</span> Piocher 2 Cartes
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- --- MODALE BOUTIQUE --- -->
@@ -254,21 +291,21 @@ const allCats = [
 ];
 
 const allBoats = [
-  { file: 'brick.webp', name: 'Le Brick', ability: 'catSlides.frigate' },
-  { file: 'brigantin.webp', name: 'Le Brigantin', ability: 'catSlides.junk' },
-  { file: 'Caravelle.webp', name: 'La Caravelle', ability: 'catSlides.frigate' },
-  { file: 'clipper.webp', name: 'Le Clipper', ability: 'catSlides.junk' },
-  { file: 'Corvette.webp', name: 'La Corvette', ability: 'catSlides.frigate' },
-  { file: 'cotre.webp', name: 'Le Cotre', ability: 'catSlides.junk' },
-  { file: 'cuirasse.webp', name: 'Le Cuirassé', ability: 'catSlides.frigate' },
-  { file: 'felouque.webp', name: 'La Felouque', ability: 'catSlides.junk' },
-  { file: 'Fregate.webp', name: 'La Frégate', ability: 'catSlides.frigate' },
-  { file: 'gabare.webp', name: 'La Gabare', ability: 'catSlides.junk' },
-  { file: 'Galion.webp', name: 'Le Galion', ability: 'catSlides.frigate' },
-  { file: 'jonque.webp', name: 'La Jonque', ability: 'catSlides.junk' },
-  { file: 'sloop.webp', name: 'Le Sloop', ability: 'catSlides.junk' },
-  { file: 'trois-mats.webp', name: 'Trois-Mâts', ability: 'catSlides.frigate' },
-  { file: 'Vaisseau_Fantôme.webp', name: 'Vaisseau Fantôme', ability: 'catSlides.ghostShip' }
+  { file: 'Fregate.webp', name: 'La Frégate', abilityId: 'fregate', type: 'passif', ability: '+1 PV à chaque élimination ennemie.' },
+  { file: 'Galion.webp', name: 'Le Galion', abilityId: 'galion', type: 'passif', ability: 'Main max à 6 cartes (non implémenté visuellement).' },
+  { file: 'Corvette.webp', name: 'La Corvette', abilityId: 'corvette', type: 'actif', ability: 'Esquive une attaque (1x/partie).' },
+  { file: 'Vaisseau_Fantôme.webp', name: 'Vaisseau Fantôme', abilityId: 'fantome', type: 'passif', ability: 'Rôle caché indétectable (non implémenté car pas de rôle).' },
+  { file: 'Caravelle.webp', name: 'La Caravelle', abilityId: 'caravelle', type: 'passif', ability: 'Pioche 1 carte supplémentaire gratuite chaque tour.' },
+  { file: 'sloop.webp', name: 'Le Sloop', abilityId: 'sloop', type: 'actif', ability: 'Échange une carte de la main (1x/tour).' },
+  { file: 'brick.webp', name: 'Le Brick', abilityId: 'brick', type: 'passif', ability: 'Quand attaqué, pioche 1 carte.' },
+  { file: 'jonque.webp', name: 'La Jonque', abilityId: 'jonque', type: 'actif', ability: 'Regarde et remet la 1ère carte (1x/tour).' },
+  { file: 'trois-mats.webp', name: 'Trois-Mâts', abilityId: 'troismats', type: 'passif', ability: 'Équipements indestructibles (non implémenté).' },
+  { file: 'felouque.webp', name: 'La Felouque', abilityId: 'felouque', type: 'passif', ability: 'Si cible a plus de PV, +1 dégât bonus.' },
+  { file: 'cotre.webp', name: 'Le Cotre', abilityId: 'cotre', type: 'actif', ability: 'Vole 1 carte (1x/partie).' },
+  { file: 'brigantin.webp', name: 'Le Brigantin', abilityId: 'brigantin', type: 'passif', ability: 'À l\'élimination d\'un joueur, pioche 2 cartes bonus.' },
+  { file: 'clipper.webp', name: 'Le Clipper', abilityId: 'clipper', type: 'passif', ability: 'Si aucune attaque, gagne 1 pièce bonus en fin de tour.' },
+  { file: 'gabare.webp', name: 'La Gabare', abilityId: 'gabare', type: 'passif', ability: '+1 pièce si l\'option pièces est choisie.' },
+  { file: 'cuirasse.webp', name: 'Le Cuirassé', abilityId: 'cuirasse', type: 'passif', ability: '-1 dégât sur attaques reçues (min 1).' }
 ];
 
 const isStarted = ref(false);
@@ -281,8 +318,101 @@ const winnerAnimVisible = ref(false);
 const pixelsPerCm = ref(38);
 const playerCount = ref(4);
 const showShop = ref(false);
+const showResourcePhase = ref(false);
 const shopRotation = ref(0);
 const currentTurn = ref(0);
+const currentRound = ref(1);
+const showEventPhase = ref(false);
+const currentEvent = ref(null);
+
+const seaEvents = [
+  { id: 'tempete', name: 'Tempête !', desc: 'La mer se déchaîne. Les attaques infligent +1 Dégât ce tour-ci.', icon: '🌪️' },
+  { id: 'brume', name: 'Brume épaisse', desc: 'Impossible de viser juste. Les attaques ont 50% de chances d\'échouer ce tour-ci.', icon: '🌫️' },
+  { id: 'tresor', name: 'Île au trésor', desc: 'Une île regorgeant de richesses ! Chaque joueur pioche 1 carte supplémentaire ce tour-ci.', icon: '🏝️' },
+  { id: 'calme', name: 'Mer d\'huile', desc: 'Une journée calme en mer. Aucun effet particulier.', icon: '☀️' }
+];
+
+const startRound = () => {
+  const randomEvent = seaEvents[Math.floor(Math.random() * seaEvents.length)];
+  currentEvent.value = randomEvent;
+  showEventPhase.value = true;
+  playRevealSound();
+};
+
+const acknowledgeEvent = () => {
+  showEventPhase.value = false;
+  showResourcePhase.value = true;
+  playUiTap();
+};
+
+const gameDeck = [
+  { id: 'atk1', name: 'Tir au But', type: 'attack', damage: 1, desc: 'Inflige 1 dégât.', icon: '💥' },
+  { id: 'atk2', name: 'Boulets chaînés', type: 'attack', damage: 2, desc: 'Inflige 2 dégâts.', icon: '⛓️' },
+  { id: 'def1', name: 'Voile renforcée', type: 'defense', value: 1, desc: 'Annule 1 dégât.', icon: '🛡️' },
+  { id: 'heal1', name: 'Tonneau de Rhum', type: 'heal', value: 1, desc: 'Soigne 1 PV.', icon: '🍺' }
+];
+
+const useBoatAbility = (playerIndex) => {
+  const player = players.value[playerIndex];
+  const boat = allBoats[player.boatIndex];
+  
+  if (player.abilityUsed || boat.type !== 'actif') return;
+
+  // Implémentation basique des pouvoirs actifs
+  if (boat.abilityId === 'sloop') {
+    if (player.hand.length > 0) {
+      player.hand.shift(); // Défausse la 1ère carte
+      const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
+      player.hand.push(randomCard);
+      playSuccessChime();
+    }
+  } else if (boat.abilityId === 'jonque') {
+    // Affiche juste un message pour l'instant (la pioche n'est pas un vrai deck trié)
+    alert("Pouvoir Jonque activé ! (Regarde la prochaine carte)");
+    playSuccessChime();
+  } else {
+    alert(`Pouvoir ${boat.name} activé !`);
+    playSuccessChime();
+  }
+
+  player.abilityUsed = true;
+};
+
+const chooseGold = () => {
+  const player = players.value[currentTurn.value];
+  const boat = allBoats[player.boatIndex];
+  
+  let goldGained = 2;
+  // Pouvoir passif: La Gabare (+1 pièce)
+  if (boat.abilityId === 'gabare') {
+    goldGained += 1;
+  }
+  
+  player.gold += goldGained;
+  showResourcePhase.value = false;
+  playSuccessChime();
+};
+
+const chooseCards = () => {
+  const player = players.value[currentTurn.value];
+  const boat = allBoats[player.boatIndex];
+  const hand = player.hand;
+  
+  let cardsToDraw = 2;
+  // Pouvoir passif: La Caravelle (+1 carte)
+  if (boat.abilityId === 'caravelle') {
+    cardsToDraw += 1;
+  }
+
+  for (let i = 0; i < cardsToDraw; i++) {
+    if (hand.length < 5) { // Main max 5
+      const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
+      hand.push(randomCard);
+    }
+  }
+  showResourcePhase.value = false;
+  playSuccessChime();
+};
 
 const shopItems = ref([
   { id: 'heal', name: 'Réparations d\'urgence', icon: '❤️', price: 8, purchased: false },
@@ -314,110 +444,33 @@ const isAttacking = ref(false);
 const selectedDamage = ref(1);
 const showDamageModal = ref(false);
 const damageInput = ref(String(selectedDamage.value));
+const cardBeingPlayed = ref(null);
 
-const createAudioContext = () => {
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContextClass) return null;
-  return new AudioContextClass();
-};
+const playCard = (playerIndex, card) => {
+  if (playerIndex !== currentTurn.value) return;
 
-const playTone = (frequency, duration = 0.12, type = 'sine', volume = 0.05, decayTo = 0.0001) => {
-  const context = createAudioContext();
-  if (!context) return;
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  oscillator.type = type;
-  oscillator.frequency.setValueAtTime(frequency, context.currentTime);
-  gain.gain.setValueAtTime(0.0001, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(volume, context.currentTime + 0.01);
-  gain.gain.exponentialRampToValueAtTime(decayTo, context.currentTime + duration);
-  oscillator.connect(gain);
-  gain.connect(context.destination);
-  oscillator.start();
-  oscillator.stop(context.currentTime + duration + 0.02);
-  window.setTimeout(() => context.close(), Math.ceil((duration + 0.2) * 1000));
-};
-
-const playUiTap = () => playTone(540, 0.08, 'square', 0.03);
-const playSuccessChime = () => {
-  playTone(523.25, 0.1, 'triangle', 0.04);
-  window.setTimeout(() => playTone(659.25, 0.1, 'triangle', 0.04), 90);
-};
-const playAttackSound = () => playTone(190, 0.16, 'sawtooth', 0.045);
-const playHitSound = () => {
-  playTone(120, 0.1, 'sine', 0.05);
-  window.setTimeout(() => playTone(75, 0.14, 'sine', 0.04), 70);
-};
-const playShopSound = () => {
-  playTone(330, 0.08, 'triangle', 0.03);
-  window.setTimeout(() => playTone(392, 0.08, 'triangle', 0.03), 70);
-};
-
-const nextTurn = () => {
-  // Donner la récompense uniquement si le joueur courant est encore en vie
-  if (players.value[currentTurn.value].hp > 0) {
-    players.value[currentTurn.value].gold += 2;
+  if (card.type === 'attack') {
+    cardBeingPlayed.value = card;
+    selectedDamage.value = card.damage;
+    isAttacking.value = true;
+    playAttackSound();
+  } else if (card.type === 'heal') {
+    // Jouer la carte de soin immédiatement sur soi-même
+    players.value[playerIndex].hp += card.value;
+    removeCardFromHand(playerIndex, card);
+    playSuccessChime();
+  } else {
+    // Autres types de cartes à implémenter (ex: défense)
+    playUiTap();
   }
+};
 
-  // Chercher le prochain joueur vivant
-  const n = players.value.length;
-  let i = (currentTurn.value + 1) % n;
-  let found = false;
-  for (let k = 0; k < n; k++) {
-    const idx = (i + k) % n;
-    if (players.value[idx].hp > 0) {
-      currentTurn.value = idx;
-      found = true;
-      break;
-    }
+const removeCardFromHand = (playerIndex, cardToRemove) => {
+  const hand = players.value[playerIndex].hand;
+  const index = hand.findIndex(c => c.uid === cardToRemove.uid);
+  if (index > -1) {
+    hand.splice(index, 1);
   }
-  // Si aucun joueur vivant trouvé (cas extrême), garder la valeur incrémentée
-  if (!found) {
-    currentTurn.value = (currentTurn.value + 1) % n;
-  }
-
-  isAttacking.value = false;
-  playUiTap();
-};
-
-const triggerAttackMode = () => {
-  // Si on est déjà en mode attaque, on quitte le mode
-  if (isAttacking.value) {
-    isAttacking.value = false;
-    showDamageModal.value = false;
-    return;
-  }
-  // Ouvrir la modale de saisie au-dessus du bateau
-  playAttackSound();
-  damageInput.value = String(selectedDamage.value);
-  showDamageModal.value = true;
-};
-
-const confirmDamage = () => {
-  const val = parseInt(damageInput.value, 10);
-  if (isNaN(val) || val <= 0) {
-    alert('Veuillez entrer un entier positif.');
-    return;
-  }
-  selectedDamage.value = val;
-  showDamageModal.value = false;
-  isAttacking.value = true;
-  playUiTap();
-};
-
-const cancelDamage = () => {
-  showDamageModal.value = false;
-  playUiTap();
-};
-
-const increaseDamage = () => {
-  const cur = parseInt(damageInput.value, 10) || 0;
-  damageInput.value = String(Math.max(1, cur + 1));
-};
-
-const decreaseDamage = () => {
-  const cur = parseInt(damageInput.value, 10) || 1;
-  playHitSound();
 };
 
 const performAttack = (targetIdx) => {
@@ -425,10 +478,64 @@ const performAttack = (targetIdx) => {
   // Ne pas attaquer un joueur déjà éliminé
   if (players.value[targetIdx].hp <= 0) return;
 
-  // Appliquer le dégât choisi par l'attaquant
-  players.value[targetIdx].hp = Math.max(0, players.value[targetIdx].hp - selectedDamage.value);
-  playShopSound();
-  playHitSound();
+  const attacker = players.value[currentTurn.value];
+  const target = players.value[targetIdx];
+  const attackerBoat = allBoats[attacker.boatIndex];
+  const targetBoat = allBoats[target.boatIndex];
+
+  // Calculer les dégâts (prendre en compte la tempête)
+  let actualDamage = selectedDamage.value;
+  if (currentEvent.value && currentEvent.value.id === 'tempete') {
+    actualDamage += 1;
+  }
+
+  // Pouvoir passif: La Felouque (+1 dégât si la cible a plus de PV)
+  if (attackerBoat.abilityId === 'felouque' && target.hp > attacker.hp) {
+    actualDamage += 1;
+  }
+
+  // Pouvoir passif: Le Cuirassé (-1 dégât reçu, minimum 1)
+  if (targetBoat.abilityId === 'cuirasse') {
+    actualDamage = Math.max(1, actualDamage - 1);
+  }
+
+  // Gérer la brume (50% de chance d'échec)
+  if (currentEvent.value && currentEvent.value.id === 'brume' && Math.random() < 0.5) {
+    alert("L'attaque a manqué à cause de la brume !");
+    playHitSound(); // Bruit d'échec
+  } else {
+    // Appliquer le dégât choisi par l'attaquant
+    target.hp = Math.max(0, target.hp - actualDamage);
+    playShopSound();
+    playHitSound();
+
+    // Pouvoir passif: Le Brick (pioche 1 carte quand attaqué)
+    if (targetBoat.abilityId === 'brick' && target.hp > 0 && target.hand.length < 5) {
+      const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
+      target.hand.push(randomCard);
+    }
+  }
+
+  // Pouvoir passif: Le Brigantin (pioche 2 cartes si on élimine un joueur)
+  if (target.hp === 0 && attackerBoat.abilityId === 'brigantin') {
+    for (let i = 0; i < 2; i++) {
+      if (attacker.hand.length < 5) {
+        const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
+        attacker.hand.push(randomCard);
+      }
+    }
+  }
+
+  // Pouvoir passif: La Frégate (+1 PV si on élimine un joueur)
+  if (target.hp === 0 && attackerBoat.abilityId === 'fregate') {
+    attacker.hp += 1;
+  }
+
+  // Retirer la carte jouée de la main
+  if (cardBeingPlayed.value) {
+    removeCardFromHand(currentTurn.value, cardBeingPlayed.value);
+    cardBeingPlayed.value = null;
+  }
 
   // RÈGLE : Jouer une carte attaque met fin au tour immédiatement
   nextTurn();
@@ -467,6 +574,7 @@ const players = ref(Array.from({ length: 4 }, () => ({
   ready: false, 
   hp: 5, 
   gold: 0,
+  hand: [],
   boatConflict: false
 })));
 
@@ -480,6 +588,7 @@ watch(playerCount, (newCount) => {
         ready: false, 
         hp: 5, 
         gold: 0,
+        hand: [],
         boatConflict: false
       });
     }
@@ -492,20 +601,26 @@ const allReady = computed(() => players.value.every(p => p.ready));
 
 const nextBoat = (idx) => { players.value[idx].boatIndex = (players.value[idx].boatIndex + 1) % allBoats.length; };
 const prevBoat = (idx) => { players.value[idx].boatIndex = (players.value[idx].boatIndex - 1 + allBoats.length) % allBoats.length; };
-const nextCat = (idx) => { players.value[idx].catIndex = (players.value[idx].catIndex + 1) % allCats.length; };
-const prevCat = (idx) => { players.value[idx].catIndex = (players.value[idx].catIndex - 1 + allCats.length) % allCats.length; };
 const toggleReady = (idx) => { 
   const player = players.value[idx];
   if (!player.ready) {
     const isBoatTaken = players.value.some((p, i) => i !== idx && p.ready && p.boatIndex === player.boatIndex);
     if (isBoatTaken) {
       playHitSound();
+      // Force Vue to notice the deep change
       player.boatConflict = true;
-      setTimeout(() => { player.boatConflict = false; }, 2000);
+      players.value[idx] = { ...player }; 
+      setTimeout(() => { 
+        if (players.value[idx]) {
+          players.value[idx].boatConflict = false;
+          players.value[idx] = { ...players.value[idx] }; 
+        }
+      }, 2000);
       return;
     }
   }
   player.ready = !player.ready; 
+  players.value[idx] = { ...player };
   playUiTap();
 };
 
@@ -903,9 +1018,9 @@ onUnmounted(() => {
 }
 
 .ready-button.conflict-error {
-  background: #c62828;
-  color: white;
-  border-color: #8e0000;
+  background: #c62828 !important;
+  color: white !important;
+  border-color: #8e0000 !important;
   animation: shake 0.4s;
 }
 
@@ -1064,118 +1179,81 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.attack-btn {
-  background: #c62828;
-  color: white;
-  border: 2px solid #8e0000;
+.ability-btn {
+  background: #f39c12;
+  color: #3d1c10;
+  border: 2px solid #e67e22;
   font-size: 0.7rem;
   padding: 5px 12px;
   white-space: nowrap;
 }
 
-.attack-btn.active {
-  background: #ff5252;
-  box-shadow: 0 0 15px #ff5252;
-  animation: pulse-red 1s infinite;
-}
-
-.attack-prompt {
+/* --- CARDS IN HAND STYLES --- */
+.player-hand-container {
   position: absolute;
-  top: -120px;
+  top: 110%; /* Display below the player's boat */
   left: 50%;
   transform: translateX(-50%);
-  background: #c62828;
-  color: white;
-  padding: 2px 10px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  white-space: nowrap;
-  z-index: 101;
+  width: max-content;
+  z-index: 90;
 }
 
-.damage-modal {
-  position: absolute;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 102;
+.player-hand {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 
-.damage-modal-content {
+.playing-card {
+  width: 90px;
+  height: 130px;
   background-image: url('/paper.png');
   background-size: cover;
-  padding: 24px 12px;
   border-radius: 8px;
-  min-width: 140px;
-  text-align: center;
-}
-
-.damage-modal-title {
-  color: #3d1c10;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-.damage-input {
-  width: 60px;
-  padding: 4px 6px;
-  font-size: 1rem;
-  text-align: center;
-  border-radius: 6px;
-  border: 1px solid #3d1c10;
-  margin-bottom: 8px;
-}
-
-.damage-modal-actions {
+  border: 3px solid #3d1c10;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
   display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.damage-input-row {
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
   justify-content: center;
-  margin-bottom: 8px;
-}
-
-.damage-step {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: none;
-  font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.2s, filter 0.2s;
+  padding: 5px;
+  text-align: center;
 }
 
-.damage-step.plus {
-  background: #388e3c;
-  color: white;
-  border: 2px solid #2e7d32;
+.playing-card:hover {
+  transform: translateY(-15px) scale(1.1);
+  z-index: 10;
+  filter: drop-shadow(0 0 10px rgba(241, 211, 161, 0.8));
 }
 
-.damage-step.minus {
-  background: #c62828;
-  color: white;
-  border: 2px solid #8e0000;
+.playing-card.attack { border-color: #c62828; }
+.playing-card.defense { border-color: #2b5797; }
+.playing-card.heal { border-color: #2e7d32; }
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 5px;
 }
 
-.damage-modal-actions .attack-confirm {
-  background: #c62828;
-  color: white;
-  border: 2px solid #8e0000;
+.card-name {
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  font-size: 0.7rem;
+  color: #3d1c10;
+  line-height: 1.1;
 }
 
-.damage-modal-actions .cancel-button {
-  background: #3d1c10;
-  color: #f1d3a1;
-  border: 2px solid #f1d3a1;
+.card-value {
+  margin-top: auto;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #c62828;
 }
 
-.damage-modal-actions .action-button:hover { transform: translateY(-2px); }
+.playing-card.heal .card-value { color: #2e7d32; }
+.playing-card.defense .card-value { color: #2b5797; }
 
 .selectable-target {
   cursor: crosshair;
@@ -1350,7 +1428,183 @@ onUnmounted(() => {
   .lobby-title { font-size: 1.2rem; }
 }
 
+/* --- EVENT OVERLAY STYLES --- */
+.event-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.event-content {
+  background-image: url('/paper.png');
+  background-size: cover;
+  background-position: center;
+  padding: 5vmin;
+  border-radius: 12px;
+  border: 5px solid #3d1c10;
+  box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 600px;
+  width: 80vw;
+  animation: scaleUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.event-round {
+  color: #c62828;
+  font-family: 'Georgia', serif;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.event-icon {
+  font-size: 5rem;
+  margin: 10px 0;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+
+.event-title {
+  font-family: 'Georgia', serif;
+  color: #3d1c10;
+  font-size: 2.5rem;
+  margin: 10px 0;
+  text-transform: uppercase;
+}
+
+.event-desc {
+  font-family: 'Georgia', serif;
+  color: #5d2a18;
+  font-size: 1.4rem;
+  font-style: italic;
+  margin: 20px 0 30px 0;
+  line-height: 1.4;
+}
+
+.event-button {
+  background: #3d1c10;
+  color: #f1d3a1;
+  border: 3px solid #5d2a18;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.event-button:hover {
+  transform: translateY(-3px);
+  background: #5d2a18;
+  color: white;
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* --- SHOP OVERLAY STYLES --- */
+.resource-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.resource-content {
+  background-image: url('/paper.png');
+  background-size: cover;
+  background-position: center;
+  padding: 4vmin;
+  border-radius: 8px;
+  border: 4px solid #3d1c10;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  text-align: center;
+  max-width: 90vw;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.resource-title {
+  font-family: 'Georgia', serif;
+  color: #3d1c10;
+  margin-top: 0;
+  text-transform: uppercase;
+  font-size: 2rem;
+  border-bottom: 2px solid #3d1c10;
+  padding-bottom: 10px;
+}
+
+.resource-desc {
+  font-family: 'Georgia', serif;
+  color: #5d2a18;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 20px 0 30px 0;
+}
+
+.resource-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.resource-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-family: 'Georgia', serif;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+  border: 3px solid #3d1c10;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+.resource-button:hover {
+  transform: translateY(-5px);
+  filter: brightness(1.1);
+}
+
+.gold-btn {
+  background: #f1c40f;
+  color: #3d1c10;
+}
+
+.cards-btn {
+  background: #3498db;
+  color: white;
+}
+
+.btn-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .shop-overlay {
   position: absolute;
   top: 0;
