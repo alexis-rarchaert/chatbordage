@@ -7,12 +7,12 @@
       <div class="hero-scene" aria-hidden="true">
         <img src="/hero-banner.webp" alt="" class="hero-banner-img" />
       </div>
-      <div class="hero-card">
+      <div class="hero-card hero-animate-card">
         <h1 class="hero-title">ChatBordage !</h1>
         <p class="hero-desc">{{ $t('hero.description') }}</p>
         <RouterLink to="/preinscription" class="btn-primary">{{ $t('cta.buy') }}</RouterLink>
       </div>
-      <div class="hero-deck" aria-hidden="true">
+      <div class="hero-deck hero-animate-deck" aria-hidden="true">
         <div class="card-mini card-mini-1">Carte</div>
         <div class="card-mini card-mini-2">Carte</div>
         <div class="card-mini card-mini-3">Carte</div>
@@ -25,7 +25,7 @@
     </div>
     <section class="section-inshort">
       <div class="container">
-        <div class="brief-scroll">
+        <div class="brief-scroll" v-reveal>
           <span class="corner tl" aria-hidden="true">✦</span>
           <span class="corner tr" aria-hidden="true">✦</span>
           <span class="corner bl" aria-hidden="true">✦</span>
@@ -59,14 +59,14 @@
     </div>
     <section class="section-concept">
       <div class="container concept-grid">
-        <div class="concept-text">
+        <div class="concept-text" v-reveal="'left'">
           <p v-html="$t('concept.p1')"></p>
           <span class="bullet-divider">•</span>
           <p v-html="$t('concept.p2')"></p>
           <span class="bullet-divider">•</span>
           <p v-html="$t('concept.p3')"></p>
         </div>
-        <div class="concept-card">
+        <div class="concept-card" v-reveal="'right'">
           <div class="carousel small">
             <div class="carousel-head">{{ $t('slides.gameType.title') }}</div>
             <div class="carousel-body">
@@ -84,7 +84,7 @@
     </div>
     <section class="section-ships">
       <div class="container">
-        <div class="ship-carousel">
+        <div class="ship-carousel" v-reveal="'zoom'">
           <button class="carousel-arrow left" @click="prevShip" aria-label="Précédent">‹</button>
           <div class="ship-body">
             <img :src="currentShip.image" :alt="currentShip.name" class="ship-image" />
@@ -96,32 +96,67 @@
       </div>
     </section>
 
+    <!-- ============ RÔLES SECRETS ============ -->
+    <div class="section-banner">
+      <h2>Les rôles secrets</h2>
+    </div>
+    <section class="section-roles">
+      <div class="container">
+        <p class="roles-intro" v-reveal>
+          Au début de la partie, chacun reçoit une <strong>mission secrète</strong>. Seul le rôle du <strong>Capitaine</strong> est dévoilé à tous. Saurez-vous deviner qui complote contre qui ?
+        </p>
+        <div class="roles-grid">
+          <article
+            v-for="(role, idx) in roles"
+            :key="role.name"
+            class="role-tile"
+            v-reveal="'zoom'"
+            :style="{ transitionDelay: `${idx * 80}ms` }"
+          >
+            <div class="role-tile-img-wrap">
+              <img :src="role.image" :alt="role.cat" class="role-tile-img" />
+            </div>
+            <h3 class="role-tile-name">{{ role.name }}</h3>
+            <div class="role-tile-cat">{{ role.cat }}</div>
+            <p class="role-tile-mission">{{ role.mission }}</p>
+            <span class="role-tile-badge" :class="{ public: role.public }">
+              {{ role.public ? 'Public' : 'Secret' }}
+            </span>
+          </article>
+        </div>
+        <p class="roles-cta">
+          Toutes les missions, le détail des conditions et les pouvoirs : voir le
+          <RouterLink to="/reglement#roles" class="roles-link">règlement complet</RouterLink>.
+        </p>
+      </div>
+    </section>
+
     <!-- ============ MÉCANIQUE IMPITOYABLE ============ -->
     <div class="section-banner">
       <h2>{{ $t('sections.mechanics') }}</h2>
     </div>
     <section class="section-mechanics">
       <div class="container">
-        <div class="mech-row">
+        <div class="mech-row" v-reveal>
           <div class="mech-text">
             <h3>{{ $t('mechanics.resources.title') }}</h3>
             <p>{{ $t('mechanics.resources.text') }}</p>
           </div>
-          <img src="/bateaux/Galion.webp" alt="" class="mech-image" />
+          <img src="/bateaux/Galion.webp" alt="" class="mech-image float-ship" />
         </div>
-        <div class="mech-row reverse">
+        <div class="mech-row reverse" v-reveal>
           <div class="mech-text">
             <h3>{{ $t('mechanics.attacks.title') }}</h3>
             <p>{{ $t('mechanics.attacks.text') }}</p>
           </div>
-          <img src="/bateaux/Fregate.webp" alt="" class="mech-image" />
+          <img src="/bateaux/Fregate.webp" alt="" class="mech-image float-ship" />
         </div>
-        <div class="mech-row">
+        <div class="mech-row" v-reveal>
           <div class="mech-text">
             <h3>{{ $t('mechanics.noMercy.title') }}</h3>
             <p>{{ $t('mechanics.noMercy.text') }}</p>
           </div>
-          <img src="/bateaux/Vaisseau_Fantôme.webp" alt="" class="mech-image" />
+          <img src="/bateaux/Vaisseau_Fantôme.webp" alt="" class="mech-image float-ship" />
         </div>
       </div>
     </section>
@@ -171,6 +206,44 @@ import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 
 const { t } = useI18n()
+
+const roles = [
+  {
+    name: 'Le Capitaine',
+    cat: 'Chat-rles Henri',
+    image: '/chats/chat-rles-henri.png',
+    mission: 'Survivre jusqu\'au duel final. Connu de tous, il commence avec +1 PV.',
+    public: true
+  },
+  {
+    name: 'Le Protecteur',
+    cat: 'Miranda',
+    image: '/chats/miranda.png',
+    mission: 'Garder le Capitaine en vie jusqu\'au bout — ils gagnent ensemble.',
+    public: false
+  },
+  {
+    name: 'Le Chasseur',
+    cat: 'Kim',
+    image: '/chats/kim.png',
+    mission: 'Être le premier à couler 2 navires ennemis.',
+    public: false
+  },
+  {
+    name: 'Le Renégat',
+    cat: 'Sylas',
+    image: '/chats/sylas.png',
+    mission: 'Être le tout dernier survivant. Aucun allié, aucune pitié.',
+    public: false
+  },
+  {
+    name: 'Le Contrebandier',
+    cat: 'Maskey',
+    image: '/chats/maskey.png',
+    mission: 'Accumuler 15 pièces, à n\'importe quel moment de la partie.',
+    public: false
+  }
+]
 
 
 const ships = [
@@ -224,6 +297,14 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+.hero-animate-card {
+  animation: hero-card-zoom 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.15s;
+}
+.hero-animate-deck {
+  animation: hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.4s;
 }
 .hero-scene::after {
   content: '';
@@ -619,6 +700,111 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   font-weight: 600;
 }
 
+/* ========= ROLES ========= */
+.section-roles {
+  padding: var(--section-py) 0;
+}
+.roles-intro {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 40px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.roles-intro :deep(strong) { color: var(--color-gold); }
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+}
+.role-tile {
+  position: relative;
+  background: linear-gradient(160deg, rgba(79, 18, 25, 0.95) 0%, rgba(60, 12, 18, 0.95) 100%);
+  background-image:
+    linear-gradient(160deg, rgba(79, 18, 25, 0.94) 0%, rgba(60, 12, 18, 0.94) 100%),
+    url('/paper.png');
+  background-size: 100% 100%, cover;
+  background-blend-mode: multiply;
+  border: 2px solid var(--color-gold-dark);
+  border-radius: var(--radius-md);
+  padding: 20px 16px 60px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.role-tile:hover {
+  transform: translateY(-8px) rotate(-0.5deg);
+  border-color: var(--color-gold);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.45);
+}
+.role-tile-img-wrap {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 12px;
+  background: radial-gradient(circle, rgba(200, 162, 74, 0.2) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.role-tile-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s ease;
+}
+.role-tile:hover .role-tile-img {
+  transform: scale(1.08) rotate(2deg);
+}
+.role-tile-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--color-gold);
+  margin-bottom: 2px;
+  letter-spacing: 0.03em;
+}
+.role-tile-cat {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.role-tile-mission {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-light);
+  margin: 0;
+}
+.role-tile-badge {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-burgundy-dark);
+  color: var(--color-gold);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-gold-dark);
+}
+.role-tile-badge.public {
+  background: var(--color-gold);
+  color: var(--color-burgundy-dark);
+  border-color: var(--color-burgundy-dark);
+}
+.roles-cta {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+.roles-link {
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
 /* ========= MECHANICS ========= */
 .section-mechanics {
   padding: var(--section-py) 0;
@@ -750,6 +936,11 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
     grid-template-columns: 1fr;
     direction: ltr;
   }
+  .roles-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 540px) {
+  .roles-grid { grid-template-columns: 1fr; }
   /* CTA section mobile : pièces plus petites en ligne, pas wrappées */
   .section-cta {
     gap: 16px;

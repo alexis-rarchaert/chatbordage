@@ -147,3 +147,56 @@ img {
   transform: translateY(2px);
   box-shadow: 0 2px 0 var(--color-burgundy-dark), 0 3px 8px rgba(0, 0, 0, 0.3);
 }
+
+/* ============ SCROLL REVEAL ============ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal--left { transform: translateX(-40px); }
+.reveal--right { transform: translateX(40px); }
+.reveal--zoom { transform: scale(0.92); }
+.reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ============ FLOATING SHIPS ============ */
+@keyframes float-ship {
+  0%, 100% { transform: translateY(0) rotate(-0.5deg); }
+  50% { transform: translateY(-12px) rotate(0.5deg); }
+}
+.float-ship {
+  animation: float-ship 6s ease-in-out infinite;
+}
+.float-ship:nth-of-type(2) { animation-duration: 7s; animation-delay: -2s; }
+.float-ship:nth-of-type(3) { animation-duration: 8s; animation-delay: -4s; }
+
+/* ============ COIN SPIN ============ */
+@keyframes coin-bob {
+  0%, 100% { transform: translateY(0) rotate(var(--coin-rot, 0deg)); }
+  50% { transform: translateY(-6px) rotate(var(--coin-rot, 0deg)); }
+}
+
+/* ============ HERO ENTRY ============ */
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes hero-card-zoom {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes deck-fan-in {
+  from { opacity: 0; transform: translateY(40px) rotate(0deg); }
+}
