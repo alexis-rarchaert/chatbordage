@@ -41,3 +41,5 @@ __screenshots__/
 
 # Claude Code
 .claude/
+
+package-lock.json

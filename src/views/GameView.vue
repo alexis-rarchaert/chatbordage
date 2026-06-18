@@ -54,9 +54,10 @@
 
             <button 
               class="ready-button" 
+              :class="{ 'conflict-error': player.boatConflict }"
               @click="toggleReady(index)"
             >
-              {{ player.ready ? $t('game.lobby.ready') : $t('game.lobby.notReady') }}
+              {{ player.boatConflict ? 'Déjà pris !' : (player.ready ? $t('game.lobby.ready') : $t('game.lobby.notReady')) }}
             </button>
           </div>
         </div>
@@ -208,34 +209,21 @@
           <button class="close-shop" @click="closeShop">✕</button>
           <h2 class="shop-title">{{ $t('header.shop') }}</h2>
           <div class="shop-grid">
-            <!-- Exemple d'articles de boutique -->
-            <div class="shop-item">
-              <div class="item-icon">❤️</div>
+            <div 
+              v-for="item in availableShopItems" 
+              :key="item.id" 
+              class="shop-item"
+              :class="{ 'disabled': players[currentTurn].gold < item.price }"
+              @click="buyItem(item)"
+            >
+              <div class="item-icon">{{ item.icon }}</div>
               <div class="item-info">
-                <span class="item-label">Full Vie</span>
-                <span class="item-price">10 <img src="/coin.png" class="price-coin" /></span>
+                <span class="item-label">{{ item.name }}</span>
+                <span class="item-price">{{ item.price }} <img src="/coin.png" class="price-coin" /></span>
               </div>
             </div>
-            <div class="shop-item">
-              <div class="item-icon">⚔️</div>
-              <div class="item-info">
-                <span class="item-label">+1 Dégât</span>
-                <span class="item-price">10 <img src="/coin.png" class="price-coin" /></span>
-              </div>
-            </div>
-            <div class="shop-item">
-              <div class="item-icon">🎴</div>
-              <div class="item-info">
-                <span class="item-label">+ Cartes</span>
-                <span class="item-price">10 <img src="/coin.png" class="price-coin" /></span>
-              </div>
-            </div>
-            <div class="shop-item">
-              <div class="item-icon">👁️</div>
-              <div class="item-info">
-                <span class="item-label">Voir rôle</span>
-                <span class="item-price">10 <img src="/coin.png" class="price-coin" /></span>
-              </div>
+            <div v-if="availableShopItems.length === 0" class="empty-shop">
+              La boutique est vide !
             </div>
           </div>
         </div>
@@ -292,9 +280,32 @@ const selectedSegment = ref(null);
 const winnerAnimVisible = ref(false);
 const pixelsPerCm = ref(38);
 const playerCount = ref(4);
-const showShop = ref(false);
-const shopRotation = ref(0);
-const currentTurn = ref(0);
+const shopItems = ref([
+  { id: 'heal', name: 'Réparations d\'urgence', icon: '❤️', price: 8, purchased: false },
+  { id: 'dmg', name: 'Poudre noire', icon: '💣', price: 6, purchased: false },
+  { id: 'draw', name: 'Coffre de contrebande', icon: '📦', price: 5, purchased: false },
+  { id: 'spy', name: 'Longue-vue du traître', icon: '🔭', price: 7, purchased: false },
+  { id: 'peace', name: 'Drapeau de trêve', icon: '🏳️', price: 10, purchased: false },
+  { id: 'revive', name: 'Revivre une fois', icon: '✝️', price: 15, purchased: false }
+]);
+
+const availableShopItems = computed(() => shopItems.value.filter(item => !item.purchased));
+
+const buyItem = (item) => {
+  const player = players.value[currentTurn.value];
+  if (player.gold >= item.price && !item.purchased) {
+    player.gold -= item.price;
+    item.purchased = true;
+    playSuccessChime();
+    
+    // Add basic immediate effects for simple items
+    if (item.id === 'heal') {
+      player.hp = Math.max(player.hp, 6); // roughly max hp
+    }
+  } else {
+    playHitSound(); // use as error sound
+  }
+};
 const isAttacking = ref(false);
 const selectedDamage = ref(1);
 const showDamageModal = ref(false);
@@ -451,7 +462,8 @@ const players = ref(Array.from({ length: 4 }, () => ({
   catIndex: getRandomIndex(allCats.length), 
   ready: false, 
   hp: 5, 
-  gold: 0 
+  gold: 0,
+  boatConflict: false
 })));
 
 watch(playerCount, (newCount) => {
@@ -463,7 +475,8 @@ watch(playerCount, (newCount) => {
         catIndex: getRandomIndex(allCats.length), 
         ready: false, 
         hp: 5, 
-        gold: 0 
+        gold: 0,
+        boatConflict: false
       });
     }
   } else if (newCount < currentCount) {
@@ -477,7 +490,20 @@ const nextBoat = (idx) => { players.value[idx].boatIndex = (players.value[idx].b
 const prevBoat = (idx) => { players.value[idx].boatIndex = (players.value[idx].boatIndex - 1 + allBoats.length) % allBoats.length; };
 const nextCat = (idx) => { players.value[idx].catIndex = (players.value[idx].catIndex + 1) % allCats.length; };
 const prevCat = (idx) => { players.value[idx].catIndex = (players.value[idx].catIndex - 1 + allCats.length) % allCats.length; };
-const toggleReady = (idx) => { players.value[idx].ready = !players.value[idx].ready; };
+const toggleReady = (idx) => { 
+  const player = players.value[idx];
+  if (!player.ready) {
+    const isBoatTaken = players.value.some((p, i) => i !== idx && p.ready && p.boatIndex === player.boatIndex);
+    if (isBoatTaken) {
+      playHitSound();
+      player.boatConflict = true;
+      setTimeout(() => { player.boatConflict = false; }, 2000);
+      return;
+    }
+  }
+  player.ready = !player.ready; 
+  playUiTap();
+};
 
 const isBoatAnimVisible = ref(false);
 const animBoatFile = ref(allBoats[0].file);
@@ -870,6 +896,20 @@ onUnmounted(() => {
   background: #4CAF50;
   color: white;
   border-color: white;
+}
+
+.ready-button.conflict-error {
+  background: #c62828;
+  color: white;
+  border-color: #8e0000;
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
 }
 
 .start-game-button {
@@ -1377,8 +1417,24 @@ onUnmounted(() => {
   transition: background 0.2s;
 }
 
-.shop-item:hover {
+.shop-item:hover:not(.disabled) {
   background: rgba(0,0,0,0.1);
+}
+
+.shop-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(80%);
+}
+
+.empty-shop {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  font-family: 'Georgia', serif;
+  color: #3d1c10;
+  font-style: italic;
+  font-size: 1.2rem;
 }
 
 .item-icon {
