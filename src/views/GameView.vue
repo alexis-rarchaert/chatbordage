@@ -95,11 +95,11 @@
               ></div>
               <div 
                 v-for="(player, index) in players" 
-                :key="'cat-' + index" 
-                class="wheel-cat-container"
-                :style="getCatContainerStyle(index)"
+                :key="'boat-' + index" 
+                class="wheel-boat-container"
+                :style="getBoatContainerStyle(index)"
               >
-                <img :src="`/chats/${allCats[player.catIndex].file}`" class="wheel-cat-img" :class="{ 'winner-anim': winnerAnimVisible && index === selectedSegment }" />
+                <img :src="`/bateaux/${allBoats[player.boatIndex].file}`" class="wheel-boat-img" :class="{ 'winner-anim': winnerAnimVisible && index === selectedSegment }" />
               </div>
             </div>
           </div>
@@ -600,11 +600,11 @@ const getSegmentStyle = (index) => {
   };
 };
 
-const getCatContainerStyle = (index) => {
+const getBoatContainerStyle = (index) => {
   const angle = 360 / players.value.length;
   const translateY = players.value.length <= 2 ? '-10vmin' : '-12vmin';
   let ang = index * angle + angle / 2;
-  if (players.value.length <= 2) ang -= 90; // place cats top/bottom instead of left/right
+  if (players.value.length <= 2) ang -= 90; // place boats top/bottom instead of left/right
   return {
     transform: `rotate(${ang}deg) translateY(${translateY})`
   };
@@ -1567,7 +1567,7 @@ onUnmounted(() => {
   transform-origin: 50% 100%;
 }
 
-.wheel-cat-container {
+.wheel-boat-container {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1581,14 +1581,14 @@ onUnmounted(() => {
   transform-origin: 50% 50%;
 }
 
-.wheel-cat-img {
+.wheel-boat-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
 }
 
-.wheel-cat-img.winner-anim {
+.wheel-boat-img.winner-anim {
   animation: winnerPop 0.8s ease-out;
   transform-origin: 50% 50%;
 }
