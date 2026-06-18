@@ -135,12 +135,14 @@
               <button class="action-button finish-turn-btn" @click.stop="nextTurn">
                 {{ $t('game.turn.finish') }}
               </button>
-              <button 
+              <button
                 v-if="allBoats[player.boatIndex].type === 'actif' && !player.abilityUsed"
-                class="action-button ability-btn" 
+                class="action-button ability-btn"
+                :title="allBoats[player.boatIndex].ability"
                 @click.stop="useBoatAbility(index)"
               >
-                Pouvoir Navire
+                <span class="ability-btn-label">Pouvoir Navire</span>
+                <span class="ability-tooltip-bubble">{{ allBoats[player.boatIndex].ability }}</span>
               </button>
             </div>
             
@@ -401,6 +403,12 @@ const seaEvents = [
 const startRound = () => {
   const randomEvent = seaEvents[Math.floor(Math.random() * seaEvents.length)];
   currentEvent.value = randomEvent;
+  // Garantir qu'on repasse par event → ressources même si flags traînaient
+  showShop.value = false;
+  showResourcePhase.value = false;
+  isAttacking.value = false;
+  showDamageModal.value = false;
+  cardBeingPlayed.value = null;
   showEventPhase.value = true;
   playRevealSound();
 };
@@ -729,6 +737,9 @@ const performAttack = (targetIdx) => {
   // Ne pas attaquer un joueur déjà éliminé
   if (players.value[targetIdx].hp <= 0) return;
 
+  // Désactive immédiatement l'attaque pour éviter les double-clics sur d'autres cibles
+  isAttacking.value = false;
+
   const attacker = players.value[currentTurn.value];
   const target = players.value[targetIdx];
   const attackerBoat = allBoats[attacker.boatIndex];
@@ -737,7 +748,8 @@ const performAttack = (targetIdx) => {
   // Trêve : impossible d'attaquer une cible sous protection
   if (target.truceTurnsLeft && target.truceTurnsLeft > 0) {
     alert(`${allCats[target.catIndex].name} est sous Drapeau de trêve, intouchable !`);
-    isAttacking.value = false;
+    // Carte non consommée — on garde le tour pour rejouer
+    isAttacking.value = true;
     playHitSound();
     return;
   }
@@ -816,9 +828,9 @@ const performAttack = (targetIdx) => {
     cardBeingPlayed.value = null;
   }
 
-  // RÈGLE : Jouer une carte attaque met fin au tour immédiatement
-  nextTurn();
   playUiTap();
+  // RÈGLE : Jouer une carte attaque met fin au tour immédiatement (et relance startRound pour le prochain)
+  nextTurn();
 };
 
 const openShop = (rotation) => {
@@ -1486,6 +1498,7 @@ onUnmounted(() => {
 }
 
 .ability-btn {
+  position: relative;
   background: #f39c12;
   color: #3d1c10;
   border: 2px solid #e67e22;
@@ -1493,73 +1506,167 @@ onUnmounted(() => {
   padding: 5px 12px;
   white-space: nowrap;
 }
+.ability-btn .ability-tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: max-content;
+  max-width: 240px;
+  white-space: normal;
+  background: #1a0f10;
+  color: #f7eed8;
+  border: 2px solid #c8a24a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 200;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+}
+.ability-btn .ability-tooltip-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #c8a24a;
+}
+.ability-btn:hover .ability-tooltip-bubble,
+.ability-btn:focus .ability-tooltip-bubble {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
 /* --- CARDS IN HAND STYLES --- */
 .player-hand-container {
   position: absolute;
-  top: 110%; /* Display below the player's boat */
+  top: 105%;
   left: 50%;
   transform: translateX(-50%);
   width: max-content;
   z-index: 90;
+  padding: 12px 0;
 }
 
 .player-hand {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   justify-content: center;
+  align-items: flex-end;
 }
 
 .playing-card {
-  width: 90px;
-  height: 130px;
-  background-image: url('/paper.png');
-  background-size: cover;
-  border-radius: 8px;
-  border: 3px solid #3d1c10;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  width: 96px;
+  height: 138px;
+  background-color: #f3e3c2;
+  background-image:
+    linear-gradient(160deg, rgba(243, 227, 194, 0.92) 0%, rgba(216, 192, 144, 0.92) 100%),
+    url('/paper.png');
+  background-size: 100% 100%, cover;
+  background-blend-mode: multiply;
+  border-radius: 10px;
+  border: 2px solid #4f1219;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px rgba(200, 162, 74, 0.55),
+    inset 0 0 0 3px rgba(243, 227, 194, 0.4);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
-  padding: 5px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), filter 0.2s, box-shadow 0.2s;
+  padding: 12px 8px 10px;
   text-align: center;
+  position: relative;
+  color: #4f1219;
+  overflow: hidden;
+}
+.playing-card::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(168, 133, 47, 0.5);
+  pointer-events: none;
 }
 
 .playing-card:hover {
-  transform: translateY(-15px) scale(1.1);
+  transform: translateY(-22px) scale(1.08) rotate(-1deg);
   z-index: 10;
-  filter: drop-shadow(0 0 10px rgba(241, 211, 161, 0.8));
+  box-shadow:
+    0 18px 32px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 2px rgba(200, 162, 74, 0.85),
+    inset 0 0 0 3px rgba(243, 227, 194, 0.6);
+  filter: drop-shadow(0 0 12px rgba(241, 211, 161, 0.6));
 }
 
-.playing-card.attack { border-color: #c62828; }
-.playing-card.defense { border-color: #2b5797; }
-.playing-card.heal { border-color: #2e7d32; }
+.playing-card.attack {
+  border-color: #8b1c1c;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px rgba(200, 162, 74, 0.55),
+    inset 0 0 0 3px rgba(243, 227, 194, 0.4),
+    inset 0 0 20px rgba(139, 28, 28, 0.18);
+}
+.playing-card.defense {
+  border-color: #1e3a6e;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px rgba(200, 162, 74, 0.55),
+    inset 0 0 0 3px rgba(243, 227, 194, 0.4),
+    inset 0 0 20px rgba(30, 58, 110, 0.18);
+}
+.playing-card.heal {
+  border-color: #1f5a25;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px rgba(200, 162, 74, 0.55),
+    inset 0 0 0 3px rgba(243, 227, 194, 0.4),
+    inset 0 0 20px rgba(31, 90, 37, 0.18);
+}
 
 .card-icon {
-  font-size: 2rem;
-  margin-bottom: 5px;
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-top: 4px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
 }
 
 .card-name {
-  font-family: 'Georgia', serif;
-  font-weight: bold;
-  font-size: 0.7rem;
-  color: #3d1c10;
-  line-height: 1.1;
+  font-family: 'Pirata One', 'Georgia', serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #4f1219;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  padding: 0 2px;
 }
 
 .card-value {
-  margin-top: auto;
-  font-weight: bold;
-  font-size: 0.9rem;
-  color: #c62828;
+  font-family: 'Pirata One', serif;
+  font-weight: 400;
+  font-size: 1.15rem;
+  color: #8b1c1c;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 0 rgba(243, 227, 194, 0.6);
 }
 
-.playing-card.heal .card-value { color: #2e7d32; }
-.playing-card.defense .card-value { color: #2b5797; }
+.playing-card.heal .card-value { color: #1f5a25; }
+.playing-card.defense .card-value { color: #1e3a6e; }
 
 .selectable-target {
   cursor: crosshair;
