@@ -13,6 +13,7 @@
         <a href="/#concept" @click="menuOpen = false">{{ $t('header.theGame') }}</a>
         <RouterLink to="/reglement" @click="menuOpen = false">{{ $t('header.rules') }}</RouterLink>
         <RouterLink to="/boutique" @click="menuOpen = false">{{ $t('header.shop') }}</RouterLink>
+        <RouterLink to="/game" @click="menuOpen = false">{{ $t('header.companion') }}</RouterLink>
         <RouterLink to="/preinscription" class="nav-cta" @click="menuOpen = false">{{ $t('hero.preorder') }}</RouterLink>
         <RouterLink to="/panier" class="cart-link" aria-label="Panier" @click="menuOpen = false">
           <span class="cart-icon" aria-hidden="true">

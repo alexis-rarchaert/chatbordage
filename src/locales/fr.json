@@ -4,12 +4,14 @@
     "home": "Accueil",
     "theGame": "Le Jeu",
     "rules": "Règlement",
-    "shop": "Boutique"
+    "shop": "Boutique",
+    "companion": "Compagnon"
   },
   "hero": {
     "title": "ChatBordage",
     "description": "Incarnez un capitaine félin redoutable ! Recrutez votre équipage, pillez des réserves de croquettes et devenez le pirate le plus craint de l'océan dans ce jeu de société à l'abordage.",
-    "preorder": "Précommander"
+    "preorder": "Précommander",
+    "play": "Application"
   },
   "cards": {
     "mage": "Mage",
@@ -72,7 +74,8 @@
   "digital": {
     "app": "L'<strong>application centrale</strong> gère l'aléatoire et les secrets pour une expérience fluide",
     "events": "Événements de mer : À chaque tour, un événement <strong>aléatoire</strong> s'applique à tous (tempête, brume, île au trésor)",
-    "shop": "La <strong>Boutique</strong> : Dépensez vos pièces pour acheter des bonus puissants et uniques (comme révéler le rôle d'un joueur, se soigner, ou obtenir +2 dégâts sur une attaque). Une fois acheté, l'objet disparaît pour tout le monde !"
+    "shop": "La <strong>Boutique</strong> : Dépensez vos pièces pour acheter des bonus puissants et uniques (comme révéler le rôle d'un joueur, se soigner, ou obtenir +2 dégâts sur une attaque). Une fois acheté, l'objet disparaît pour tout le monde !",
+    "playLink": "Lancer l'Application Compagnon"
   },
   "cta": {
     "buy": "ACHETER",
@@ -532,6 +535,52 @@
       "longDesc": {
         "0": "L'édition ultime pour les vrais loups de mer. Tu reçois tout : le jeu de base, les stickers, le mug Capitaine, plus un set exclusif de cartes Navire en finition dorée à chaud (les 15 navires en version premium, foilées, non disponibles à l'unité).",
         "1": "Présenté dans un coffre en bois sérigraphié à la patte de chat, avec un certificat d'authenticité numéroté à la main. Tirage limité à 500 exemplaires."
+      }
+    }
+  },
+  "legalPage": {
+    "title": "Mentions Légales",
+    "sections": {
+      "editor": {
+        "title": "Éditeur du site",
+        "content": "Ce site internet est un produit développé par des étudiants du BUT MMI de Castres et Troyes, dans le cadre de leur formation universitaire."
+      },
+      "hosting": {
+        "title": "Hébergement",
+        "content": "Le site est hébergé par <a href=\"https://notabl.fr\" target=\"_blank\" rel=\"noopener noreferrer\">Notabl.fr</a>."
+      },
+      "intellectualProperty": {
+        "title": "Propriété intellectuelle",
+        "content": "Tous les éléments de ce site (textes, illustrations, logos, etc.) sont la propriété exclusive du projet ChatBordage ou de leurs auteurs respectifs, sauf mention contraire. Toute reproduction est interdite sans autorisation préalable."
+      },
+      "privacy": {
+        "title": "Données personnelles et cookies",
+        "content": "Conformément à la réglementation sur la protection des données personnelles, les informations collectées via le formulaire de préinscription sont utilisées exclusivement dans le cadre de ce projet et ne seront jamais revendues ou cédées à des tiers."
+      }
+    }
+  },
+  "tosPage": {
+    "title": "Conditions Générales de Vente",
+    "sections": {
+      "purpose": {
+        "title": "1. Objet",
+        "content": "Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre le projet étudiant ChatBordage et toute personne effectuant une précommande ou un achat sur le site."
+      },
+      "validation": {
+        "title": "2. Validation de commande",
+        "content": "Toute précommande passée sur le site vaut acceptation pleine et entière des présentes CGV. Dans le cadre de ce projet d'études, les commandes sont simulées à des fins pédagogiques (aucune commande ne sera expédiée)."
+      },
+      "prices": {
+        "title": "3. Tarifs et Paiement",
+        "content": "Les prix affichés sur la boutique sont indiqués en Euros (€) toutes taxes comprises (TTC). Les modes de paiement acceptés sont indiqués lors de la finalisation de la commande."
+      },
+      "delivery": {
+        "title": "4. Livraison",
+        "content": "Dans le cadre de ce projet pédagogique fictif, aucune commande ne sera expédiée et aucun produit ne sera livré à l'adresse indiquée."
+      },
+      "withdrawal": {
+        "title": "5. Droit de rétractation",
+        "content": "Conformément à la législation en vigueur, vous disposez d'un droit de rétractation de 14 jours à compter de la réception de vos produits."
       }
     }
   }

@@ -20,5 +20,5 @@ export async function insertPreinscription(payload: Preinscription) {
     console.info('[Supabase] Mock insert:', payload)
     return { data: payload, error: null }
   }
-  return await supabase.from('preinscriptions').insert(payload).select().single()
+  return await supabase.from('preinscriptions').insert(payload)
 }

@@ -10,7 +10,10 @@
       <div class="hero-card hero-animate-card">
         <h1 class="hero-title">ChatBordage !</h1>
         <p class="hero-desc">{{ $t('hero.description') }}</p>
-        <RouterLink to="/preinscription" class="btn-primary">{{ $t('cta.buy') }}</RouterLink>
+        <div class="hero-actions">
+          <RouterLink to="/preinscription" class="btn-primary">{{ $t('cta.buy') }}</RouterLink>
+          <RouterLink to="/game" class="btn-secondary">{{ $t('hero.play') }}</RouterLink>
+        </div>
       </div>
       <div class="hero-deck hero-animate-deck" aria-hidden="true">
         <div class="card-mini card-mini-1">{{ $t('cards.card') }}</div>
@@ -168,11 +171,16 @@
         <div class="packshot" v-reveal="'left'">
           <img src="/packshot.webp" alt="Boîte du jeu ChatBordage en boutique" class="packshot-img" />
         </div>
-        <ul class="digital-bullets" v-reveal="'right'">
-          <li v-html="$t('digital.app')"></li>
-          <li v-html="$t('digital.events')"></li>
-          <li v-html="$t('digital.shop')"></li>
-        </ul>
+        <div class="digital-info" v-reveal="'right'">
+          <ul class="digital-bullets">
+            <li v-html="$t('digital.app')"></li>
+            <li v-html="$t('digital.events')"></li>
+            <li v-html="$t('digital.shop')"></li>
+          </ul>
+          <div class="digital-actions">
+            <RouterLink to="/game" class="btn-primary">{{ $t('digital.playLink') }}</RouterLink>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -969,5 +977,39 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
     order: 2;
   }
   .cta-center { order: 1; }
+}
+
+/* ========= ADDED CTA ACTIONS STYLE ========= */
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 480px) {
+  .hero-actions {
+    flex-direction: row;
+    align-items: center;
+  }
+  .hero-actions .btn-primary,
+  .hero-actions .btn-secondary {
+    flex: 1;
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+}
+
+.digital-info {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.digital-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+@media (max-width: 900px) {
+  .digital-actions {
+    justify-content: center;
+  }
 }
 </style>

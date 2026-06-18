@@ -148,6 +148,35 @@ img {
   box-shadow: 0 2px 0 var(--color-burgundy-dark), 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
+.btn-secondary {
+  display: inline-block;
+  background: transparent;
+  color: var(--color-gold);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  border: 2px solid var(--color-gold);
+  padding: 14px 32px;
+  border-radius: var(--radius-md);
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 4px 0 var(--color-burgundy-dark), 0 6px 14px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  background: var(--color-gold);
+  color: var(--color-burgundy-dark);
+  box-shadow: 0 6px 0 var(--color-burgundy-dark), 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--color-burgundy-dark), 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* ============ SCROLL REVEAL ============ */
 .reveal {
   opacity: 0;

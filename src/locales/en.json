@@ -4,12 +4,14 @@
     "home": "Home",
     "theGame": "The Game",
     "rules": "Rules",
-    "shop": "Shop"
+    "shop": "Shop",
+    "companion": "Companion"
   },
   "hero": {
     "title": "ChatBordage",
     "description": "Embark as a formidable feline captain! Recruit your crew, loot kibble reserves, and become the ocean's most feared pirate in this boarding board game.",
-    "preorder": "Pre-order"
+    "preorder": "Pre-order",
+    "play": "Companion App"
   },
   "cards": {
     "mage": "Mage",
@@ -72,7 +74,8 @@
   "digital": {
     "app": "The <strong>central app</strong> manages randomness and secrets for a smooth experience",
     "events": "Sea Events: Each turn, a <strong>random</strong> event applies to all (storm, fog, treasure island)",
-    "shop": "The <strong>Shop</strong>: Spend your coins to buy powerful and unique bonuses (like revealing a player's role, healing, or getting +2 damage on an attack). Once bought, the item disappears for everyone!"
+    "shop": "The <strong>Shop</strong>: Spend your coins to buy powerful and unique bonuses (like revealing a player's role, healing, or getting +2 damage on an attack). Once bought, the item disappears for everyone!",
+    "playLink": "Launch Companion App"
   },
   "cta": {
     "buy": "BUY",
@@ -532,6 +535,52 @@
       "longDesc": {
         "0": "The ultimate edition for true sea dogs. You receive everything: the base game, the stickers, the Captain mug, plus an exclusive set of Ship cards with hot foil finish (the 15 ships in premium, foiled versions, not available individually).",
         "1": "Presented in a wooden chest screen-printed with a cat paw, with a hand-numbered certificate of authenticity. Limited edition of 500 copies."
+      }
+    }
+  },
+  "legalPage": {
+    "title": "Legal Mentions",
+    "sections": {
+      "editor": {
+        "title": "Website Publisher",
+        "content": "This website is a product developed by students from BUT MMI Castres and Troyes as part of their academic training."
+      },
+      "hosting": {
+        "title": "Hosting",
+        "content": "The site is hosted by <a href=\"https://notabl.fr\" target=\"_blank\" rel=\"noopener noreferrer\">Notabl.fr</a>."
+      },
+      "intellectualProperty": {
+        "title": "Intellectual Property",
+        "content": "All elements of this site (texts, illustrations, logos, etc.) are the exclusive property of the ChatBordage project or their respective authors, unless stated otherwise. Any reproduction is prohibited without prior authorization."
+      },
+      "privacy": {
+        "title": "Personal Data and Cookies",
+        "content": "In accordance with personal data protection regulations, information collected via the pre-registration form is used exclusively for this project and will never be sold or transferred to third parties."
+      }
+    }
+  },
+  "tosPage": {
+    "title": "Terms and Conditions of Sale",
+    "sections": {
+      "purpose": {
+        "title": "1. Purpose",
+        "content": "These Terms and Conditions of Sale (TCS) govern the contractual relationship between the ChatBordage student project and any person making a pre-order or purchase on the site."
+      },
+      "validation": {
+        "title": "2. Order Validation",
+        "content": "Any pre-order placed on the site constitutes full and complete acceptance of these terms. As part of this student project, orders are simulated for educational purposes (no orders will be shipped)."
+      },
+      "prices": {
+        "title": "3. Prices and Payment",
+        "content": "Prices displayed in the shop are indicated in Euros (€) including all taxes (VAT). Accepted payment methods are indicated during checkout."
+      },
+      "delivery": {
+        "title": "4. Delivery",
+        "content": "As part of this mock educational project, no orders will be shipped and no products will be delivered to the specified address."
+      },
+      "withdrawal": {
+        "title": "5. Right of Withdrawal",
+        "content": "In accordance with current legislation, you have a 14-day right of withdrawal starting from the receipt of your products."
       }
     }
   }

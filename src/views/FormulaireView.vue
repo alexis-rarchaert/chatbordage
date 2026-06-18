@@ -28,7 +28,7 @@
 
         <label class="checkbox">
           <input v-model="acceptTos" type="checkbox" required />
-          <span>{{ $t('form.tosAccept') }} <a href="#">{{ $t('footer.tos') }}</a></span>
+          <span>{{ $t('form.tosAccept') }} <RouterLink to="/cgv" target="_blank">{{ $t('footer.tos') }}</RouterLink></span>
         </label>
 
         <button type="submit" class="btn-primary submit-btn" :disabled="loading">

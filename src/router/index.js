@@ -7,6 +7,8 @@ import BoutiqueView from '../views/BoutiqueView.vue'
 import ProductView from '../views/ProductView.vue'
 import CartView from '../views/CartView.vue'
 import CheckoutSuccessView from '../views/CheckoutSuccessView.vue'
+import LegalView from '../views/LegalView.vue'
+import TosView from '../views/TosView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +52,16 @@ const router = createRouter({
       path: '/commande/merci',
       name: 'checkout-success',
       component: CheckoutSuccessView
+    },
+    {
+      path: '/mentions-legales',
+      name: 'legal',
+      component: LegalView
+    },
+    {
+      path: '/cgv',
+      name: 'tos',
+      component: TosView
     }
   ]
 })
