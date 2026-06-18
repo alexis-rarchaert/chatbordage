@@ -3,65 +3,65 @@
     <SiteHeader />
 
     <div v-if="!product" class="pp-empty container">
-      <h1>Produit introuvable</h1>
-      <p>Cet article a peut-être coulé en mer.</p>
-      <RouterLink to="/boutique" class="btn-primary">Retour à la boutique</RouterLink>
+      <h1>{{ $t('product.notFound') }}</h1>
+      <p>{{ $t('product.notFoundDesc') }}</p>
+      <RouterLink to="/boutique" class="btn-primary">{{ $t('product.backToShop') }}</RouterLink>
     </div>
 
     <main v-else class="pp-main container">
       <nav class="pp-breadcrumb">
-        <RouterLink to="/">Accueil</RouterLink>
+        <RouterLink to="/">{{ $t('header.home') }}</RouterLink>
         <span class="sep">›</span>
-        <RouterLink to="/boutique">Boutique</RouterLink>
+        <RouterLink to="/boutique">{{ $t('header.shop') }}</RouterLink>
         <span class="sep">›</span>
-        <span class="current">{{ product.name }}</span>
+        <span class="current">{{ $t('products.' + product.id + '.name') }}</span>
       </nav>
 
       <div class="pp-layout">
         <div class="pp-media" v-reveal="'left'">
-          <span v-if="product.badge" class="pp-badge">{{ product.badge }}</span>
-          <img v-if="product.image" :src="product.image" :alt="product.name" class="pp-img" />
+          <span v-if="product.badge" class="pp-badge">{{ $t('products.' + product.id + '.badge') }}</span>
+          <img v-if="product.image" :src="product.image" :alt="$t('products.' + product.id + '.name')" class="pp-img" />
           <div v-else class="pp-placeholder" aria-hidden="true">
             <span>{{ product.icon }}</span>
           </div>
         </div>
 
         <div class="pp-info" v-reveal="'right'">
-          <h1 class="pp-title">{{ product.name }}</h1>
-          <p class="pp-short">{{ product.shortDesc }}</p>
+          <h1 class="pp-title">{{ $t('products.' + product.id + '.name') }}</h1>
+          <p class="pp-short">{{ $t('products.' + product.id + '.shortDesc') }}</p>
 
           <div class="pp-price">
             <span class="amount">{{ formatPrice(product.price) }}</span>
             <span class="pp-stock" v-if="product.stock != null">
               <span class="dot" :class="{ low: product.stock < 50 }"></span>
-              {{ product.stock > 0 ? 'En stock' : 'Rupture' }}
+              {{ product.stock > 0 ? $t('product.inStock') : $t('product.outOfStock') }}
             </span>
           </div>
 
           <div class="pp-actions">
             <QuantitySelector v-model="qty" :min="1" :max="99" />
             <button class="btn-primary pp-add" @click="onAdd">
-              <span v-if="!justAdded">Ajouter au panier</span>
-              <span v-else>Ajouté ✓ — total {{ inCart }} dans le panier</span>
+              <span v-if="!justAdded">{{ $t('shop.addToCart') }}</span>
+              <span v-else>{{ $t('product.addedToCart', { count: inCart }) }}</span>
             </button>
           </div>
 
           <div v-if="product.features?.length" class="pp-features">
-            <h3>Inclus :</h3>
+            <h3>{{ $t('product.includes') }}</h3>
             <ul>
-              <li v-for="f in product.features" :key="f">{{ f }}</li>
+              <li v-for="(f, idx) in product.features" :key="f">{{ $t('products.' + product.id + '.features.' + idx) }}</li>
             </ul>
           </div>
         </div>
       </div>
 
       <section class="pp-desc">
-        <h2>Description</h2>
-        <p v-for="(p, i) in product.longDesc" :key="i">{{ p }}</p>
+        <h2>{{ $t('product.description') }}</h2>
+        <p v-for="idx in product.longDesc.length" :key="idx">{{ $t('products.' + product.id + '.longDesc.' + (idx - 1)) }}</p>
       </section>
 
       <section v-if="related.length" class="pp-related">
-        <h2>Tu aimeras aussi</h2>
+        <h2>{{ $t('product.related') }}</h2>
         <div class="pp-related-grid">
           <RouterLink
             v-for="r in related"
@@ -70,11 +70,11 @@
             class="pp-related-card"
           >
             <div class="pp-related-media">
-              <img v-if="r.image" :src="r.image" :alt="r.name" />
+              <img v-if="r.image" :src="r.image" :alt="$t('products.' + r.id + '.name')" />
               <span v-else class="pp-related-icon">{{ r.icon }}</span>
             </div>
             <div class="pp-related-body">
-              <h3>{{ r.name }}</h3>
+              <h3>{{ $t('products.' + r.id + '.name') }}</h3>
               <span class="pp-related-price">{{ formatPrice(r.price) }}</span>
             </div>
           </RouterLink>

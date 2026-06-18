@@ -3,28 +3,28 @@
     <SiteHeader />
 
     <main class="cart-main container">
-      <h1 class="cart-title">Mon panier</h1>
+      <h1 class="cart-title">{{ $t('cart.title') }}</h1>
 
       <div v-if="lines.length === 0" class="cart-empty">
         <div class="cart-empty-icon" aria-hidden="true">🦴</div>
-        <p>Ton panier est aussi vide qu'un coffre pillé.</p>
-        <RouterLink to="/boutique" class="btn-primary">Aller à la boutique</RouterLink>
+        <p>{{ $t('cart.empty') }}</p>
+        <RouterLink to="/boutique" class="btn-primary">{{ $t('cart.goToShop') }}</RouterLink>
       </div>
 
       <div v-else class="cart-layout">
         <div class="cart-items">
           <article v-for="line in lines" :key="line.product.id" class="cart-line">
             <RouterLink :to="`/boutique/${line.product.slug}`" class="cart-line-media">
-              <img v-if="line.product.image" :src="line.product.image" :alt="line.product.name" />
+              <img v-if="line.product.image" :src="line.product.image" :alt="$t('products.' + line.product.id + '.name')" />
               <div v-else class="cart-line-placeholder">{{ line.product.icon }}</div>
             </RouterLink>
 
             <div class="cart-line-body">
               <RouterLink :to="`/boutique/${line.product.slug}`" class="cart-line-name">
-                {{ line.product.name }}
+                {{ $t('products.' + line.product.id + '.name') }}
               </RouterLink>
-              <p class="cart-line-desc">{{ line.product.shortDesc }}</p>
-              <div class="cart-line-unit">{{ formatPrice(line.product.price) }} l'unité</div>
+              <p class="cart-line-desc">{{ $t('products.' + line.product.id + '.shortDesc') }}</p>
+              <div class="cart-line-unit">{{ formatPrice(line.product.price) }} {{ $t('cart.perUnit') }}</div>
             </div>
 
             <div class="cart-line-controls">
@@ -34,8 +34,8 @@
                 :max="99"
                 @update:model-value="v => cart.setQuantity(line.product.id, v)"
               />
-              <button class="cart-line-remove" @click="cart.remove(line.product.id)" aria-label="Retirer">
-                Retirer
+              <button class="cart-line-remove" @click="cart.remove(line.product.id)" :aria-label="$t('cart.remove')">
+                {{ $t('cart.remove') }}
               </button>
             </div>
 
@@ -44,31 +44,31 @@
             </div>
           </article>
 
-          <button class="cart-clear" @click="onClear">Vider le panier</button>
+          <button class="cart-clear" @click="onClear">{{ $t('cart.clear') }}</button>
         </div>
 
         <aside class="cart-summary">
-          <h2>Récapitulatif</h2>
+          <h2>{{ $t('cart.summary') }}</h2>
           <div class="summary-row">
-            <span>Articles ({{ totalItems }})</span>
+            <span>{{ $t('cart.itemsCount', { count: totalItems }) }}</span>
             <span>{{ formatPrice(totalPrice) }}</span>
           </div>
           <div class="summary-row">
-            <span>Livraison</span>
-            <span class="summary-free">Offerte</span>
+            <span>{{ $t('cart.shipping') }}</span>
+            <span class="summary-free">{{ $t('cart.free') }}</span>
           </div>
           <div class="summary-row total">
-            <span>Total</span>
+            <span>{{ $t('cart.total') }}</span>
             <span>{{ formatPrice(totalPrice) }}</span>
           </div>
           <button class="btn-primary summary-cta" @click="onCheckout" :disabled="!lines.length || checkoutLoading">
-            {{ checkoutLoading ? 'Redirection…' : 'Passer commande' }}
+            {{ checkoutLoading ? $t('cart.redirecting') : $t('cart.checkout') }}
           </button>
           <p v-if="checkoutError" class="checkout-error">{{ checkoutError }}</p>
           <p class="summary-note">
-            Paiement sécurisé via Stripe. Tu seras redirigé sur leur page.
+            {{ $t('cart.securePaymentNote') }}
           </p>
-          <RouterLink to="/boutique" class="summary-back">← Continuer mes achats</RouterLink>
+          <RouterLink to="/boutique" class="summary-back">{{ $t('cart.continueShopping') }}</RouterLink>
         </aside>
       </div>
     </main>
@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import QuantitySelector from '../components/QuantitySelector.vue'
@@ -87,6 +88,7 @@ import { useCart } from '../lib/cart'
 import { formatPrice } from '../lib/products'
 import { startCheckout } from '../lib/checkout'
 
+const { t } = useI18n()
 const cart = useCart()
 const { lines, totalItems, totalPrice } = cart
 const router = useRouter()
@@ -95,7 +97,7 @@ const checkoutLoading = ref(false)
 const checkoutError = ref('')
 
 function onClear() {
-  if (confirm('Vider le panier ?')) cart.clear()
+  if (confirm(t('cart.confirmClear'))) cart.clear()
 }
 
 async function onCheckout() {
@@ -104,7 +106,7 @@ async function onCheckout() {
   const payload = lines.value.map(l => ({ id: l.product.id, quantity: l.quantity }))
   const { ok, error } = await startCheckout(payload)
   if (!ok) {
-    checkoutError.value = error || 'Une erreur est survenue'
+    checkoutError.value = error || t('cart.error')
     checkoutLoading.value = false
   }
 }

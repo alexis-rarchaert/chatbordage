@@ -4,12 +4,12 @@
 
     <div class="shop-banner">
       <img src="/hero-banner.webp" alt="" class="shop-banner-img" />
-      <h1 class="shop-banner-title">Boutique</h1>
+      <h1 class="shop-banner-title">{{ $t('header.shop') }}</h1>
     </div>
 
     <main class="shop-main container">
       <p class="shop-intro" v-reveal>
-        Embarque l'aventure chez toi : le jeu, des goodies, et l'édition collector pour les vrais loups de mer.
+        {{ $t('shop.intro') }}
       </p>
 
       <div class="shop-grid">
@@ -21,18 +21,18 @@
           :style="{ transitionDelay: `${idx * 80}ms` }"
         >
           <RouterLink :to="`/boutique/${item.slug}`" class="product-link">
-            <span v-if="item.badge" class="product-badge">{{ item.badge }}</span>
+            <span v-if="item.badge" class="product-badge">{{ $t('products.' + item.id + '.badge') }}</span>
 
             <div class="product-media">
-              <img v-if="item.image" :src="item.image" :alt="item.name" class="product-img" />
+              <img v-if="item.image" :src="item.image" :alt="$t('products.' + item.id + '.name')" class="product-img" />
               <div v-else class="product-placeholder" aria-hidden="true">
                 <span class="product-placeholder-icon">{{ item.icon }}</span>
               </div>
             </div>
 
             <div class="product-body">
-              <h3 class="product-name">{{ item.name }}</h3>
-              <p class="product-desc">{{ item.shortDesc }}</p>
+              <h3 class="product-name">{{ $t('products.' + item.id + '.name') }}</h3>
+              <p class="product-desc">{{ $t('products.' + item.id + '.shortDesc') }}</p>
               <div class="product-price">{{ formatPrice(item.price) }}</div>
             </div>
           </RouterLink>
@@ -40,7 +40,7 @@
           <div class="product-foot">
             <template v-if="cart.getQuantity(item.id) === 0">
               <button class="btn-primary product-btn" @click="cart.add(item.id)">
-                Ajouter au panier
+                {{ $t('shop.addToCart') }}
               </button>
             </template>
             <template v-else>
@@ -50,16 +50,16 @@
                 :max="99"
                 @update:model-value="v => cart.setQuantity(item.id, v)"
               />
-              <span class="product-incart">{{ cart.getQuantity(item.id) }} dans le panier</span>
+              <span class="product-incart">{{ cart.getQuantity(item.id) }} {{ $t('shop.inCart') }}</span>
             </template>
           </div>
         </article>
       </div>
 
       <p class="shop-note">
-        Les commandes seront expédiées dès la sortie officielle du jeu.
-        <RouterLink to="/preinscription" class="shop-link">Préinscris-toi</RouterLink>
-        pour être prévenu en premier.
+        {{ $t('shop.shippingNote') }}
+        <RouterLink to="/preinscription" class="shop-link">{{ $t('shop.preorderLink') }}</RouterLink>
+        {{ $t('shop.preorderNoteEnd') }}
       </p>
     </main>
 

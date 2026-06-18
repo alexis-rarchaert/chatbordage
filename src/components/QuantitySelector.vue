@@ -1,6 +1,6 @@
 <template>
   <div class="qty">
-    <button class="qty-btn" :disabled="modelValue <= min" @click="dec" aria-label="Diminuer">−</button>
+    <button class="qty-btn" :disabled="modelValue <= min" @click="dec" :aria-label="$t('cart.decrease')">−</button>
     <input
       type="number"
       class="qty-input"
@@ -10,7 +10,7 @@
       @input="onInput"
       @blur="onBlur"
     />
-    <button class="qty-btn" :disabled="modelValue >= max" @click="inc" aria-label="Augmenter">+</button>
+    <button class="qty-btn" :disabled="modelValue >= max" @click="inc" :aria-label="$t('cart.increase')">+</button>
   </div>
 </template>
 

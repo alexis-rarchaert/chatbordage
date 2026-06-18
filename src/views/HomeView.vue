@@ -13,9 +13,9 @@
         <RouterLink to="/preinscription" class="btn-primary">{{ $t('cta.buy') }}</RouterLink>
       </div>
       <div class="hero-deck hero-animate-deck" aria-hidden="true">
-        <div class="card-mini card-mini-1">Carte</div>
-        <div class="card-mini card-mini-2">Carte</div>
-        <div class="card-mini card-mini-3">Carte</div>
+        <div class="card-mini card-mini-1">{{ $t('cards.card') }}</div>
+        <div class="card-mini card-mini-2">{{ $t('cards.card') }}</div>
+        <div class="card-mini card-mini-3">{{ $t('cards.card') }}</div>
       </div>
     </section>
 
@@ -87,8 +87,8 @@
         <div class="ship-carousel" v-reveal="'zoom'">
           <button class="carousel-arrow left" @click="prevShip" aria-label="Précédent">‹</button>
           <div class="ship-body">
-            <img :src="currentShip.image" :alt="currentShip.name" class="ship-image" />
-            <h3 class="ship-name">{{ currentShip.name }}</h3>
+            <img :src="currentShip.image" :alt="$t('ships.' + currentShip.id + '.name')" class="ship-image" />
+            <h3 class="ship-name">{{ $t('ships.' + currentShip.id + '.name') }}</h3>
           </div>
           <button class="carousel-arrow right" @click="nextShip" aria-label="Suivant">›</button>
         </div>
@@ -98,17 +98,15 @@
 
     <!-- ============ RÔLES SECRETS ============ -->
     <div class="section-banner">
-      <h2>Les rôles secrets</h2>
+      <h2>{{ $t('home.secretRolesTitle') }}</h2>
     </div>
     <section class="section-roles">
       <div class="container">
-        <p class="roles-intro" v-reveal>
-          Au début de la partie, chacun reçoit une <strong>mission secrète</strong>. Seul le rôle du <strong>Capitaine</strong> est dévoilé à tous. Saurez-vous deviner qui complote contre qui ?
-        </p>
+        <p class="roles-intro" v-reveal v-html="$t('home.secretRolesDesc')"></p>
         <div class="roles-grid">
           <article
             v-for="(role, idx) in roles"
-            :key="role.name"
+            :key="role.id"
             class="role-tile"
             v-reveal="'zoom'"
             :style="{ transitionDelay: `${idx * 80}ms` }"
@@ -116,17 +114,17 @@
             <div class="role-tile-img-wrap">
               <img :src="role.image" :alt="role.cat" class="role-tile-img" />
             </div>
-            <h3 class="role-tile-name">{{ role.name }}</h3>
+            <h3 class="role-tile-name">{{ $t('roles.' + role.id + '.name') }}</h3>
             <div class="role-tile-cat">{{ role.cat }}</div>
-            <p class="role-tile-mission">{{ role.mission }}</p>
+            <p class="role-tile-mission">{{ $t('roles.' + role.id + '.desc') }}</p>
             <span class="role-tile-badge" :class="{ public: role.public }">
-              {{ role.public ? 'Public' : 'Secret' }}
+              {{ role.public ? $t('home.rolePublic') : $t('home.roleSecret') }}
             </span>
           </article>
         </div>
         <p class="roles-cta">
-          Toutes les missions, le détail des conditions et les pouvoirs : voir le
-          <RouterLink to="/reglement#roles" class="roles-link">règlement complet</RouterLink>.
+          {{ $t('home.rolesCtaStart') }}
+          <RouterLink to="/reglement#roles" class="roles-link">{{ $t('home.rolesCtaLink') }}</RouterLink>{{ $t('home.rolesCtaEnd') }}
         </p>
       </div>
     </section>
@@ -209,59 +207,54 @@ const { t } = useI18n()
 
 const roles = [
   {
-    name: 'Le Capitaine',
+    id: 'capitaine',
     cat: 'Chat-rles Henri',
     image: '/chats/chat-rles-henri.png',
-    mission: 'Survivre jusqu\'au duel final. Connu de tous, il commence avec +1 PV.',
     public: true
   },
   {
-    name: 'Le Protecteur',
+    id: 'protecteur',
     cat: 'Miranda',
     image: '/chats/miranda.png',
-    mission: 'Garder le Capitaine en vie jusqu\'au bout — ils gagnent ensemble.',
     public: false
   },
   {
-    name: 'Le Chasseur',
+    id: 'chasseur',
     cat: 'Kim',
     image: '/chats/kim.png',
-    mission: 'Être le premier à couler 2 navires ennemis.',
     public: false
   },
   {
-    name: 'Le Renégat',
+    id: 'renegat',
     cat: 'Sylas',
     image: '/chats/sylas.png',
-    mission: 'Être le tout dernier survivant. Aucun allié, aucune pitié.',
     public: false
   },
   {
-    name: 'Le Contrebandier',
+    id: 'contrebandier',
     cat: 'Maskey',
     image: '/chats/maskey.png',
-    mission: 'Accumuler 15 pièces, à n\'importe quel moment de la partie.',
     public: false
   }
 ]
 
 
 const ships = [
-  { name: 'La Frégate', image: '/bateaux/Fregate.webp' },
-  { name: 'Le Galion', image: '/bateaux/Galion.webp' },
-  { name: 'La Corvette', image: '/bateaux/Corvette.webp' },
-  { name: 'Le Vaisseau Fantôme', image: '/bateaux/Vaisseau_Fantôme.webp' },
-  { name: 'La Caravelle', image: '/bateaux/Caravelle.webp' },
-  { name: 'Le Sloop', image: '/bateaux/sloop.webp' },
-  { name: 'Le Brick', image: '/bateaux/brick.webp' },
-  { name: 'La Jonque', image: '/bateaux/jonque.webp' },
-  { name: 'Le Trois-Mâts', image: '/bateaux/trois-mats.webp' },
-  { name: 'La Felouque', image: '/bateaux/felouque.webp' },
-  { name: 'Le Cotre', image: '/bateaux/cotre.webp' },
-  { name: 'Le Brigantin', image: '/bateaux/brigantin.webp' },
-  { name: 'Le Clipper', image: '/bateaux/clipper.webp' },
-  { name: 'La Gabare', image: '/bateaux/gabare.webp' },
-  { name: 'Le Cuirassé', image: '/bateaux/cuirasse.webp' }
+  { id: 'fregate', image: '/bateaux/Fregate.webp' },
+  { id: 'galion', image: '/bateaux/Galion.webp' },
+  { id: 'corvette', image: '/bateaux/Corvette.webp' },
+  { id: 'fantome', image: '/bateaux/Vaisseau_Fantôme.webp' },
+  { id: 'caravelle', image: '/bateaux/Caravelle.webp' },
+  { id: 'sloop', image: '/bateaux/sloop.webp' },
+  { id: 'brick', image: '/bateaux/brick.webp' },
+  { id: 'jonque', image: '/bateaux/jonque.webp' },
+  { id: 'troismats', image: '/bateaux/trois-mats.webp' },
+  { id: 'felouque', image: '/bateaux/felouque.webp' },
+  { id: 'cotre', image: '/bateaux/cotre.webp' },
+  { id: 'brigantin', image: '/bateaux/brigantin.webp' },
+  { id: 'clipper', image: '/bateaux/clipper.webp' },
+  { id: 'gabare', image: '/bateaux/gabare.webp' },
+  { id: 'cuirasse', image: '/bateaux/cuirasse.webp' }
 ]
 const shipIdx = ref(0)
 const currentShip = computed(() => ships[shipIdx.value])

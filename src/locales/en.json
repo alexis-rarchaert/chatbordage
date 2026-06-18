@@ -14,7 +14,8 @@
   "cards": {
     "mage": "Mage",
     "nekomancer": "Nekomancer",
-    "captain": "Captain"
+    "captain": "Captain",
+    "card": "Card"
   },
   "sections": {
     "inShort": "IN SHORT",
@@ -105,16 +106,100 @@
       "notReady": "WAITING",
       "chooseBoat": "Choose Ship",
       "chooseCat": "Choose Captain",
-      "start": "START GAME"
+      "start": "START GAME",
+      "youArePlayer": "You are player {num}",
+      "alreadyTaken": "Already taken!"
+    },
+    "roulette": {
+      "title": "Designation of the Captain",
+      "spinning": "Drawing in progress...",
+      "spin": "Start the draw!",
+      "captainChosen": "The Captain is {name} !",
+      "hpBonus": "+1 Bonus Hit Point!",
+      "startAdventure": "Start the adventure"
     },
     "turn": {
       "yourTurn": "Your Turn!",
       "finish": "Finish",
       "attack": "Attack",
+      "attackBtn": "Attack",
       "selectTarget": "Select Target!",
       "selectDamage": "How much damage?",
       "confirm": "Confirm",
-      "activePlayer": "Player's Turn"
+      "activePlayer": "Player's Turn",
+      "shipPower": "Ship Power",
+      "howManyHp": "How many HP to remove?",
+      "cancel": "Cancel"
+    },
+    "reveal": {
+      "passTablet": "Pass the tablet to Player {num}.",
+      "noPeeking": "Make sure no one is looking!",
+      "revealButton": "Reveal my role",
+      "publicRole": "Public role",
+      "secretRole": "Your secret role",
+      "publicRoleNote": "⚓ Your role is known to all — announce it out loud!<br/>You do not receive a secret mission.",
+      "replaceTablet": "Place the tablet back in the center",
+      "announceAndNext": "Announce and pass to next",
+      "hideAndNext": "Hide and pass to next"
+    },
+    "event": {
+      "round": "Round {round}",
+      "startRound": "Set sail"
+    },
+    "resources": {
+      "title": "Resource Phase",
+      "desc": "Player {num}, it's your turn! Choose your bonus:",
+      "takeCoins": "Take 2 Coins",
+      "drawCards": "Draw {count} physical cards"
+    },
+    "shop": {
+      "empty": "The shop is empty!"
+    },
+    "end": {
+      "gameOver": "Game Over!",
+      "winner": "Winner",
+      "playAgain": "Play again",
+      "backHome": "Back to Home"
+    },
+    "popup": {
+      "abilityActivated": {
+        "title": "Power Activated"
+      },
+      "bonusDraw": {
+        "title": "Bonus Draw!",
+        "message": "You draw {amount} physical cards this turn thanks to your bonuses."
+      },
+      "contrabandChest": {
+        "title": "Contraband Chest",
+        "message": "Draw 3 physical cards!"
+      },
+      "truce": {
+        "title": "Truce Flag",
+        "message": "{name} is untouchable this turn!"
+      },
+      "failedAttack": {
+        "title": "Attack Failed",
+        "message": "The attack failed due to the fog!"
+      },
+      "brickPower": {
+        "title": "Brick Power",
+        "message": "{name} draws 1 physical card!"
+      },
+      "revive": {
+        "title": "Revive",
+        "message": "{name} comes back to life with 1 HP!"
+      },
+      "brigantinPower": {
+        "title": "Brigantin Power",
+        "message": "Draw 2 bonus physical cards!"
+      }
+    },
+    "victory": {
+      "renegat": "Renegade — last survivor.",
+      "capitaine": "Captain — last standing.",
+      "contrebandier": "Smuggler — 15 coins accumulated.",
+      "chasseur": "Bounty hunter — 2 ships sunk.",
+      "duo": "Captain and Protector — surviving duo."
     }
   },
   "rulesPage": {
@@ -122,5 +207,332 @@
     "back": "⬅ Back to Home",
     "rule1Title": "Rule #1: No quarter for kibble",
     "rule1Text": "Here you can write all the rules of Chatbordage..."
+  },
+  "ships": {
+    "fregate": {
+      "name": "The Frigate",
+      "ability": "+1 HP for each enemy elimination.",
+      "powerLabel": "Bloody Tribute"
+    },
+    "galion": {
+      "name": "The Galleon",
+      "ability": "Maximum hand size increased to 6 cards.",
+      "powerLabel": "Spacious Hold"
+    },
+    "corvette": {
+      "name": "The Corvette",
+      "ability": "Completely dodges an attack (1x/game).",
+      "powerLabel": "Royal Dodge"
+    },
+    "fantome": {
+      "name": "The Ghost Ship",
+      "ability": "Your role can never be revealed by the enemy.",
+      "powerLabel": "Fog of Souls"
+    },
+    "caravelle": {
+      "name": "The Caravelle",
+      "ability": "Draw 1 additional free card each turn.",
+      "powerLabel": "Favorable Draw"
+    },
+    "sloop": {
+      "name": "The Sloop",
+      "ability": "Exchange a card from your hand with a random card from the deck (1x/turn).",
+      "powerLabel": "Random Purse"
+    },
+    "brick": {
+      "name": "The Brig",
+      "ability": "When you are attacked, draw 1 card.",
+      "powerLabel": "Compensation"
+    },
+    "jonque": {
+      "name": "The Junk",
+      "ability": "Look at the top card of the deck; keep it or put it back on the bottom (1x/turn).",
+      "powerLabel": "Sharp Eye"
+    },
+    "troismats": {
+      "name": "The Three-Masted Ship",
+      "ability": "Your Equipment cards cannot be destroyed.",
+      "powerLabel": "Strong Hold"
+    },
+    "felouque": {
+      "name": "The Felucca",
+      "ability": "If you attack a player with more HP than you, +1 bonus damage.",
+      "powerLabel": "Law of the Jungle"
+    },
+    "cotre": {
+      "name": "The Cutter",
+      "ability": "Steal 1 random card from an opponent's hand (1x/game).",
+      "powerLabel": "Sleight of Paw"
+    },
+    "brigantin": {
+      "name": "The Brigantine",
+      "ability": "When you eliminate a player, draw 2 bonus cards.",
+      "powerLabel": "Scavenger"
+    },
+    "clipper": {
+      "name": "The Clipper",
+      "ability": "If you haven't played any Attack cards this turn, gain 1 bonus coin (1x/turn).",
+      "powerLabel": "Wise Merchant"
+    },
+    "gabare": {
+      "name": "The Lighter",
+      "ability": "Gain 1 additional coin whenever you choose the coins option.",
+      "powerLabel": "Full Purse"
+    },
+    "cuirasse": {
+      "name": "The Ironclad",
+      "ability": "-1 damage on all received attacks (minimum 1).",
+      "powerLabel": "Armor plating"
+    },
+    "powerTypes": {
+      "passive": "Passive",
+      "activeOnce": "Active (1x/game)",
+      "activeTurn": "Active (1x/turn)",
+      "activePassive": "Active (passive in practice)"
+    }
+  },
+  "roles": {
+    "capitaine": {
+      "name": "The Captain",
+      "mission": "Survive and ensure that only himself and his Protector (whom he does not know!) remain at the end. +1 starting HP.",
+      "desc": "Survive until the final duel."
+    },
+    "protecteur": {
+      "name": "The Protector",
+      "mission": "Keep the Captain alive until the end of the game. If the Captain survives and the Protector is alive, both win together!",
+      "desc": "Keep the Captain alive until the end."
+    },
+    "chasseur": {
+      "name": "The Bounty Hunter",
+      "mission": "Be the first to sink 2 enemy ships. Once done, he wins immediately, no matter what happens next.",
+      "desc": "Sink (eliminate) 2 enemy ships before anyone else."
+    },
+    "renegat": {
+      "name": "The Renegade",
+      "mission": "Teams up with no one. Must be the absolute last survivor: all other players, without exception, must be eliminated.",
+      "desc": "Be the last survivor (see the elimination of all others)."
+    },
+    "contrebandier": {
+      "name": "The Smuggler",
+      "mission": "Wins as soon as he has 15 coins, at any point in the game. Better to keep an eye on your savings than your damage.",
+      "desc": "Accumulate 15 coins at any point."
+    }
+  },
+  "shop": {
+    "intro": "Bring the adventure home: the game, goodies, and the collector's edition for true sea dogs.",
+    "addToCart": "Add to cart",
+    "inCart": "in cart",
+    "shippingNote": "Orders will be shipped as soon as the game is officially released.",
+    "preorderLink": "Pre-register",
+    "preorderNoteEnd": " to be notified first.",
+    "items": {
+      "reparations": { "name": "Emergency Repairs" },
+      "poudre": { "name": "Black Powder" },
+      "coffre": { "name": "Contraband Chest" },
+      "longue-vue": { "name": "Traitor's Spyglass" },
+      "treve": { "name": "Truce Flag" },
+      "revivre": { "name": "Revive Once" }
+    }
+  },
+  "product": {
+    "notFound": "Product not found",
+    "notFoundDesc": "This item may have sunk at sea.",
+    "backToShop": "Back to shop",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "addedToCart": "Added ✓ — total {count} in cart",
+    "includes": "Includes:",
+    "description": "Description",
+    "related": "You might also like"
+  },
+  "cart": {
+    "title": "My cart",
+    "empty": "Your cart is as empty as a looted chest.",
+    "goToShop": "Go to shop",
+    "perUnit": "each",
+    "remove": "Remove",
+    "clear": "Clear cart",
+    "confirmClear": "Empty the cart?",
+    "summary": "Summary",
+    "itemsCount": "Items ({count})",
+    "shipping": "Shipping",
+    "free": "Free",
+    "total": "Total",
+    "checkout": "Checkout",
+    "redirecting": "Redirecting…",
+    "error": "An error occurred",
+    "securePaymentNote": "Secure payment via Stripe. You will be redirected to their page.",
+    "continueShopping": "← Continue shopping",
+    "decrease": "Decrease",
+    "increase": "Increase"
+  },
+  "success": {
+    "title": "Thank you, sailor!",
+    "loading": "Verifying payment…",
+    "paymentStatus": "Your payment is <strong>{status}</strong>.",
+    "statusPaid": "confirmed",
+    "amount": "Amount: <strong>{amount}</strong>",
+    "emailSent": "A summary has been sent to <strong>{email}</strong>.",
+    "testPayment": "Your test payment has been recorded.",
+    "note": "While we prepare the shipment, hoist the mainsail: explore the rules or the shop.",
+    "backHome": "Back to Home",
+    "readRules": "Read the rules"
+  },
+  "home": {
+    "secretRolesTitle": "Secret Roles",
+    "secretRolesDesc": "At the start of the game, everyone receives a <strong>secret mission</strong>. Only the Captain's role is revealed to all. Will you guess who is plotting against whom?",
+    "rolePublic": "Public",
+    "roleSecret": "Secret",
+    "rolesCtaStart": "All missions, detailed conditions and powers: see the ",
+    "rolesCtaLink": "complete rules",
+    "rolesCtaEnd": "."
+  },
+  "rules": {
+    "welcome": {
+      "title": "Welcome aboard!",
+      "lead": "In <strong>ChatBordage</strong>, each player commands a ship of feline pirates. <em>But beware</em>: under your sailor card hides a secret. A mission that <strong>only you know</strong>."
+    },
+    "goal": {
+      "title": "Goal of the Game",
+      "p1": "Each player has a different secret mission (except the Captain, whose role is known to everyone). The game ends as soon as a player completes their mission. The possible missions are detailed below.",
+      "tip": "<strong>First game tip:</strong> play once 'cards on the table', revealing everyone's roles out loud, just to understand the flow. The real game, with the secret, will be even better afterwards!"
+    },
+    "setup": {
+      "title": "Setup",
+      "item1": "Each player is assigned (or draws at random) a <strong>ship</strong> via the app, visible to everyone on the screen.",
+      "item2": "Everyone checks their <strong>secret role</strong> on the app, hidden from others. The Captain is announced out loud: everyone must know who they are.",
+      "item3": "Each player takes <strong>5 hit points</strong>. The Captain starts with <strong>6 HP</strong> because they are more exposed.",
+      "item4": "Each player receives a starting hand of <strong>3 cards</strong>, drawn from the well-shuffled playing deck.",
+      "item5": "The Captain starts the game. The turn then passes to the next player clockwise."
+    },
+    "tour": {
+      "title": "Turn Sequence",
+      "p1": "On their turn, each player always follows the same 4 steps, in this order:",
+      "step1Title": "Step 1 — The Sea Event",
+      "step1Desc": "The app announces an event that applies to everyone during this turn: a storm, a thick fog, a lucky break... Everyone suffers (or benefits from) this event in the same way, unless otherwise specified.",
+      "step2Title": "Step 2 — Cards or Coins, your choice",
+      "step2Desc": "The player whose turn it is chooses <strong>only one</strong> of the two options: draw <strong>2 cards</strong>, OR gain <strong>2 coins</strong>. Impossible to do both! A hand can never exceed 5 cards — if a special card makes you gain more, you must discard down to 5 at the end of your turn.",
+      "step3Title": "Step 3 — Play your cards",
+      "step3Desc": "You can play as many cards as you want, in the order you want, and target any other player around the table. <strong>But as soon as you play an Boarding (attack) card, your turn ends immediately</strong>, even if you have cards left in your hand. Think carefully about the order in which you play your cards!",
+      "step4Title": "Step 4 — Your ship's power",
+      "step4Desc": "Once per turn, you can activate your ship's special power (some powers are automatic and do not need activation, check your ship's sheet on the app).",
+      "tip": "<strong>When a player attacks you,</strong> you are not totally helpless! You have the right to play a Sails card immediately after to defend yourself, before damage is calculated. Always keep a defense card handy if you can."
+    },
+    "elimination": {
+      "title": "Hit Points & Elimination",
+      "item1": "Each player starts with <strong>5 hit points</strong> (6 for the Captain).",
+      "item2": "When a player drops to 0 HP, they are eliminated: they no longer play until the end of the game.",
+      "item3": "All cards in hand and all coins of the eliminated player are given to the player who eliminated them.",
+      "item4": "If a card affects multiple players at once (like a Spread Shot) and eliminates two at the same time, the attacker collects the cards and coins of both."
+    },
+    "roles": {
+      "title": "Secret Roles",
+      "p1": "At the very beginning of the game, each player discovers their mission through the cards. No one must know the other players' roles (except the Captain's, announced to everyone). One simple rule: <strong>roles do not grant any special powers</strong>, only a secret goal to reach. All powers in the game come from the ships.",
+      "tip": "If several missions seem to be completed 'at the same time', it is almost never really the case: each card or action is resolved one by one. The very first mission accomplished, in the actual order of actions, ends the game."
+    },
+    "ships": {
+      "title": "The Ships",
+      "p1": "Visible to all, your ship displays your starting hit points, your base attack damage, and your special power. Choose one that fits your play style: cautious, aggressive, or cunning!",
+      "p2": "<em>For more challenge and fun, draw your ship at random.</em>"
+    },
+    "precisions": {
+      "title": "Useful Clarifications",
+      "item1": "You can voluntarily discard a card you do not want to keep at any point during your turn.",
+      "item2": "If your hand exceeds 5 cards at the end of a turn (for example after a Contraband Chest), you discard the excess to go back down to 5.",
+      "item3": "If the draw pile is ever depleted, we simply mix the discard pile to make a new draw pile.",
+      "item4": "If a player has to leave the game mid-way, they are treated as eliminated: their cards and coins go to the player sitting on their left.",
+      "item5": "Techniquement, nothing stops you from playing a card on yourself (for example a Sabotage on your own Treasure), but it's rarely of any use!"
+    },
+    "content": {
+      "title": "Box Contents",
+      "item1": "100 playing cards",
+      "item2": "Coins (tokens) for the game currency",
+      "item3": "The ChatBordage <strong>companion app</strong> (ships, secret roles, sea events, shop)",
+      "meta": "4–6 players · ages 7 to 77 · ~30 minutes",
+      "credits": "All rights reserved — Group 7 — 2026"
+    }
+  },
+  "events": {
+    "tempete": {
+      "name": "Storm!",
+      "desc": "The sea goes wild. Attacks inflict +1 Damage this turn."
+    },
+    "brume": {
+      "name": "Thick fog",
+      "desc": "Impossible to aim straight. Attacks have a 50% chance of failing this turn."
+    },
+    "tresor": {
+      "name": "Treasure island",
+      "desc": "An island full of riches! Each player draws 1 additional card this turn."
+    },
+    "calme": {
+      "name": "Calm sea",
+      "desc": "A calm day at sea. No special effects."
+    }
+  },
+  "products": {
+    "jeu": {
+      "name": "ChatBordage — The game",
+      "shortDesc": "The hidden-role card game in a world of pirate cats. 4 to 6 players, ~30 minutes.",
+      "badge": "New",
+      "features": {
+        "0": "100 playing cards",
+        "1": "Companion app (15 ships + 5 roles)",
+        "2": "Doubloon-style coins",
+        "3": "4 to 6 players · ages 7 to 77 · ~30 min"
+      },
+      "longDesc": {
+        "0": "Each player commands a feline pirate ship, with its own stats and a unique power. But under your sailor card hides a secret mission that only you know...",
+        "1": "Bluff, accusations, betrayals: ChatBordage blends strategy, luck, and social interaction in an original world of pirate cats. The game ends as soon as a player completes their hidden mission — will you guess who is plotting against whom?",
+        "2": "The game is accompanied by a companion app that manages secret roles, sea events, ship assignments, and the in-game shop."
+      }
+    },
+    "stickers": {
+      "name": "Pack of 5 stickers",
+      "shortDesc": "The 5 pirate cats as waterproof vinyl stickers.",
+      "badge": "",
+      "features": {
+        "0": "Waterproof cut vinyl",
+        "1": "Chat-rles Henri, Miranda, Kim, Sylas, Maskey",
+        "2": "Size ~7 cm",
+        "3": "Made in France"
+      },
+      "longDesc": {
+        "0": "Show off your favorite crew! This pack brings together the 5 star cats of the game: Chat-rles Henri the Captain, Miranda the Protector, Kim the Bounty Hunter, Sylas the Renegade, and Maskey the Smuggler.",
+        "1": "Waterproof die-cut vinyl: decorate your bowl, computer, water bottle, or rum barrel. Resistant to water, sun, and friendly boardings."
+      }
+    },
+    "mug": {
+      "name": "Captain Mug",
+      "shortDesc": "A 33cl mug featuring Chat-rles Henri.",
+      "badge": "",
+      "features": {
+        "0": "Ceramic 33 cl",
+        "1": "Dishwasher safe",
+        "2": "High definition print",
+        "3": "Gift box included"
+      },
+      "longDesc": {
+        "0": "Ideal for sipping your coffee before sinking your friends. Captain Chat-rles Henri in all his glory, printed in high definition on white ceramic.",
+        "1": "Capacity 33 cl, dishwasher and microwave safe (at your own risk for the effigy)."
+      }
+    },
+    "collector": {
+      "name": "Collector's Edition",
+      "shortDesc": "The game box, 5 stickers, the mug and a set of exclusive gold cards.",
+      "badge": "Limited edition",
+      "features": {
+        "0": "Complete ChatBordage game",
+        "1": "Pack of 5 vinyl stickers",
+        "2": "Captain Mug 33 cl",
+        "3": "Set of 15 exclusive gold Ship cards",
+        "4": "Sérigraphied wooden chest",
+        "5": "Numbered certificate"
+      },
+      "longDesc": {
+        "0": "The ultimate edition for true sea dogs. You receive everything: the base game, the stickers, the Captain mug, plus an exclusive set of Ship cards with hot foil finish (the 15 ships in premium, foiled versions, not available individually).",
+        "1": "Presented in a wooden chest screen-printed with a cat paw, with a hand-numbered certificate of authenticity. Limited edition of 500 copies."
+      }
+    }
   }
 }

@@ -14,7 +14,8 @@
   "cards": {
     "mage": "Mage",
     "nekomancer": "Nekomancer",
-    "captain": "Capitaine"
+    "captain": "Capitaine",
+    "card": "Carte"
   },
   "sections": {
     "inShort": "EN BREF",
@@ -105,16 +106,100 @@
       "notReady": "EN ATTENTE",
       "chooseBoat": "Choisir le Navire",
       "chooseCat": "Choisir le Capitaine",
-      "start": "LANCER LA PARTIE"
+      "start": "LANCER LA PARTIE",
+      "youArePlayer": "Vous êtes le joueur {num}",
+      "alreadyTaken": "Déjà pris !"
+    },
+    "roulette": {
+      "title": "Désignation du Capitaine",
+      "spinning": "Tirage en cours...",
+      "spin": "Lancer le tirage !",
+      "captainChosen": "Le Capitaine est {name} !",
+      "hpBonus": "+1 Point de Vie bonus !",
+      "startAdventure": "Commencer l'aventure"
     },
     "turn": {
       "yourTurn": "C'est ton tour !",
       "finish": "Finir",
-      "attack": "Attaque",
+      "attack": "Attaquer",
+      "attackBtn": "Attaque",
       "selectTarget": "Choisis ta cible !",
       "selectDamage": "Combien de dégâts ?",
       "confirm": "Confirmer",
-      "activePlayer": "Tour du Joueur"
+      "activePlayer": "Tour du Joueur",
+      "shipPower": "Pouvoir Navire",
+      "howManyHp": "Combien de PV retirer ?",
+      "cancel": "Annuler"
+    },
+    "reveal": {
+      "passTablet": "Passez la tablette au Joueur {num}.",
+      "noPeeking": "Assurez-vous que personne ne regarde !",
+      "revealButton": "Révéler mon rôle",
+      "publicRole": "Rôle public",
+      "secretRole": "Votre rôle secret",
+      "publicRoleNote": "⚓ Votre rôle est connu de tous — annoncez-le à voix haute !<br/>Vous ne recevez pas de mission secrète.",
+      "replaceTablet": "Replacer la tablette au centre",
+      "announceAndNext": "Annoncer et passer au suivant",
+      "hideAndNext": "Cacher et passer au suivant"
+    },
+    "event": {
+      "round": "Round {round}",
+      "startRound": "Prendre le large"
+    },
+    "resources": {
+      "title": "Phase de Ressources",
+      "desc": "Joueur {num}, c'est à vous ! Choisissez votre bonus :",
+      "takeCoins": "Prendre 2 Pièces",
+      "drawCards": "Piocher {count} cartes physiques"
+    },
+    "shop": {
+      "empty": "La boutique est vide !"
+    },
+    "end": {
+      "gameOver": "Partie terminée !",
+      "winner": "Vainqueur",
+      "playAgain": "Rejouer une partie",
+      "backHome": "Retour à l'accueil"
+    },
+    "popup": {
+      "abilityActivated": {
+        "title": "Pouvoir Activé"
+      },
+      "bonusDraw": {
+        "title": "Pioche Bonus !",
+        "message": "Vous piochez {amount} cartes physiques ce tour-ci grâce à vos bonus."
+      },
+      "contrabandChest": {
+        "title": "Coffre de Contrebande",
+        "message": "Piochez 3 cartes physiques !"
+      },
+      "truce": {
+        "title": "Drapeau de trêve",
+        "message": "{name} est intouchable ce tour-ci !"
+      },
+      "failedAttack": {
+        "title": "Échec de l'attaque",
+        "message": "L'attaque a manqué à cause de la brume !"
+      },
+      "brickPower": {
+        "title": "Pouvoir Brick",
+        "message": "{name} pioche 1 carte physique !"
+      },
+      "revive": {
+        "title": "Revivre",
+        "message": "{name} revient à la vie avec 1 PV !"
+      },
+      "brigantinPower": {
+        "title": "Pouvoir Brigantin",
+        "message": "Piochez 2 cartes physiques bonus !"
+      }
+    },
+    "victory": {
+      "renegat": "Renégat — dernier survivant.",
+      "capitaine": "Capitaine — dernier debout.",
+      "contrebandier": "Contrebandier — 15 pièces accumulées.",
+      "chasseur": "Chasseur de primes — 2 navires coulés.",
+      "duo": "Capitaine et Protecteur — duo survivant."
     }
   },
   "rulesPage": {
@@ -122,5 +207,332 @@
     "back": "⬅ Retour à l'accueil",
     "rule1Title": "Règle n°1 : Pas de quartier pour les croquettes",
     "rule1Text": "Ici, vous pourrez écrire toutes les règles de Chatbordage..."
+  },
+  "ships": {
+    "fregate": {
+      "name": "La Frégate",
+      "ability": "+1 PV à chaque élimination ennemie.",
+      "powerLabel": "Tribut sanglant"
+    },
+    "galion": {
+      "name": "Le Galion",
+      "ability": "Main maximale portée à 6 cartes.",
+      "powerLabel": "Cale spacieuse"
+    },
+    "corvette": {
+      "name": "La Corvette",
+      "ability": "Esquive une attaque complètement (1x/partie).",
+      "powerLabel": "Esquive royale"
+    },
+    "fantome": {
+      "name": "Le Vaisseau Fantôme",
+      "ability": "Ton rôle ne peut jamais être révélé par l'ennemi.",
+      "powerLabel": "Brouillard d'âmes"
+    },
+    "caravelle": {
+      "name": "La Caravelle",
+      "ability": "Pioche 1 carte supplémentaire gratuite chaque tour.",
+      "powerLabel": "Pioche favorable"
+    },
+    "sloop": {
+      "name": "Le Sloop",
+      "ability": "Échange une carte de ta main contre une carte au hasard de la pioche (1x/tour).",
+      "powerLabel": "Bourse aléatoire"
+    },
+    "brick": {
+      "name": "Le Brick",
+      "ability": "Quand tu es attaqué, pioche 1 carte.",
+      "powerLabel": "Compensation"
+    },
+    "jonque": {
+      "name": "La Jonque",
+      "ability": "Regarde la carte du dessus de la pioche ; garde-la ou remets-la dessous (1x/tour).",
+      "powerLabel": "Œil aiguisé"
+    },
+    "troismats": {
+      "name": "Le Trois-Mâts",
+      "ability": "Tes cartes Équipement ne peuvent pas être détruites.",
+      "powerLabel": "Cale forte"
+    },
+    "felouque": {
+      "name": "La Felouque",
+      "ability": "Si tu attaques un joueur qui a plus de PV que toi, +1 dégât bonus.",
+      "powerLabel": "Loi de la jungle"
+    },
+    "cotre": {
+      "name": "Le Cotre",
+      "ability": "Vole 1 carte au hasard dans la main d'un adversaire (1x/partie).",
+      "powerLabel": "Tour de passe-patte"
+    },
+    "brigantin": {
+      "name": "Le Brigantin",
+      "ability": "Quand tu élimines un joueur, pioche 2 cartes en bonus.",
+      "powerLabel": "Charognard"
+    },
+    "clipper": {
+      "name": "Le Clipper",
+      "ability": "Si tu n'as joué aucune carte Attaque ce tour, gagne 1 pièce bonus (1x/tour).",
+      "powerLabel": "Marchand sage"
+    },
+    "gabare": {
+      "name": "La Gabare",
+      "ability": "Gagne 1 pièce supplémentaire chaque fois que tu choisis l'option pièces.",
+      "powerLabel": "Bourse pleine"
+    },
+    "cuirasse": {
+      "name": "Le Cuirassé",
+      "ability": "-1 dégât sur toutes les attaques reçues (minimum 1).",
+      "powerLabel": "Blindage"
+    },
+    "powerTypes": {
+      "passive": "Passif",
+      "activeOnce": "Actif (1x/partie)",
+      "activeTurn": "Actif (1x/tour)",
+      "activePassive": "Actif (passif en pratique)"
+    }
+  },
+  "roles": {
+    "capitaine": {
+      "name": "Le Capitaine",
+      "mission": "Survivre et faire en sorte qu'il ne reste, à la fin, que lui-même et son Protecteur (qu'il ne connaît pas !). +1 PV de départ.",
+      "desc": "Survivre jusqu'au duel final."
+    },
+    "protecteur": {
+      "name": "Le Protecteur",
+      "mission": "Garder le Capitaine en vie jusqu'à la fin de la partie. Si le Capitaine survit et que le Protecteur est en vie, les deux gagnent ensemble !",
+      "desc": "Garder le Capitaine en vie jusqu'à la fin."
+    },
+    "chasseur": {
+      "name": "Le Chasseur de primes",
+      "mission": "Être le premier à couler 2 navires ennemis. Dès que c'est fait, il gagne immédiatement, peu importe ce qui se passe ensuite.",
+      "desc": "Couler (éliminer) 2 navires ennemis avant tout le monde."
+    },
+    "renegat": {
+      "name": "Le Renégat",
+      "mission": "Ne fait équipe avec personne. Doit être le tout dernier survivant : tous les autres joueurs, sans exception, doivent être éliminés.",
+      "desc": "Être le dernier survivant (voir l'élimination de tous les autres)."
+    },
+    "contrebandier": {
+      "name": "Le Contrebandier",
+      "mission": "Gagne dès qu'il possède 15 pièces, à n'importe quel moment de la partie. Mieux vaut garder un œil sur ses économies que sur ses dégâts.",
+      "desc": "Accumuler 15 pièces à n'importe quel moment."
+    }
+  },
+  "shop": {
+    "intro": "Embarque l'aventure chez toi : le jeu, des goodies, et l'édition collector pour les vrais loups de mer.",
+    "addToCart": "Ajouter au panier",
+    "inCart": "dans le panier",
+    "shippingNote": "Les commandes seront expédiées dès la sortie officielle du jeu.",
+    "preorderLink": "Préinscris-toi",
+    "preorderNoteEnd": " pour être prévenu en premier.",
+    "items": {
+      "reparations": { "name": "Réparations d'urgence" },
+      "poudre": { "name": "Poudre noire" },
+      "coffre": { "name": "Coffre de contrebande" },
+      "longue-vue": { "name": "Longue-vue du traître" },
+      "treve": { "name": "Drapeau de trêve" },
+      "revivre": { "name": "Revivre une fois" }
+    }
+  },
+  "product": {
+    "notFound": "Produit introuvable",
+    "notFoundDesc": "Cet article a peut-être coulé en mer.",
+    "backToShop": "Retour à la boutique",
+    "inStock": "En stock",
+    "outOfStock": "Rupture",
+    "addedToCart": "Ajouté ✓ — total {count} dans le panier",
+    "includes": "Inclus :",
+    "description": "Description",
+    "related": "Tu aimeras aussi"
+  },
+  "cart": {
+    "title": "Mon panier",
+    "empty": "Ton panier est aussi vide qu'un coffre pillé.",
+    "goToShop": "Aller à la boutique",
+    "perUnit": "l'unité",
+    "remove": "Retirer",
+    "clear": "Vider le panier",
+    "confirmClear": "Vider le panier ?",
+    "summary": "Récapitulatif",
+    "itemsCount": "Articles ({count})",
+    "shipping": "Livraison",
+    "free": "Offerte",
+    "total": "Total",
+    "checkout": "Passer commande",
+    "redirecting": "Redirection…",
+    "error": "Une erreur est survenue",
+    "securePaymentNote": "Paiement sécurisé via Stripe. Tu seras redirigé sur leur page.",
+    "continueShopping": "← Continuer mes achats",
+    "decrease": "Diminuer",
+    "increase": "Augmenter"
+  },
+  "success": {
+    "title": "Merci, moussaillon !",
+    "loading": "Vérification du paiement…",
+    "paymentStatus": "Ton paiement est <strong>{status}</strong>.",
+    "statusPaid": "confirmé",
+    "amount": "Montant : <strong>{amount}</strong>",
+    "emailSent": "Un récap part vers <strong>{email}</strong>.",
+    "testPayment": "Ton paiement de test a été enregistré.",
+    "note": "Pendant qu'on prépare l'expédition, hisse la grand-voile : explore les règles ou la boutique.",
+    "backHome": "Retour à l'accueil",
+    "readRules": "Lire le règlement"
+  },
+  "home": {
+    "secretRolesTitle": "Les rôles secrets",
+    "secretRolesDesc": "Au début de la partie, chacun reçoit une <strong>mission secrète</strong>. Seul le rôle du <strong>Capitaine</strong> est dévoilé à tous. Saurez-vous deviner qui complote contre qui ?",
+    "rolePublic": "Public",
+    "roleSecret": "Secret",
+    "rolesCtaStart": "Toutes les missions, le détail des conditions et les pouvoirs : voir le ",
+    "rolesCtaLink": "règlement complet",
+    "rolesCtaEnd": "."
+  },
+  "rules": {
+    "welcome": {
+      "title": "Bienvenue à bord !",
+      "lead": "Dans <strong>ChatBordage</strong>, chaque joueur commande un navire de pirates félins. <em>Mais attention</em> : sous ta carte de matelot se cache un secret. Une mission que <strong>toi seul connais</strong>."
+    },
+    "goal": {
+      "title": "But du jeu",
+      "p1": "Chaque joueur a une mission secrète différente (sauf le Capitaine, dont tout le monde connaît le rôle). La partie se termine dès qu'un joueur accomplit sa mission. Les missions possibles sont détaillées plus bas.",
+      "tip": "<strong>Astuce première partie :</strong> jouez une fois « cartes sur table », en révélant les rôles de tous à voix haute, juste pour comprendre le déroulement. La vraie partie, avec le secret, n'en sera que meilleure ensuite !"
+    },
+    "setup": {
+      "title": "Mise en place",
+      "item1": "Chaque joueur se voit attribuer (ou tire au hasard) un <strong>navire</strong> via l'application, visible de tous sur l'écran.",
+      "item2": "Chacun consulte son <strong>rôle secret</strong> sur l'application, en cachette des autres. Le Capitaine est annoncé à voix haute : tout le monde doit savoir qui il est.",
+      "item3": "Chaque joueur prend <strong>5 points de vie</strong>. Le Capitaine commence avec <strong>6 PV</strong>, parce qu'il est davantage exposé.",
+      "item4": "Chaque joueur reçoit une main de départ de <strong>3 cartes</strong>, piochées dans le deck à jouer bien mélangé.",
+      "item5": "Le Capitaine commence la partie. Le tour passe ensuite au joueur suivant dans le sens des aiguilles d'une montre."
+    },
+    "tour": {
+      "title": "Déroulement d'un tour",
+      "p1": "À son tour, chaque joueur suit toujours les 4 mêmes étapes, dans cet ordre :",
+      "step1Title": "Étape 1 — L'événement de mer",
+      "step1Desc": "L'application annonce un événement qui s'applique à tout le monde pendant ce tour : une tempête, une brume épaisse, un coup de chance... Tout le monde subit (ou profite de) cet événement de la même façon, sauf indication contraire.",
+      "step2Title": "Étape 2 — Cartes ou pièces, à toi de choisir",
+      "step2Desc": "Le joueur dont c'est le tour choisit <strong>une seule</strong> des deux options : piocher <strong>2 cartes</strong>, OU gagner <strong>2 pièces</strong>. Impossible de faire les deux ! Une main ne peut jamais dépasser 5 cartes — si une carte spéciale t'en fait gagner plus, tu devras en défausser à la fin de ton tour pour redescendre à 5.",
+      "step3Title": "Étape 3 — Joue tes cartes",
+      "step3Desc": "Tu peux jouer autant de cartes que tu veux, dans l'ordre que tu veux, et viser n'importe quel autre joueur autour de la table. <strong>Mais dès que tu joues une carte Abordage (attaque), ton tour s'arrête immédiatement</strong>, même s'il te reste des cartes en main. Réfléchis bien à l'ordre dans lequel tu joues tes cartes !",
+      "step4Title": "Étape 4 — Le pouvoir de ton navire",
+      "step4Desc": "Une fois par tour, tu peux activer le pouvoir spécial de ton navire (certains pouvoirs sont automatiques et n'ont pas besoin d'être activés, regarde bien la fiche de ton navire sur l'application).",
+      "tip": "<strong>Quand un joueur t'attaque,</strong> tu n'es pas totalement impuissant ! Tu as le droit de jouer une carte Voiles juste après pour te défendre, avant que les dégâts ne soient comptés. Garde toujours une carte de défense sous le coude si tu peux."
+    },
+    "elimination": {
+      "title": "Points de vie et élimination",
+      "item1": "Chaque joueur commence avec <strong>5 points de vie</strong> (6 pour le Capitaine).",
+      "item2": "Quand un joueur tombe à 0 PV, il est éliminé : il ne joue plus jusqu'à la fin de la partie.",
+      "item3": "Toutes les cartes en main et toutes les pièces du joueur éliminé sont données au joueur qui l'a éliminé.",
+      "item4": "Si une carte touche plusieurs joueurs à la fois (comme un Tir groupé) et en élimine deux en même temps, l'auteur de l'attaque récupère les cartes et les pièces des deux."
+    },
+    "roles": {
+      "title": "Les rôles secrets",
+      "p1": "En tout début de partie, chaque joueur découvre sa mission grâce aux cartes. Personne ne doit savoir le rôle des autres joueurs (sauf celui du Capitaine, annoncé à tous). Une seule règle simple : <strong>les rôles ne donnent aucun pouvoir spécial</strong>, juste un objectif à atteindre en secret. Tous les pouvoirs du jeu viennent des navires.",
+      "tip": "Si plusieurs missions semblent se réaliser « au même moment », ce n'est presque jamais vraiment le cas : chaque carte ou action se résout une par une. La toute première mission accomplie, dans l'ordre réel des actions, termine la partie."
+    },
+    "ships": {
+      "title": "Les navires",
+      "p1": "Visible de tous, ton navire affiche tes points de vie de départ, tes dégâts d'attaque de base, et ton pouvoir spécial. Choisis-en un qui correspond à ton style de jeu : prudent, agressif, ou rusé !",
+      "p2": "<em>Pour plus de challenge et de fun, tire au hasard ton navire.</em>"
+    },
+    "precisions": {
+      "title": "Petites précisions utiles",
+      "item1": "Tu peux défausser volontairement une carte que tu ne veux pas garder, à n'importe quel moment de ton tour.",
+      "item2": "Si ta main dépasse 5 cartes en fin de tour (par exemple après un Coffre de contrebande), tu défausses l'excédent pour redescendre à 5.",
+      "item3": "Si la pioche est un jour épuisée, on mélange simplement la défausse pour en faire une nouvelle pioche.",
+      "item4": "Si un joueur doit quitter la partie en cours de route, il est traité comme éliminé : ses cartes et ses pièces vont au joueur assis à sa gauche.",
+      "item5": "Techniquement, rien n'empêche de jouer une carte sur soi-même (par exemple un Sabotage sur son propre Trésor), mais ça n'a jamais beaucoup d'intérêt !"
+    },
+    "content": {
+      "title": "Contenu de la boîte",
+      "item1": "100 cartes à jouer",
+      "item2": "Des pièces (jetons) pour la monnaie du jeu",
+      "item3": "L'<strong>application compagnon</strong> ChatBordage (navires, rôles secrets, événements de mer, boutique)",
+      "meta": "4–6 joueurs · 7 à 77 ans · ~30 minutes",
+      "credits": "Tous droits réservés — Groupe 7 — 2026"
+    }
+  },
+  "events": {
+    "tempete": {
+      "name": "Tempête !",
+      "desc": "La mer se déchaîne. Les attaques infligent +1 Dégât ce tour-ci."
+    },
+    "brume": {
+      "name": "Brume épaisse",
+      "desc": "Impossible de viser juste. Les attaques ont 50% de chances d'échouer ce tour-ci."
+    },
+    "tresor": {
+      "name": "Île au trésor",
+      "desc": "Une île regorgeant de richesses ! Chaque joueur pioche 1 carte supplémentaire ce tour-ci."
+    },
+    "calme": {
+      "name": "Mer d'huile",
+      "desc": "Une journée calme en mer. Aucun effet particulier."
+    }
+  },
+  "products": {
+    "jeu": {
+      "name": "ChatBordage — Le jeu",
+      "shortDesc": "Le jeu de cartes à rôles cachés dans un univers de chats pirates. 4 à 6 joueurs, ~30 minutes.",
+      "badge": "Nouveauté",
+      "features": {
+        "0": "100 cartes à jouer",
+        "1": "Application compagnon (15 navires + 5 rôles)",
+        "2": "Des pièces façon doublons",
+        "3": "4 à 6 joueurs · 7 à 77 ans · ~30 min"
+      },
+      "longDesc": {
+        "0": "Chaque joueur commande un navire de pirates félins, doté de ses propres statistiques et d'un pouvoir unique. Mais sous ta carte de matelot se cache une mission secrète que toi seul connais...",
+        "1": "Bluff, accusations, trahisons : ChatBordage mélange réflexion, hasard et interactions sociales dans un univers original de chats pirates. La partie se termine dès qu'un joueur accomplit sa mission cachée — sauras-tu deviner qui complote contre qui ?",
+        "2": "Le jeu est accompagné d'une application compagnon qui gère les rôles secrets, les événements de mer, l'attribution des navires et la boutique en jeu."
+      }
+    },
+    "stickers": {
+      "name": "Pack de 5 stickers",
+      "shortDesc": "Les 5 chats pirates en stickers vinyle waterproof.",
+      "badge": "",
+      "features": {
+        "0": "Vinyle découpé waterproof",
+        "1": "Chat-rles Henri, Miranda, Kim, Sylas, Maskey",
+        "2": "Format ~7 cm",
+        "3": "Fabriqué en France"
+      },
+      "longDesc": {
+        "0": "Affiche ton équipage préféré ! Ce pack rassemble les 5 chats stars du jeu : Chat-rles Henri le Capitaine, Miranda la Protectrice, Kim le Chasseur de primes, Sylas le Renégat et Maskey le Contrebandier.",
+        "1": "Vinyle découpé waterproof : décore ta gamelle, ton ordi, ta gourde, ton tonneau de rhum. Résiste à l'eau, au soleil et aux abordages amicaux."
+      }
+    },
+    "mug": {
+      "name": "Mug Capitaine",
+      "shortDesc": "Un mug 33cl à l'effigie de Chat-rles Henri.",
+      "badge": "",
+      "features": {
+        "0": "Céramique 33 cl",
+        "1": "Lave-vaisselle compatible",
+        "2": "Impression haute définition",
+        "3": "Boîte cadeau incluse"
+      },
+      "longDesc": {
+        "0": "Idéal pour siroter ton café avant de couler tes amis. Le Capitaine Chat-rles Henri en majesté, imprimé en haute définition sur céramique blanche.",
+        "1": "Capacité 33 cl, passe au lave-vaisselle et au micro-ondes (à risques et périls pour l'effigie)."
+      }
+    },
+    "collector": {
+      "name": "Édition Collector",
+      "shortDesc": "La boîte du jeu, les 5 stickers, le mug et un set de cartes dorées exclusives.",
+      "badge": "Édition limitée",
+      "features": {
+        "0": "Le jeu ChatBordage complet",
+        "1": "Pack de 5 stickers vinyle",
+        "2": "Mug Capitaine 33 cl",
+        "3": "Set de 15 cartes Navire dorées exclusives",
+        "4": "Coffre en bois sérigraphié",
+        "5": "Certificat numéroté"
+      },
+      "longDesc": {
+        "0": "L'édition ultime pour les vrais loups de mer. Tu reçois tout : le jeu de base, les stickers, le mug Capitaine, plus un set exclusif de cartes Navire en finition dorée à chaud (les 15 navires en version premium, foilées, non disponibles à l'unité).",
+        "1": "Présenté dans un coffre en bois sérigraphié à la patte de chat, avec un certificat d'authenticité numéroté à la main. Tirage limité à 500 exemplaires."
+      }
+    }
   }
 }

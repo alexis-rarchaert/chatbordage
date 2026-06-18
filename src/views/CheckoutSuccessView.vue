@@ -5,33 +5,27 @@
     <main class="success-main container">
       <div class="success-card" v-reveal="'zoom'">
         <div class="success-icon" aria-hidden="true">⚓</div>
-        <h1 class="success-title">Merci, moussaillon !</h1>
+        <h1 class="success-title">{{ $t('success.title') }}</h1>
 
-        <div v-if="loading" class="success-loading">Vérification du paiement…</div>
+        <div v-if="loading" class="success-loading">{{ $t('success.loading') }}</div>
 
         <template v-else-if="status">
-          <p class="success-lead">
-            Ton paiement est <strong>{{ status.payment_status === 'paid' ? 'confirmé' : status.payment_status }}</strong>.
-          </p>
-          <div v-if="status.amount_total != null" class="success-amount">
-            Montant : <strong>{{ formatAmount(status.amount_total, status.currency) }}</strong>
-          </div>
-          <p v-if="status.customer_email" class="success-email">
-            Un récap part vers <strong>{{ status.customer_email }}</strong>.
-          </p>
+          <p class="success-lead" v-html="$t('success.paymentStatus', { status: status.payment_status === 'paid' ? $t('success.statusPaid') : status.payment_status })"></p>
+          <div v-if="status.amount_total != null" class="success-amount" v-html="$t('success.amount', { amount: formatAmount(status.amount_total, status.currency) })"></div>
+          <p v-if="status.customer_email" class="success-email" v-html="$t('success.emailSent', { email: status.customer_email })"></p>
         </template>
 
         <template v-else>
-          <p class="success-lead">Ton paiement de test a été enregistré.</p>
+          <p class="success-lead">{{ $t('success.testPayment') }}</p>
         </template>
 
         <p class="success-note">
-          Pendant qu'on prépare l'expédition, hisse la grand-voile : explore les règles ou la boutique.
+          {{ $t('success.note') }}
         </p>
 
         <div class="success-actions">
-          <RouterLink to="/" class="btn-primary">Retour à l'accueil</RouterLink>
-          <RouterLink to="/reglement" class="success-link">Lire le règlement</RouterLink>
+          <RouterLink to="/" class="btn-primary">{{ $t('success.backHome') }}</RouterLink>
+          <RouterLink to="/reglement" class="success-link">{{ $t('success.readRules') }}</RouterLink>
         </div>
       </div>
     </main>

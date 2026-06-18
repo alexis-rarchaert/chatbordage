@@ -26,7 +26,7 @@
           :class="['corner-group', playerPositions[index]]"
         >
           <div class="selection-card" :class="{ 'is-ready': player.ready }">
-            <h2 class="player-name">Vous êtes le joueur {{ index + 1 }}</h2>
+            <h2 class="player-name">{{ $t('game.lobby.youArePlayer', { num: index + 1 }) }}</h2>
             
             <!-- SÉLECTEUR DE BATEAU -->
             <div class="selector">
@@ -36,8 +36,8 @@
               </div>
               <button @click.stop="nextBoat(index)" :disabled="player.ready">▶</button>
             </div>
-            <p class="item-name">{{ allBoats[player.boatIndex].name }}</p>
-            <p class="boat-ability-text">{{ allBoats[player.boatIndex].ability }}</p>
+            <p class="item-name">{{ $t('ships.' + allBoats[player.boatIndex].abilityId + '.name') }}</p>
+            <p class="boat-ability-text">{{ $t('ships.' + allBoats[player.boatIndex].abilityId + '.ability') }}</p>
 
 
 
@@ -46,7 +46,7 @@
               :class="{ 'conflict-error': player.boatConflict }"
               @click="toggleReady(index)"
             >
-              {{ player.boatConflict ? 'Déjà pris !' : (player.ready ? $t('game.lobby.ready') : $t('game.lobby.notReady')) }}
+              {{ player.boatConflict ? $t('game.lobby.alreadyTaken') : (player.ready ? $t('game.lobby.ready') : $t('game.lobby.notReady')) }}
             </button>
           </div>
         </div>
@@ -65,7 +65,7 @@
     <template v-else-if="isRouletteVisible">
       <div class="roulette-overlay">
         <div class="roulette-container">
-          <h2 class="roulette-title">Désignation du Capitaine</h2>
+          <h2 class="roulette-title">{{ $t('game.roulette.title') }}</h2>
           
           <div class="wheel-outer">
             <div class="wheel-pointer">▼</div>
@@ -94,13 +94,13 @@
               :disabled="isSpinning"
               @click="spinRoulette"
             >
-              {{ isSpinning ? 'Tirage en cours...' : 'Lancer le tirage !' }}
+              {{ isSpinning ? $t('game.roulette.spinning') : $t('game.roulette.spin') }}
             </button>
 
             <div v-else class="winner-reveal">
-              <h3>Le Capitaine est {{ allBoats[players[winnerIndex].boatIndex].name }} !</h3>
-              <p class="bonus-text">+1 Point de Vie bonus !</p>
-              <button class="confirm-button" @click="confirmCaptain">Commencer l'aventure</button>
+              <h3>{{ $t('game.roulette.captainChosen', { name: $t('ships.' + allBoats[players[winnerIndex].boatIndex].abilityId + '.name') }) }}</h3>
+              <p class="bonus-text">{{ $t('game.roulette.hpBonus') }}</p>
+              <button class="confirm-button" @click="confirmCaptain">{{ $t('game.roulette.startAdventure') }}</button>
             </div>
           </div>
         </div>
@@ -133,16 +133,16 @@
                 {{ $t('game.turn.finish') }}
               </button>
               <button class="action-button attack-btn" @click.stop="initiateAttack">
-                Attaque
+                {{ $t('game.turn.attackBtn') }}
               </button>
               <button
                 v-if="allBoats[player.boatIndex].type === 'actif' && !player.abilityUsed"
                 class="action-button ability-btn"
-                :title="allBoats[player.boatIndex].ability"
+                :title="$t('ships.' + allBoats[player.boatIndex].abilityId + '.ability')"
                 @click.stop="useBoatAbility(index)"
               >
-                <span class="ability-btn-label">Pouvoir Navire</span>
-                <span class="ability-tooltip-bubble">{{ allBoats[player.boatIndex].ability }}</span>
+                <span class="ability-btn-label">{{ $t('game.turn.shipPower') }}</span>
+                <span class="ability-tooltip-bubble">{{ $t('ships.' + allBoats[player.boatIndex].abilityId + '.ability') }}</span>
               </button>
             </div>
             
@@ -154,15 +154,15 @@
 
             <div v-if="showDamageModal && currentTurn === index" class="damage-modal" @click.stop>
               <div class="damage-modal-content">
-                <div class="damage-modal-title">Combien de PV retirer ?</div>
+                <div class="damage-modal-title">{{ $t('game.turn.howManyHp') }}</div>
                 <div class="damage-input-row">
                   <button class="damage-step minus" @click.stop="decreaseDamage">-</button>
                   <input type="number" min="1" v-model="damageInput" class="damage-input" />
                   <button class="damage-step plus" @click.stop="increaseDamage">+</button>
                 </div>
                 <div class="damage-modal-actions">
-                  <button class="action-button attack-confirm" @click.stop="confirmDamage">{{ $t ? $t('game.turn.attack') : 'Attaquer' }}</button>
-                  <button class="action-button cancel-button" @click.stop="cancelDamage">Annuler</button>
+                  <button class="action-button attack-confirm" @click.stop="confirmDamage">{{ $t('game.turn.attack') }}</button>
+                  <button class="action-button cancel-button" @click.stop="cancelDamage">{{ $t('game.turn.cancel') }}</button>
                 </div>
               </div>
             </div>
@@ -197,23 +197,23 @@
       <div v-if="showRoleReveal" class="role-reveal-overlay">
         <div class="role-reveal-content">
           <template v-if="roleRevealStep === 'pass'">
-            <h2 class="role-title">Joueur {{ roleRevealPlayerIndex + 1 }}</h2>
-            <p class="role-desc">Passez la tablette au Joueur {{ roleRevealPlayerIndex + 1 }}.<br/>Assurez-vous que personne ne regarde !</p>
-            <button class="role-button" @click="nextRoleReveal">Révéler mon rôle</button>
+            <h2 class="role-title">{{ $t('game.lobby.player') }} {{ roleRevealPlayerIndex + 1 }}</h2>
+            <p class="role-desc" v-html="$t('game.reveal.passTablet', { num: roleRevealPlayerIndex + 1 }) + '<br/>' + $t('game.reveal.noPeeking')"></p>
+            <button class="role-button" @click="nextRoleReveal">{{ $t('game.reveal.revealButton') }}</button>
           </template>
           <template v-else>
-            <h2 class="role-title">{{ players[roleRevealPlayerIndex].roleId === 'capitaine' ? 'Rôle public' : 'Votre rôle secret' }}</h2>
+            <h2 class="role-title">{{ players[roleRevealPlayerIndex].roleId === 'capitaine' ? $t('game.reveal.publicRole') : $t('game.reveal.secretRole') }}</h2>
             <img :src="`/chats/${allCats[players[roleRevealPlayerIndex].catIndex].file}`" class="role-cat-img" />
-            <h3 class="role-name">{{ allRoles.find(r => r.id === players[roleRevealPlayerIndex].roleId).name }}</h3>
-            <p class="role-desc">{{ allRoles.find(r => r.id === players[roleRevealPlayerIndex].roleId).desc }}</p>
-            <p v-if="players[roleRevealPlayerIndex].roleId === 'capitaine'" class="role-public-note">⚓ Votre rôle est connu de tous — annoncez-le à voix haute !<br/>Vous ne recevez pas de mission secrète.</p>
+            <h3 class="role-name">{{ $t('roles.' + players[roleRevealPlayerIndex].roleId + '.name') }}</h3>
+            <p class="role-desc">{{ $t('roles.' + players[roleRevealPlayerIndex].roleId + '.desc') }}</p>
+            <p v-if="players[roleRevealPlayerIndex].roleId === 'capitaine'" class="role-public-note" v-html="$t('game.reveal.publicRoleNote')"></p>
             <button class="role-button" @click="nextRoleReveal">
               {{
                 roleRevealPlayerIndex === players.length - 1
-                  ? 'Replacer la tablette au centre'
+                  ? $t('game.reveal.replaceTablet')
                   : players[roleRevealPlayerIndex].roleId === 'capitaine'
-                    ? 'Annoncer et passer au suivant'
-                    : 'Cacher et passer au suivant'
+                    ? $t('game.reveal.announceAndNext')
+                    : $t('game.reveal.hideAndNext')
               }}
             </button>
           </template>
@@ -223,25 +223,25 @@
       <!-- --- MODALE ÉVÉNEMENT DE MER --- -->
       <div v-if="showEventPhase && currentEvent" class="event-overlay">
         <div class="event-content">
-          <h2 class="event-round">Round {{ currentRound }}</h2>
+          <h2 class="event-round">{{ $t('game.event.round', { round: currentRound }) }}</h2>
           <div class="event-icon">{{ currentEvent.icon }}</div>
-          <h3 class="event-title">{{ currentEvent.name }}</h3>
-          <p class="event-desc">{{ currentEvent.desc }}</p>
-          <button class="event-button" @click="acknowledgeEvent">Prendre le large</button>
+          <h3 class="event-title">{{ $t('events.' + currentEvent.id + '.name') }}</h3>
+          <p class="event-desc">{{ $t('events.' + currentEvent.id + '.desc') }}</p>
+          <button class="event-button" @click="acknowledgeEvent">{{ $t('game.event.startRound') }}</button>
         </div>
       </div>
 
       <!-- --- MODALE PHASE DE RESSOURCES --- -->
       <div v-if="showResourcePhase" class="resource-overlay">
         <div class="resource-content">
-          <h2 class="resource-title">Phase de Ressources</h2>
-          <p class="resource-desc">Joueur {{ currentTurn + 1 }}, c'est à vous ! Choisissez votre bonus :</p>
+          <h2 class="resource-title">{{ $t('game.resources.title') }}</h2>
+          <p class="resource-desc">{{ $t('game.resources.desc', { num: currentTurn + 1 }) }}</p>
           <div class="resource-actions">
             <button class="resource-button gold-btn" @click="chooseGold">
-              <img src="/coin.png" class="btn-icon" /> Prendre 2 Pièces
+              <img src="/coin.png" class="btn-icon" /> {{ $t('game.resources.takeCoins') }}
             </button>
             <button class="resource-button cards-btn" @click="chooseCards">
-              <span class="btn-icon">🎴</span> Piocher {{ cardsToDrawAmount }} cartes physiques
+              <span class="btn-icon">🎴</span> {{ $t('game.resources.drawCards', { count: cardsToDrawAmount }) }}
             </button>
           </div>
         </div>
@@ -262,12 +262,12 @@
             >
               <div class="item-icon">{{ item.icon }}</div>
               <div class="item-info">
-                <span class="item-label">{{ item.name }}</span>
+                <span class="item-label">{{ $t('shop.items.' + item.id + '.name') }}</span>
                 <span class="item-price">{{ item.price }} <img src="/coin.png" class="price-coin" /></span>
               </div>
             </div>
             <div v-if="availableShopItems.length === 0" class="empty-shop">
-              La boutique est vide !
+              {{ $t('game.shop.empty') }}
             </div>
           </div>
         </div>
@@ -276,29 +276,29 @@
       <div v-if="isGameOver" class="end-overlay">
         <div class="end-content">
           <div class="end-flag" aria-hidden="true">🏴‍☠️</div>
-          <h2 class="end-title">Partie terminée !</h2>
+          <h2 class="end-title">{{ $t('game.end.gameOver') }}</h2>
 
           <div v-if="winners.length === 1" class="end-winner">
             <img :src="`/chats/${allCats[winners[0].catIndex].file}`" class="end-cat" />
             <div class="end-meta">
-              <div class="end-label">Vainqueur</div>
+              <div class="end-label">{{ $t('game.end.winner') }}</div>
               <div class="end-name">{{ allCats[winners[0].catIndex].name }}</div>
-              <div class="end-role">{{ allRoles.find(r => r.id === winners[0].roleId)?.name }}</div>
+              <div class="end-role">{{ $t('roles.' + winners[0].roleId + '.name') }}</div>
             </div>
           </div>
           <div v-else-if="winners.length > 1" class="end-winner duo">
             <div v-for="w in winners" :key="w.roleId" class="end-winner-card">
               <img :src="`/chats/${allCats[w.catIndex].file}`" class="end-cat" />
               <div class="end-name">{{ allCats[w.catIndex].name }}</div>
-              <div class="end-role">{{ allRoles.find(r => r.id === w.roleId)?.name }}</div>
+              <div class="end-role">{{ $t('roles.' + w.roleId + '.name') }}</div>
             </div>
           </div>
 
           <p class="end-reason">{{ victoryReason }}</p>
 
           <div class="end-actions">
-            <button class="end-button primary" @click="restartGame">Rejouer une partie</button>
-            <button class="end-button" @click="goHome">Retour à l'accueil</button>
+            <button class="end-button primary" @click="restartGame">{{ $t('game.end.playAgain') }}</button>
+            <button class="end-button" @click="goHome">{{ $t('game.end.backHome') }}</button>
           </div>
         </div>
       </div>
@@ -321,7 +321,10 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { SHOP_ITEMS as GAME_SHOP_ITEMS } from '../game';
+
+const { t } = useI18n();
 
 const popupData = ref(null);
 let popupTimeout = null;
@@ -451,26 +454,26 @@ const checkVictory = () => {
   // Contrebandier : 15 pièces atteintes
   for (const p of players.value) {
     if (p.roleId === 'contrebandier' && p.gold >= 15) {
-      return { winners: [p], reason: 'Contrebandier — 15 pièces accumulées.' };
+      return { winners: [p], reasonKey: 'contrebandier' };
     }
   }
   // Chasseur de primes : 2 éliminations
   for (const p of players.value) {
     if (p.roleId === 'chasseur' && (p.eliminations || 0) >= 2) {
-      return { winners: [p], reason: 'Chasseur de primes — 2 navires coulés.' };
+      return { winners: [p], reasonKey: 'chasseur' };
     }
   }
   // Capitaine + Protecteur : seuls survivants
   if (alive.length === 2) {
     const cap = alive.find(p => p.roleId === 'capitaine');
     const prot = alive.find(p => p.roleId === 'protecteur');
-    if (cap && prot) return { winners: [cap, prot], reason: 'Capitaine et Protecteur — duo survivant.' };
+    if (cap && prot) return { winners: [cap, prot], reasonKey: 'duo' };
   }
   // Renégat / Capitaine seul
   if (alive.length === 1) {
     const last = alive[0];
-    if (last.roleId === 'renegat') return { winners: [last], reason: 'Renégat — dernier survivant.' };
-    if (last.roleId === 'capitaine') return { winners: [last], reason: 'Capitaine — dernier debout.' };
+    if (last.roleId === 'renegat') return { winners: [last], reasonKey: 'renegat' };
+    if (last.roleId === 'capitaine') return { winners: [last], reasonKey: 'capitaine' };
   }
   return null;
 };
@@ -484,7 +487,7 @@ const evaluateVictory = () => {
     isGameOver.value = true;
     winners.value = v.winners;
     winner.value = v.winners[0] ?? null;
-    victoryReason.value = v.reason;
+    victoryReason.value = t('game.victory.' + v.reasonKey);
     return true;
   }
   return false;
@@ -585,7 +588,7 @@ const useBoatAbility = (playerIndex) => {
   const boat = allBoats[player.boatIndex];
   if (player.abilityUsed || boat.type !== 'actif') return;
   // Les pouvoirs qui concernent la pioche physique : rappeler au joueur verbalement
-  triggerPopup('Pouvoir Activé', `${boat.name} :\n${boat.ability}`);
+  triggerPopup(t('game.popup.abilityActivated.title'), `${t('ships.' + boat.abilityId + '.name')} :\n${t('ships.' + boat.abilityId + '.ability')}`);
   player.abilityUsed = true;
   playSuccessChime();
 };
@@ -626,7 +629,7 @@ const cardsToDrawAmount = computed(() => {
 const chooseCards = () => {
   const amount = cardsToDrawAmount.value;
   if (amount > 2) {
-    triggerPopup('Pioche Bonus !', `Vous piochez ${amount} cartes physiques ce tour-ci grâce à vos bonus.`);
+    triggerPopup(t('game.popup.bonusDraw.title'), t('game.popup.bonusDraw.message', { amount }));
   }
   showResourcePhase.value = false;
   playSuccessChime();
@@ -676,7 +679,7 @@ const buyItem = (item) => {
       player.buffNextAttack = (player.buffNextAttack || 0) + 2;
       break;
     case 'DRAW_3':
-      triggerPopup('Coffre de Contrebande', 'Piochez 3 cartes physiques !');
+      triggerPopup(t('game.popup.contrabandChest.title'), t('game.popup.contrabandChest.message'));
       break;
     case 'TRUCE_2':
       player.truceTurnsLeft = 2;
@@ -739,7 +742,7 @@ const confirmDamage = () => {
 
   // Trêve : impossible d'attaquer une cible sous protection
   if (target.truceTurnsLeft && target.truceTurnsLeft > 0) {
-    triggerPopup('Drapeau de trêve', `${allCats[target.catIndex].name} est intouchable ce tour-ci !`);
+    triggerPopup(t('game.popup.truce.title'), t('game.popup.truce.message', { name: allCats[target.catIndex].name }));
     // Carte non consommée — on garde le tour pour rejouer
     isAttacking.value = true;
     playHitSound();
@@ -770,7 +773,7 @@ const confirmDamage = () => {
 
   // Gérer la brume (50% de chance d'échec)
   if (currentEvent.value && currentEvent.value.id === 'brume' && Math.random() < 0.5) {
-    triggerPopup('Échec de l\'attaque', 'L\'attaque a manqué à cause de la brume !');
+    triggerPopup(t('game.popup.failedAttack.title'), t('game.popup.failedAttack.message'));
     playHitSound(); // Bruit d'échec
   } else {
     // Appliquer le dégât choisi par l'attaquant
@@ -780,7 +783,7 @@ const confirmDamage = () => {
 
     // Pouvoir passif: Le Brick (pioche 1 carte physique quand attaqué)
     if (targetBoat.abilityId === 'brick' && target.hp > 0) {
-      triggerPopup('Pouvoir Brick', `${allBoats[target.boatIndex].name} pioche 1 carte physique !`);
+      triggerPopup(t('game.popup.brickPower.title'), t('game.popup.brickPower.message', { name: t('ships.' + allBoats[target.boatIndex].abilityId + '.name') }));
     }
   }
 
@@ -790,12 +793,12 @@ const confirmDamage = () => {
   if (target.revivePending) {
     target.revivePending = false;
     target.hp = 1;
-    triggerPopup('Revivre', `${allCats[target.catIndex].name} revient à la vie avec 1 PV !`);
+    triggerPopup(t('game.popup.revive.title'), t('game.popup.revive.message', { name: allCats[target.catIndex].name }));
   } else {
   attacker.eliminations += 1;
   // Pouvoir passif: Le Brigantin (pioche 2 cartes physiques à l'élimination)
   if (attackerBoat.abilityId === 'brigantin') {
-    triggerPopup('Pouvoir Brigantin', 'Piochez 2 cartes physiques bonus !');
+    triggerPopup(t('game.popup.brigantinPower.title'), t('game.popup.brigantinPower.message'));
   }
   // Transfert des pièces du joueur éliminé
   attacker.gold += target.gold;
