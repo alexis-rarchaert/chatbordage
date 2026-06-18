@@ -141,7 +141,9 @@
       "activePlayer": "Player's Turn",
       "shipPower": "Ship Power",
       "howManyHp": "How many HP to remove?",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "useSpyglass": "Spyglass",
+      "selectSpyglassTarget": "Choose a target to spy on!"
     },
     "reveal": {
       "passTablet": "Pass the tablet to Player {num}.",
@@ -204,6 +206,10 @@
       "brigantinPower": {
         "title": "Brigantin Power",
         "message": "Draw 2 bonus physical cards!"
+      },
+      "spyglass": {
+        "title": "Traitor's Spyglass",
+        "message": "{name}'s secret role is: {role}"
       }
     },
     "victory": {

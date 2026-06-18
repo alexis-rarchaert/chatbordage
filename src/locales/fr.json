@@ -141,7 +141,9 @@
       "activePlayer": "Tour du Joueur",
       "shipPower": "Pouvoir Navire",
       "howManyHp": "Combien de PV retirer ?",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "useSpyglass": "Longue-vue",
+      "selectSpyglassTarget": "Choisis une cible à espionner !"
     },
     "reveal": {
       "passTablet": "Passez la tablette au Joueur {num}.",
@@ -204,6 +206,10 @@
       "brigantinPower": {
         "title": "Pouvoir Brigantin",
         "message": "Piochez 2 cartes physiques bonus !"
+      },
+      "spyglass": {
+        "title": "Longue-vue du Traître",
+        "message": "Le rôle secret de {name} est : {role}"
       }
     },
     "victory": {

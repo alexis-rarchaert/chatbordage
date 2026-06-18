@@ -157,10 +157,10 @@
           'corner-group', 
           playerPositions[index], 
           { 'current-turn': currentTurn === index },
-          { 'selectable-target': isAttacking && currentTurn !== index && player.hp > 0 },
+          { 'selectable-target': (isAttacking || isRevealingRole) && currentTurn !== index && player.hp > 0 },
           { 'eliminated': player.hp === 0 }
         ]"
-        @click="performAttack(index)"
+        @click="handlePlayerClick(index)"
       >
         <div class="pair-container">
           <div class="avatar-box">
@@ -170,6 +170,13 @@
               </button>
               <button class="action-button attack-btn" @click.stop="initiateAttack">
                 {{ $t('game.turn.attackBtn') }}
+              </button>
+              <button
+                v-if="player.canRevealRole"
+                class="action-button reveal-role-btn"
+                @click.stop="initiateRevealRole"
+              >
+                {{ $t('game.turn.useSpyglass') }}
               </button>
               <button
                 v-if="allBoats[player.boatIndex].type === 'actif' && !player.abilityUsed"
@@ -186,6 +193,10 @@
 
             <div v-if="isAttacking && currentTurn === index" class="attack-prompt">
               {{ $t('game.turn.selectTarget') }} (-{{ selectedDamage }})
+            </div>
+
+            <div v-if="isRevealingRole && currentTurn === index" class="attack-prompt">
+              {{ $t('game.turn.selectSpyglassTarget') }}
             </div>
 
             <div v-if="showDamageModal && currentTurn === index" class="damage-modal" @click.stop>
@@ -517,6 +528,7 @@ const startRound = () => {
 };
 
 const isAttacking = ref(false);
+const isRevealingRole = ref(false);
 const showDamageModal = ref(false);
 const cardBeingPlayed = ref(null);
 
@@ -596,6 +608,7 @@ const restartGame = () => {
   roleRevealPlayerIndex.value = 0;
   roleRevealStep.value = 'pass';
   isAttacking.value = false;
+  isRevealingRole.value = false;
   showDamageModal.value = false;
 
   currentTurn.value = 0;
@@ -604,7 +617,7 @@ const restartGame = () => {
   shopItems.value.forEach(it => { it.purchased = false; });
   // Reset des players (sans toucher au navire/chat)
   players.value.forEach(p => {
-    p.hp = 5;
+    p.hp = getBaseHp(p.boatIndex);
     p.gold = 0;
     p.ready = false;
     p.roleId = null;
@@ -621,6 +634,7 @@ const restartGame = () => {
 const nextTurn = () => {
   // Reset des états de tour
   isAttacking.value = false;
+  isRevealingRole.value = false;
   showDamageModal.value = false;
   cardBeingPlayed.value = null;
   showShop.value = false;
@@ -748,13 +762,8 @@ const buyItem = (item) => {
   // Effets boutique (livret de règles)
   switch (item.effect) {
     case 'HEAL_FULL':
-      // Restaure aux PV de départ du navire
-      player.hp = allBoats[player.boatIndex].abilityId === 'fregate' ? 6
-                 : allBoats[player.boatIndex].abilityId === 'cuirasse' ? 7
-                 : allBoats[player.boatIndex].abilityId === 'troismats' ? 6
-                 : 5;
-      // Bonus Capitaine
-      if (player.roleId === 'capitaine') player.hp += 1;
+      // Restaure aux PV de départ du navire (plus bonus Capitaine si applicable)
+      player.hp = getBaseHp(player.boatIndex) + (player.roleId === 'capitaine' ? 1 : 0);
       break;
     case 'BUFF_NEXT_ATTACK_2':
       player.buffNextAttack = (player.buffNextAttack || 0) + 2;
@@ -808,6 +817,34 @@ const confirmDamage = () => {
   showDamageModal.value = false;
   isAttacking.value = true;
   playUiTap();
+};
+
+const initiateRevealRole = () => {
+  isRevealingRole.value = true;
+  playUiTap();
+};
+
+const performRevealRole = (targetIdx) => {
+  const target = players.value[targetIdx];
+  const roleName = t('roles.' + target.roleId + '.name');
+  triggerPopup(
+    t('game.popup.spyglass.title'), 
+    t('game.popup.spyglass.message', { name: allCats[target.catIndex].name, role: roleName })
+  );
+  // Consommer la longue-vue
+  players.value[currentTurn.value].canRevealRole = false;
+  isRevealingRole.value = false;
+  playSuccessChime();
+};
+
+const handlePlayerClick = (index) => {
+  if (isRevealingRole.value) {
+    if (index !== currentTurn.value && players.value[index].hp > 0) {
+      performRevealRole(index);
+    }
+  } else {
+    performAttack(index);
+  }
 };const performAttack = (targetIdx) => {
   if (!isAttacking.value || targetIdx === currentTurn.value) return;
   // Ne pas attaquer un joueur déjà éliminé
@@ -1148,10 +1185,17 @@ const spinRoulette = () => {
   }, spinDuration);
 };
 
+const getBaseHp = (boatIndex) => {
+  const boatId = allBoats[boatIndex].abilityId;
+  if (boatId === 'fregate' || boatId === 'troismats') return 6;
+  if (boatId === 'cuirasse') return 7;
+  if (['corvette', 'sloop', 'jonque', 'felouque', 'brigantin', 'clipper'].includes(boatId)) return 4;
+  return 5;
+};
+
 const confirmCaptain = () => {
   if (winnerIndex.value !== null) {
-    // Le Capitaine gagne +1 PV et reçoit le rôle 'capitaine'
-    players.value[winnerIndex.value].hp += 1;
+    // Le Capitaine reçoit le rôle 'capitaine'
     players.value[winnerIndex.value].roleId = 'capitaine';
 
     // Distribuer les autres rôles aux autres joueurs
@@ -1168,6 +1212,9 @@ const confirmCaptain = () => {
         player.roleId = availableHiddenRoles[roleIndex % availableHiddenRoles.length];
         roleIndex++;
       }
+      
+      // Assigner le PV de départ correct selon le bateau (plus bonus Capitaine)
+      player.hp = getBaseHp(player.boatIndex) + (idx === winnerIndex.value ? 1 : 0);
     });
 
     isRouletteVisible.value = false;
