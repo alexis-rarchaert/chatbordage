@@ -278,6 +278,36 @@
           </div>
         </div>
       </div>
+      <!-- --- MODALE FIN DE PARTIE --- -->
+      <div v-if="isGameOver" class="end-overlay">
+        <div class="end-content">
+          <div class="end-flag" aria-hidden="true">🏴‍☠️</div>
+          <h2 class="end-title">Partie terminée !</h2>
+
+          <div v-if="winners.length === 1" class="end-winner">
+            <img :src="`/chats/${allCats[winners[0].catIndex].file}`" class="end-cat" />
+            <div class="end-meta">
+              <div class="end-label">Vainqueur</div>
+              <div class="end-name">{{ allCats[winners[0].catIndex].name }}</div>
+              <div class="end-role">{{ allRoles.find(r => r.id === winners[0].roleId)?.name }}</div>
+            </div>
+          </div>
+          <div v-else-if="winners.length > 1" class="end-winner duo">
+            <div v-for="w in winners" :key="w.roleId" class="end-winner-card">
+              <img :src="`/chats/${allCats[w.catIndex].file}`" class="end-cat" />
+              <div class="end-name">{{ allCats[w.catIndex].name }}</div>
+              <div class="end-role">{{ allRoles.find(r => r.id === w.roleId)?.name }}</div>
+            </div>
+          </div>
+
+          <p class="end-reason">{{ victoryReason }}</p>
+
+          <div class="end-actions">
+            <button class="end-button primary" @click="restartGame">Rejouer une partie</button>
+            <button class="end-button" @click="goHome">Retour à l'accueil</button>
+          </div>
+        </div>
+      </div>
     </template>
   </div>
 </template>
@@ -419,6 +449,64 @@ const checkVictory = () => {
 };
 
 const victoryReason = ref('');
+const winners = ref([]);
+
+const evaluateVictory = () => {
+  const v = checkVictory();
+  if (v) {
+    isGameOver.value = true;
+    winners.value = v.winners;
+    winner.value = v.winners[0] ?? null;
+    victoryReason.value = v.reason;
+    return true;
+  }
+  return false;
+};
+
+import { useRouter } from 'vue-router';
+const __router = useRouter();
+const goHome = () => __router.push('/');
+
+const restartGame = () => {
+  // Reset complet vers le lobby (les joueurs gardent leur navire/chat de départ choisi)
+  isGameOver.value = false;
+  winner.value = null;
+  winners.value = [];
+  victoryReason.value = '';
+  isStarted.value = false;
+  isRouletteVisible.value = false;
+  winnerIndex.value = null;
+  selectedSegment.value = null;
+  showShop.value = false;
+  showResourcePhase.value = false;
+  showEventPhase.value = false;
+  currentEvent.value = null;
+  showRoleReveal.value = false;
+  roleRevealPlayerIndex.value = 0;
+  roleRevealStep.value = 'pass';
+  isAttacking.value = false;
+  showDamageModal.value = false;
+  cardBeingPlayed.value = null;
+  currentTurn.value = 0;
+  currentRound.value = 1;
+  // Reset shop items
+  shopItems.value.forEach(it => { it.purchased = false; });
+  // Reset des players (sans toucher au navire/chat)
+  players.value.forEach(p => {
+    p.hp = 5;
+    p.gold = 0;
+    p.hand = [];
+    p.ready = false;
+    p.roleId = null;
+    p.eliminations = 0;
+    p.abilityUsed = false;
+    p.boatConflict = false;
+    p.truceTurnsLeft = 0;
+    p.buffNextAttack = 0;
+    p.revivePending = false;
+    p.canRevealRole = false;
+  });
+};
 
 const nextTurn = () => {
   // Reset des états de tour
@@ -431,13 +519,7 @@ const nextTurn = () => {
   currentEvent.value = null;
 
   // Évaluer la victoire (toutes conditions)
-  const v = checkVictory();
-  if (v) {
-    isGameOver.value = true;
-    winner.value = v.winners[0] ?? null;
-    victoryReason.value = v.reason;
-    return;
-  }
+  if (evaluateVictory()) return;
 
   // Trouver le prochain joueur vivant en sens horaire
   const total = players.value.length;
@@ -525,6 +607,8 @@ const chooseGold = () => {
   player.gold += goldGained;
   showResourcePhase.value = false;
   playSuccessChime();
+  // Le Contrebandier peut gagner dès qu'il atteint 15 pièces
+  evaluateVictory();
 };
 
 const chooseCards = () => {
@@ -2197,5 +2281,155 @@ onUnmounted(() => {
   0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.1); opacity: 0.8; }
   100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============ FIN DE PARTIE ============ */
+.end-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(107, 25, 34, 0.92) 0%, rgba(20, 5, 8, 0.97) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(6px);
+  animation: end-fadein 0.5s ease both;
+}
+@keyframes end-fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.end-content {
+  background: linear-gradient(160deg, rgba(79, 18, 25, 0.98) 0%, rgba(45, 10, 15, 0.98) 100%);
+  border: 3px solid #c8a24a;
+  border-radius: 20px;
+  padding: 48px 56px;
+  max-width: 640px;
+  width: calc(100% - 40px);
+  text-align: center;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(245, 233, 212, 0.1);
+  animation: end-zoom 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+@keyframes end-zoom {
+  from { opacity: 0; transform: scale(0.85) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.end-flag {
+  font-size: 64px;
+  margin-bottom: 12px;
+  animation: end-flag-bob 2.4s ease-in-out infinite;
+}
+@keyframes end-flag-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+.end-title {
+  font-family: 'Pirata One', serif;
+  color: #c8a24a;
+  font-size: clamp(38px, 5vw, 52px);
+  margin: 0 0 28px;
+  letter-spacing: 0.04em;
+  text-shadow: 0 3px 0 #4f1219, 0 6px 14px rgba(0, 0, 0, 0.5);
+}
+.end-winner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.end-winner.duo {
+  flex-direction: row;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.end-winner-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.end-cat {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55));
+  animation: end-cat-pulse 2s ease-in-out infinite;
+}
+.end-winner.duo .end-cat { width: 100px; height: 100px; }
+@keyframes end-cat-pulse {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.04); }
+}
+.end-label {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #d8c9a4;
+  opacity: 0.7;
+}
+.end-name {
+  font-family: 'Pirata One', serif;
+  color: #c8a24a;
+  font-size: 28px;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 0 #4f1219;
+}
+.end-role {
+  color: #f7eed8;
+  font-size: 15px;
+  font-style: italic;
+}
+.end-reason {
+  background: rgba(58, 170, 176, 0.12);
+  border-left: 4px solid #3aaab0;
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: #f7eed8;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 auto 28px;
+  max-width: 480px;
+  text-align: left;
+}
+.end-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.end-button {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 13px 26px;
+  border-radius: 12px;
+  border: 2px solid #c8a24a;
+  background: transparent;
+  color: #c8a24a;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+.end-button:hover {
+  background: rgba(200, 162, 74, 0.15);
+  transform: translateY(-2px);
+}
+.end-button.primary {
+  background: linear-gradient(180deg, #c8a24a 0%, #a8852f 100%);
+  color: #4f1219;
+  border-color: #4f1219;
+  box-shadow: 0 4px 0 #4f1219;
+}
+.end-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #4f1219;
+}
+.end-button.primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #4f1219;
 }
 </style>
