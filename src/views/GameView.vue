@@ -284,6 +284,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { CARDS as GAME_CARDS, SHOP_ITEMS as GAME_SHOP_ITEMS } from '../game';
 
 const allCats = [
   { file: 'antoine.png', name: 'Antoine' },
@@ -387,6 +388,38 @@ const acknowledgeEvent = () => {
 const isGameOver = ref(false);
 const winner = ref(null);
 
+const checkVictory = () => {
+  const alive = players.value.filter(p => p.hp > 0);
+
+  // Contrebandier : 15 pièces atteintes
+  for (const p of players.value) {
+    if (p.roleId === 'contrebandier' && p.gold >= 15) {
+      return { winners: [p], reason: 'Contrebandier — 15 pièces accumulées.' };
+    }
+  }
+  // Chasseur de primes : 2 éliminations
+  for (const p of players.value) {
+    if (p.roleId === 'chasseur' && (p.eliminations || 0) >= 2) {
+      return { winners: [p], reason: 'Chasseur de primes — 2 navires coulés.' };
+    }
+  }
+  // Capitaine + Protecteur : seuls survivants
+  if (alive.length === 2) {
+    const cap = alive.find(p => p.roleId === 'capitaine');
+    const prot = alive.find(p => p.roleId === 'protecteur');
+    if (cap && prot) return { winners: [cap, prot], reason: 'Capitaine et Protecteur — duo survivant.' };
+  }
+  // Renégat / Capitaine seul
+  if (alive.length === 1) {
+    const last = alive[0];
+    if (last.roleId === 'renegat') return { winners: [last], reason: 'Renégat — dernier survivant.' };
+    if (last.roleId === 'capitaine') return { winners: [last], reason: 'Capitaine — dernier debout.' };
+  }
+  return null;
+};
+
+const victoryReason = ref('');
+
 const nextTurn = () => {
   // Reset des états de tour
   isAttacking.value = false;
@@ -397,13 +430,12 @@ const nextTurn = () => {
   showEventPhase.value = false;
   currentEvent.value = null;
 
-  // Joueurs vivants
-  const alivePlayers = players.value.filter(p => p.hp > 0);
-
-  // Condition de victoire : un seul survivant
-  if (alivePlayers.length <= 1) {
+  // Évaluer la victoire (toutes conditions)
+  const v = checkVictory();
+  if (v) {
     isGameOver.value = true;
-    winner.value = alivePlayers[0] ?? null;
+    winner.value = v.winners[0] ?? null;
+    victoryReason.value = v.reason;
     return;
   }
 
@@ -414,10 +446,8 @@ const nextTurn = () => {
   while (players.value[next].hp <= 0 && guard-- > 0) {
     next = (next + 1) % total;
   }
-  currentTurn.value = next;
-
-  // Si on revient au premier siège, on incrémente le round
   if (next <= currentTurn.value && next === 0) currentRound.value += 1;
+  currentTurn.value = next;
 
   // Reset des pouvoirs actifs 1x/tour pour le joueur qui va jouer
   const ship = allBoats[players.value[next].boatIndex];
@@ -425,16 +455,36 @@ const nextTurn = () => {
     players.value[next].abilityUsed = false;
   }
 
+  // Décrémenter trêve
+  if (players.value[next].truceTurnsLeft > 0) players.value[next].truceTurnsLeft -= 1;
+
   playUiTap();
   startRound();
 };
 
-const gameDeck = [
-  { id: 'atk1', name: 'Tir au But', type: 'attack', damage: 1, desc: 'Inflige 1 dégât.', icon: '💥' },
-  { id: 'atk2', name: 'Boulets chaînés', type: 'attack', damage: 2, desc: 'Inflige 2 dégâts.', icon: '⛓️' },
-  { id: 'def1', name: 'Voile renforcée', type: 'defense', value: 1, desc: 'Annule 1 dégât.', icon: '🛡️' },
-  { id: 'heal1', name: 'Tonneau de Rhum', type: 'heal', value: 1, desc: 'Soigne 1 PV.', icon: '🍺' }
-];
+// Adapter : projette les cartes du moteur src/game/cards.ts vers le format UI (attack/heal/defense)
+const FAMILY_ICONS = { ABORDAGE: '⚔️', VOILE: '🛡️', MAREE: '🍺', RUMEUR: '🦜', TRESOR: '💎' };
+function familyToUiType(card) {
+  if (card.family === 'ABORDAGE') return 'attack';
+  if (card.family === 'MAREE' && card.heal) return 'heal';
+  if (card.family === 'VOILE') return 'defense';
+  return null;
+}
+const gameDeck = GAME_CARDS
+  .map(c => {
+    const type = familyToUiType(c);
+    if (!type) return null;
+    return {
+      id: c.id,
+      name: c.name,
+      type,
+      damage: c.damage,
+      value: c.heal,
+      desc: c.description,
+      icon: FAMILY_ICONS[c.family]
+    };
+  })
+  .filter(Boolean);
 
 const useBoatAbility = (playerIndex) => {
   const player = players.value[playerIndex];
@@ -498,31 +548,67 @@ const chooseCards = () => {
   playSuccessChime();
 };
 
-const shopItems = ref([
-  { id: 'heal', name: 'Réparations d\'urgence', icon: '❤️', price: 8, purchased: false },
-  { id: 'dmg', name: 'Poudre noire', icon: '💣', price: 6, purchased: false },
-  { id: 'draw', name: 'Coffre de contrebande', icon: '📦', price: 5, purchased: false },
-  { id: 'spy', name: 'Longue-vue du traître', icon: '🔭', price: 7, purchased: false },
-  { id: 'peace', name: 'Drapeau de trêve', icon: '🏳️', price: 10, purchased: false },
-  { id: 'revive', name: 'Revivre une fois', icon: '✝️', price: 15, purchased: false }
-]);
+const SHOP_ICONS = {
+  reparations: '❤️',
+  poudre: '💣',
+  coffre: '📦',
+  'longue-vue': '🔭',
+  treve: '🏳️',
+  revivre: '✝️'
+};
+const shopItems = ref(GAME_SHOP_ITEMS.map(it => ({
+  id: it.id,
+  name: it.name,
+  icon: SHOP_ICONS[it.id] || '🎒',
+  price: it.price,
+  description: it.description,
+  effect: it.effect,
+  purchased: false
+})));
 
 const availableShopItems = computed(() => shopItems.value.filter(item => !item.purchased));
 
 const buyItem = (item) => {
   const player = players.value[currentTurn.value];
-  if (player.gold >= item.price && !item.purchased) {
-    player.gold -= item.price;
-    item.purchased = true;
-    playSuccessChime();
-    
-    // Add basic immediate effects for simple items
-    if (item.id === 'heal') {
-      player.hp = Math.max(player.hp, 6); // roughly max hp
-    }
-  } else {
-    playHitSound(); // use as error sound
+  if (player.gold < item.price || item.purchased) {
+    playHitSound();
+    return;
   }
+  player.gold -= item.price;
+  item.purchased = true;
+
+  // Effets boutique (livret de règles)
+  switch (item.effect) {
+    case 'HEAL_FULL':
+      // Restaure aux PV de départ du navire
+      player.hp = allBoats[player.boatIndex].abilityId === 'fregate' ? 6
+                 : allBoats[player.boatIndex].abilityId === 'cuirasse' ? 7
+                 : allBoats[player.boatIndex].abilityId === 'troismats' ? 6
+                 : 5;
+      // Bonus Capitaine
+      if (player.roleId === 'capitaine') player.hp += 1;
+      break;
+    case 'BUFF_NEXT_ATTACK_2':
+      player.buffNextAttack = (player.buffNextAttack || 0) + 2;
+      break;
+    case 'DRAW_3':
+      for (let i = 0; i < 3 && player.hand.length < 5; i++) {
+        const c = gameDeck[Math.floor(Math.random() * gameDeck.length)];
+        player.hand.push({ ...c, uid: Math.random().toString(36).substr(2, 9) });
+      }
+      break;
+    case 'TRUCE_2':
+      player.truceTurnsLeft = 2;
+      break;
+    case 'REVIVE_PENDING':
+      player.revivePending = true;
+      break;
+    case 'REVEAL_ROLE':
+      // Pas de ciblage UI ici — on stocke un flag, l'UI peut s'en servir plus tard
+      player.canRevealRole = true;
+      break;
+  }
+  playSuccessChime();
 };
 const selectedDamage = ref(1);
 const damageInput = ref(String(selectedDamage.value));
@@ -564,10 +650,24 @@ const performAttack = (targetIdx) => {
   const attackerBoat = allBoats[attacker.boatIndex];
   const targetBoat = allBoats[target.boatIndex];
 
+  // Trêve : impossible d'attaquer une cible sous protection
+  if (target.truceTurnsLeft && target.truceTurnsLeft > 0) {
+    alert(`${allCats[target.catIndex].name} est sous Drapeau de trêve, intouchable !`);
+    isAttacking.value = false;
+    playHitSound();
+    return;
+  }
+
   // Calculer les dégâts (prendre en compte la tempête)
   let actualDamage = selectedDamage.value;
   if (currentEvent.value && currentEvent.value.id === 'tempete') {
     actualDamage += 1;
+  }
+
+  // Buff Poudre noire (achat boutique)
+  if (attacker.buffNextAttack) {
+    actualDamage += attacker.buffNextAttack;
+    attacker.buffNextAttack = 0;
   }
 
   // Pouvoir passif: La Felouque (+1 dégât si la cible a plus de PV)
@@ -599,6 +699,12 @@ const performAttack = (targetIdx) => {
 
   // Pouvoir passif: Le Brigantin (pioche 2 cartes si on élimine un joueur)
   if (target.hp === 0) {
+  // Revivre une fois : la cible revient avec 1 PV au lieu d'être éliminée
+  if (target.revivePending) {
+    target.revivePending = false;
+    target.hp = 1;
+    alert(`${allCats[target.catIndex].name} revient à la vie avec 1 PV !`);
+  } else {
   attacker.eliminations += 1;
   if (attackerBoat.abilityId === 'brigantin') {
     for (let i = 0; i < 2; i++) {
@@ -608,11 +714,16 @@ const performAttack = (targetIdx) => {
       }
     }
   }
-  }
-
+  // Transfert des cartes & pièces du joueur éliminé
+  attacker.hand.push(...target.hand);
+  attacker.gold += target.gold;
+  target.hand = [];
+  target.gold = 0;
   // Pouvoir passif: La Frégate (+1 PV si on élimine un joueur)
-  if (target.hp === 0 && attackerBoat.abilityId === 'fregate') {
+  if (attackerBoat.abilityId === 'fregate') {
     attacker.hp += 1;
+  }
+  }
   }
 
   // Retirer la carte jouée de la main
