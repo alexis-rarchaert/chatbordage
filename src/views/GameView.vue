@@ -218,12 +218,20 @@
             <button class="role-button" @click="nextRoleReveal">Révéler mon rôle</button>
           </template>
           <template v-else>
-            <h2 class="role-title">Votre rôle secret</h2>
+            <h2 class="role-title">{{ players[roleRevealPlayerIndex].roleId === 'capitaine' ? 'Rôle public' : 'Votre rôle secret' }}</h2>
             <img :src="`/chats/${allCats[players[roleRevealPlayerIndex].catIndex].file}`" class="role-cat-img" />
             <h3 class="role-name">{{ allRoles.find(r => r.id === players[roleRevealPlayerIndex].roleId).name }}</h3>
             <p class="role-desc">{{ allRoles.find(r => r.id === players[roleRevealPlayerIndex].roleId).desc }}</p>
-            <p v-if="players[roleRevealPlayerIndex].roleId === 'capitaine'" class="role-public-note">(Ceci est public, tout le monde sait que vous êtes le Capitaine)</p>
-            <button class="role-button" @click="nextRoleReveal">Cacher et passer au suivant</button>
+            <p v-if="players[roleRevealPlayerIndex].roleId === 'capitaine'" class="role-public-note">⚓ Votre rôle est connu de tous — annoncez-le à voix haute !<br/>Vous ne recevez pas de mission secrète.</p>
+            <button class="role-button" @click="nextRoleReveal">
+              {{
+                roleRevealPlayerIndex === players.length - 1
+                  ? 'Replacer la tablette au centre'
+                  : players[roleRevealPlayerIndex].roleId === 'capitaine'
+                    ? 'Annoncer et passer au suivant'
+                    : 'Cacher et passer au suivant'
+              }}
+            </button>
           </template>
         </div>
       </div>
@@ -977,6 +985,44 @@ const playRevealSound = () => {
   drum.stop(context.currentTime + 0.3);
 
   setTimeout(() => context.close(), 1200);
+};
+
+// Petit clic neutre pour les interactions UI (ready, draw, buy…)
+const playUiTap = () => {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+  const ctx = new AudioContextClass();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.06);
+  gain.gain.setValueAtTime(0.06, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.13);
+  setTimeout(() => ctx.close(), 400);
+};
+
+// Son d'impact grave pour les conflits / erreurs / attaques
+const playHitSound = () => {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+  const ctx = new AudioContextClass();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(180, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.18);
+  gain.gain.setValueAtTime(0.12, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.22);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.25);
+  setTimeout(() => ctx.close(), 600);
 };
 
 const spinRoulette = () => {
@@ -1877,9 +1923,10 @@ onUnmounted(() => {
 }
 
 .role-cat-img {
+  display: block;
   width: 120px;
   height: auto;
-  margin: 20px 0;
+  margin: 20px auto;
   filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
 }
 
