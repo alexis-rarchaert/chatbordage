@@ -8,7 +8,7 @@
           <h1 class="lobby-title title-top">{{ $t('game.lobby.title') }}</h1>
           
           <!-- SÉLECTEUR DE NOMBRE DE JOUEURS -->
-          <div class="player-count-selector">
+          <div v-if="!allReady" class="player-count-selector">
             <span class="count-label">{{ $t('game.lobby.playerCount') }}</span>
             <div class="count-controls">
               <button @click="playerCount = Math.max(2, playerCount - 1)" :disabled="playerCount <= 2">-</button>
@@ -707,7 +707,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1vmin;
+  gap: 15vmin;
   pointer-events: none;
   z-index: 10;
 }
