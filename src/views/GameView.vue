@@ -182,6 +182,8 @@
             </div>
 
             <img :src="`/bateaux/${allBoats[player.boatIndex].file}`" class="boat-img" />
+            <!-- Afficher le chat uniquement pour le Capitaine (rôle public) -->
+            <img v-if="player.roleId === 'capitaine'" :src="`/chats/${allCats[player.catIndex].file}`" class="cat-img" />
             <div v-if="currentTurn === index" class="turn-badge">{{ $t('game.turn.yourTurn') }}</div>
           </div>
           
@@ -203,6 +205,25 @@
       <div class="deck-area-controls bottom-area">
         <div class="turn-display bottom-turn">{{ $t('game.turn.activePlayer') }} {{ currentTurn + 1 }}</div>
         <button class="shop-button bottom-shop" @click="openShop(0)">{{ $t('header.shop') }}</button>
+      </div>
+
+      <!-- --- MODALE RÉVÉLATION DES RÔLES --- -->
+      <div v-if="showRoleReveal" class="role-reveal-overlay">
+        <div class="role-reveal-content">
+          <template v-if="roleRevealStep === 'pass'">
+            <h2 class="role-title">Joueur {{ roleRevealPlayerIndex + 1 }}</h2>
+            <p class="role-desc">Passez la tablette au Joueur {{ roleRevealPlayerIndex + 1 }}.<br/>Assurez-vous que personne ne regarde !</p>
+            <button class="role-button" @click="nextRoleReveal">Révéler mon rôle</button>
+          </template>
+          <template v-else>
+            <h2 class="role-title">Votre rôle secret</h2>
+            <img :src="`/chats/${allCats[players[roleRevealPlayerIndex].catIndex].file}`" class="role-cat-img" />
+            <h3 class="role-name">{{ allRoles.find(r => r.id === players[roleRevealPlayerIndex].roleId).name }}</h3>
+            <p class="role-desc">{{ allRoles.find(r => r.id === players[roleRevealPlayerIndex].roleId).desc }}</p>
+            <p v-if="players[roleRevealPlayerIndex].roleId === 'capitaine'" class="role-public-note">(Ceci est public, tout le monde sait que vous êtes le Capitaine)</p>
+            <button class="role-button" @click="nextRoleReveal">Cacher et passer au suivant</button>
+          </template>
+        </div>
       </div>
 
       <!-- --- MODALE ÉVÉNEMENT DE MER --- -->
@@ -316,6 +337,28 @@ const currentTurn = ref(0);
 const currentRound = ref(1);
 const showEventPhase = ref(false);
 const currentEvent = ref(null);
+
+// Sequence de révélation des rôles
+const showRoleReveal = ref(false);
+const roleRevealPlayerIndex = ref(0);
+const roleRevealStep = ref('pass'); // 'pass' | 'view'
+
+const nextRoleReveal = () => {
+  if (roleRevealStep.value === 'pass') {
+    roleRevealStep.value = 'view';
+    playRevealSound();
+  } else {
+    roleRevealPlayerIndex.value++;
+    if (roleRevealPlayerIndex.value < players.value.length) {
+      roleRevealStep.value = 'pass';
+      playUiTap();
+    } else {
+      // Tous les joueurs ont vu leur rôle, on lance la partie
+      showRoleReveal.value = false;
+      startRound();
+    }
+  }
+};
 
 const seaEvents = [
   { id: 'tempete', name: 'Tempête !', desc: 'La mer se déchaîne. Les attaques infligent +1 Dégât ce tour-ci.', icon: '🌪️' },
@@ -740,7 +783,11 @@ const confirmCaptain = () => {
     isRouletteVisible.value = false;
     isStarted.value = true;
     currentTurn.value = 0;
-    startRound(); // Lancer le premier événement de mer
+    
+    // Début de la séquence de révélation des rôles
+    showRoleReveal.value = true;
+    roleRevealPlayerIndex.value = 0;
+    roleRevealStep.value = 'pass';
   }
 };
 
@@ -1444,6 +1491,97 @@ onUnmounted(() => {
 @media (max-width: 600px) {
   .corner-group { width: 45vmin; height: 45vmin; }
   .lobby-title { font-size: 1.2rem; }
+}
+
+/* --- ROLE REVEAL OVERLAY STYLES --- */
+.role-reveal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+}
+
+.role-reveal-content {
+  background-image: url('/paper.png');
+  background-size: cover;
+  background-position: center;
+  padding: 5vmin;
+  border-radius: 12px;
+  border: 5px solid #3d1c10;
+  box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 600px;
+  width: 80vw;
+  animation: scaleUp 0.3s ease-out;
+}
+
+.role-title {
+  font-family: 'Georgia', serif;
+  color: #3d1c10;
+  font-size: 2.5rem;
+  margin-top: 0;
+  text-transform: uppercase;
+  border-bottom: 2px solid #3d1c10;
+  padding-bottom: 10px;
+}
+
+.role-cat-img {
+  width: 120px;
+  height: auto;
+  margin: 20px 0;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+
+.role-name {
+  font-family: 'Georgia', serif;
+  color: #c62828;
+  font-size: 2rem;
+  margin: 10px 0;
+  text-transform: uppercase;
+}
+
+.role-desc {
+  font-family: 'Georgia', serif;
+  color: #5d2a18;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.role-public-note {
+  font-family: 'Georgia', serif;
+  color: #c62828;
+  font-size: 1rem;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.role-button {
+  background: #3d1c10;
+  color: #f1d3a1;
+  border: 3px solid #5d2a18;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+
+.role-button:hover {
+  transform: translateY(-3px);
+  background: #5d2a18;
+  color: white;
 }
 
 /* --- EVENT OVERLAY STYLES --- */
