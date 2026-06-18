@@ -1,0 +1,111 @@
+:root {
+  --color-burgundy: #6b1922;
+  --color-burgundy-dark: #4f1219;
+  --color-gold: #c8a24a;
+  --color-gold-dark: #a8852f;
+  --color-cream: #f5e9d4;
+  --color-turquoise: #3aaab0;
+  --color-ink: #1a0f10;
+  --color-text-light: #f7eed8;
+  --color-text-muted: #d8c9a4;
+
+  --font-display: 'Pirata One', 'Cinzel', serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.25);
+
+  --container-max: 1200px;
+  --section-py: clamp(48px, 8vw, 96px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-burgundy);
+  color: var(--color-text-light);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  display: block;
+}
+
+.section-banner {
+  background: var(--color-gold);
+  padding: 18px 24px;
+  text-align: center;
+}
+
+.section-banner h2 {
+  color: var(--color-burgundy);
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: 0.04em;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn-primary {
+  background: var(--color-gold);
+  color: var(--color-burgundy);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  border: none;
+  padding: 14px 32px;
+  border-radius: var(--radius-md);
+  text-transform: uppercase;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-gold-dark);
+  transform: translateY(-1px);
+}

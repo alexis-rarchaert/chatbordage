@@ -75,6 +75,20 @@
     "legal": "Mentions légales",
     "tos": "Conditions Générales de Vente"
   },
+  "form": {
+    "lead": "Préinscrivez-vous dès maintenant pour ne rien rater !",
+    "firstName": "Prénom",
+    "firstNamePh": "Jean",
+    "lastName": "Nom",
+    "lastNamePh": "Valjean",
+    "email": "Adresse e-mail",
+    "emailPh": "jean.valjean@gmail.com",
+    "tosAccept": "J'accepte les",
+    "submit": "SE PRÉINSCRIRE",
+    "sending": "Envoi en cours…",
+    "success": "Merci ! Votre préinscription a bien été enregistrée.",
+    "error": "Une erreur est survenue. Réessayez plus tard."
+  },
   "game": {
     "lobby": {
       "title": "Préparation de l'équipage",

@@ -75,6 +75,20 @@
     "legal": "Legal Mentions",
     "tos": "Terms of Service"
   },
+  "form": {
+    "lead": "Pre-register now to stay in the loop!",
+    "firstName": "First name",
+    "firstNamePh": "John",
+    "lastName": "Last name",
+    "lastNamePh": "Doe",
+    "email": "Email address",
+    "emailPh": "john.doe@gmail.com",
+    "tosAccept": "I accept the",
+    "submit": "PRE-REGISTER",
+    "sending": "Sending…",
+    "success": "Thanks! Your pre-registration has been recorded.",
+    "error": "Something went wrong. Please try again later."
+  },
   "game": {
     "lobby": {
       "title": "Crew Preparation",
