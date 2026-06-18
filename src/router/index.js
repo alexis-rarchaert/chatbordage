@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import ReglementView from '../views/ReglementView.vue'
 import GameView from '../views/GameView.vue'
 import FormulaireView from '../views/FormulaireView.vue'
+import BoutiqueView from '../views/BoutiqueView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/preinscription',
       name: 'preinscription',
       component: FormulaireView
+    },
+    {
+      path: '/boutique',
+      name: 'boutique',
+      component: BoutiqueView
     }
   ]
 })

@@ -12,6 +12,7 @@
         <RouterLink to="/" @click="menuOpen = false">{{ $t('header.home') }}</RouterLink>
         <a href="/#concept" @click="menuOpen = false">{{ $t('header.theGame') }}</a>
         <RouterLink to="/reglement" @click="menuOpen = false">{{ $t('header.rules') }}</RouterLink>
+        <RouterLink to="/boutique" @click="menuOpen = false">{{ $t('header.shop') }}</RouterLink>
         <RouterLink to="/preinscription" class="nav-cta" @click="menuOpen = false">{{ $t('hero.preorder') }}</RouterLink>
         <select v-model="$i18n.locale" class="lang-selector" aria-label="Langue">
           <option value="fr">FR</option>
