@@ -35,7 +35,7 @@
                 <div class="boat-preview">
                   <img :src="`/bateaux/${allBoats[player.boatIndex].file}`" class="preview-img" />
                   <div class="info-icon">i</div>
-                  <div class="ability-tooltip">{{ $t(allBoats[player.boatIndex].ability) }}</div>
+                  <div class="ability-tooltip">{{ allBoats[player.boatIndex].ability }}</div>
                 </div>
               </div>
               <button @click.stop="nextBoat(index)" :disabled="player.ready">▶</button>
