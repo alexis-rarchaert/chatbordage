@@ -1,27 +1,6 @@
 <template>
   <div class="home">
-    <!-- ============ HEADER ============ -->
-    <header class="site-header">
-      <div class="header-inner">
-        <div class="logo-wrap">
-          <img src="/favicon.png" alt="ChatBordage" class="logo-img" />
-          <span class="logo-text">ChatBordage</span>
-        </div>
-        <button class="burger" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
-        <nav class="nav-links" :class="{ open: menuOpen }">
-          <RouterLink to="/">{{ $t('header.home') }}</RouterLink>
-          <a href="#concept">{{ $t('header.theGame') }}</a>
-          <RouterLink to="/reglement">{{ $t('header.rules') }}</RouterLink>
-          <RouterLink to="/preinscription" class="nav-cta">{{ $t('hero.preorder') }}</RouterLink>
-          <select v-model="$i18n.locale" class="lang-selector" aria-label="Langue">
-            <option value="fr">FR</option>
-            <option value="en">EN</option>
-          </select>
-        </nav>
-      </div>
-    </header>
+    <SiteHeader />
 
     <!-- ============ HERO ============ -->
     <section class="hero">
@@ -178,26 +157,17 @@
       </div>
     </section>
 
-    <!-- ============ FOOTER ============ -->
-    <footer class="site-footer">
-      <div class="socials" aria-hidden="true">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-      </div>
-      <a href="#" aria-disabled="true">{{ $t('footer.legal') }}</a>
-      <a href="#" aria-disabled="true">{{ $t('footer.tos') }}</a>
-    </footer>
+    <SiteFooter />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import SiteHeader from '../components/SiteHeader.vue'
+import SiteFooter from '../components/SiteFooter.vue'
 
 const { t } = useI18n()
-const menuOpen = ref(false)
 
 const slides = computed(() => [
   { title: t('slides.gameType.title'), description: t('slides.gameType.description'), image: '/chats/escobarre.png' },
@@ -236,82 +206,6 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .home {
   background: var(--color-burgundy);
   color: var(--color-text-light);
-}
-
-/* ========= HEADER ========= */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: var(--color-burgundy-dark);
-  border-bottom: 2px solid var(--color-gold);
-}
-.header-inner {
-  max-width: var(--container-max);
-  margin: 0 auto;
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-.logo-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.logo-img { width: 44px; height: 44px; }
-.logo-text {
-  font-family: var(--font-display);
-  font-size: 28px;
-  color: var(--color-cream);
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.nav-links a {
-  color: var(--color-text-light);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 15px;
-  transition: color 0.15s;
-}
-.nav-links a:hover { color: var(--color-gold); }
-.nav-cta {
-  background: var(--color-gold);
-  color: var(--color-burgundy) !important;
-  padding: 8px 18px;
-  border-radius: var(--radius-md);
-  font-weight: 700;
-}
-.lang-selector {
-  background: transparent;
-  color: var(--color-text-light);
-  border: 1px solid var(--color-gold);
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-size: 13px;
-}
-.burger {
-  display: none;
-  background: var(--color-burgundy);
-  border: none;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  padding: 10px;
-}
-.burger span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--color-cream);
 }
 
 /* ========= HERO ========= */
@@ -753,47 +647,6 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   margin-top: 4px;
 }
 
-/* ========= FOOTER ========= */
-.site-footer {
-  background-color: var(--color-gold-dark);
-  background-image:
-    linear-gradient(180deg, rgba(168, 133, 47, 0) 0%, rgba(107, 25, 34, 0.15) 100%),
-    url('/bois.png');
-  background-size: auto, 400px;
-  background-blend-mode: overlay, multiply;
-  color: var(--color-burgundy-dark);
-  padding: 40px 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  border-top: 3px solid var(--color-burgundy-dark);
-}
-.site-footer a {
-  color: var(--color-burgundy-dark);
-  text-decoration: underline;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color 0.15s;
-}
-.site-footer a:hover { color: var(--color-ink); }
-.socials {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 8px;
-}
-.dot {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--color-burgundy);
-  border: 2px solid var(--color-burgundy-dark);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 0.15s;
-}
-.dot:hover { transform: translateY(-2px); }
-
 /* ========= RESPONSIVE ========= */
 @media (max-width: 900px) {
   .hero {
@@ -812,22 +665,6 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
     grid-template-columns: 1fr;
     direction: ltr;
   }
-  .nav-links {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--color-burgundy-dark);
-    flex-direction: column;
-    padding: 20px;
-    gap: 16px;
-    border-bottom: 2px solid var(--color-gold);
-  }
-  .nav-links.open { display: flex; }
-  .burger { display: flex; }
-  .site-header { position: relative; }
-
   /* CTA section mobile : pièces plus petites en ligne, pas wrappées */
   .section-cta {
     gap: 16px;
