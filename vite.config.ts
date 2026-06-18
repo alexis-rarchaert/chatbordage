@@ -11,12 +11,6 @@ export default defineConfig({
     vueDevTools(),
   ],
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-      }
-    },
     host: true
   },
   resolve: {

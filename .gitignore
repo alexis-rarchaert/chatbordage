@@ -43,5 +43,8 @@ __screenshots__/
 
 # Claude Code
 .claude/
+.antigravitycli/
 
 package-lock.json
+
+supabase/.temp
