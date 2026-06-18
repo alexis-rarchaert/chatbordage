@@ -33,7 +33,7 @@
 
           <div class="brief-stats">
             <div class="brief-stat">
-              <div class="brief-stat-value">4–8</div>
+              <div class="brief-stat-value">4–6</div>
               <div class="brief-stat-label">{{ $t('brief.players') }}</div>
             </div>
             <span class="brief-sep" aria-hidden="true"></span>

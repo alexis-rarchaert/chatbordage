@@ -46,8 +46,8 @@
         <section id="mise-en-place" class="reg-section">
           <h2>Mise en place</h2>
           <ol class="reg-list">
-            <li>Chaque joueur choisit (ou tire au hasard) une carte <strong>Navire</strong>, qu'il pose devant lui, bien visible de tous.</li>
-            <li>Chacun consulte son <strong>rôle secret</strong> via les cartes « Rôles », en cachette des autres. Le Capitaine est annoncé à voix haute : tout le monde doit savoir qui il est.</li>
+            <li>Chaque joueur se voit attribuer (ou tire au hasard) un <strong>navire</strong> via l'application, visible de tous sur l'écran.</li>
+            <li>Chacun consulte son <strong>rôle secret</strong> sur l'application, en cachette des autres. Le Capitaine est annoncé à voix haute : tout le monde doit savoir qui il est.</li>
             <li>Chaque joueur prend <strong>5 points de vie</strong>. Le Capitaine commence avec <strong>6 PV</strong>, parce qu'il est davantage exposé.</li>
             <li>Chaque joueur reçoit une main de départ de <strong>3 cartes</strong>, piochées dans le deck à jouer bien mélangé.</li>
             <li>Le Capitaine commence la partie. Le tour passe ensuite au joueur suivant dans le sens des aiguilles d'une montre.</li>
@@ -61,7 +61,7 @@
           <div class="reg-step">
             <h3>Étape 1 — L'événement de mer</h3>
             <p>
-              La tablette annonce un événement qui s'applique à tout le monde pendant ce tour : une tempête, une brume épaisse, un coup de chance...
+              L'application annonce un événement qui s'applique à tout le monde pendant ce tour : une tempête, une brume épaisse, un coup de chance...
               Tout le monde subit (ou profite de) cet événement de la même façon, sauf indication contraire.
             </p>
           </div>
@@ -86,7 +86,7 @@
           <div class="reg-step">
             <h3>Étape 4 — Le pouvoir de ton navire</h3>
             <p>
-              Une fois par tour, tu peux activer le pouvoir spécial de ton navire (certains pouvoirs sont automatiques et n'ont pas besoin d'être activés, regarde bien ta carte Navire).
+              Une fois par tour, tu peux activer le pouvoir spécial de ton navire (certains pouvoirs sont automatiques et n'ont pas besoin d'être activés, regarde bien la fiche de ton navire sur l'application).
             </p>
           </div>
 
@@ -173,13 +173,11 @@
         <section id="contenu" class="reg-section reg-section--last">
           <h2>Contenu de la boîte</h2>
           <ul class="reg-list">
-            <li>1 tablette compagnon</li>
-            <li>15 cartes Navire</li>
-            <li>5 cartes Rôle secret</li>
             <li>100 cartes à jouer</li>
             <li>Des pièces (jetons) pour la monnaie du jeu</li>
+            <li>L'<strong>application compagnon</strong> ChatBordage (navires, rôles secrets, événements de mer, boutique)</li>
           </ul>
-          <p class="reg-meta">4–8 joueurs · 7 à 77 ans · ~30 minutes</p>
+          <p class="reg-meta">4–6 joueurs · 7 à 77 ans · ~30 minutes</p>
           <p class="reg-credits">Tous droits réservés — Groupe 7 — 2026</p>
         </section>
       </main>
