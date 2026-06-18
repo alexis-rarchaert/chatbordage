@@ -12,8 +12,17 @@ const stripe = stripeKey ? new Stripe(stripeKey) : null
 
 type CartPayload = { id: string; quantity: number }[]
 
-function buildLineItems(cart: CartPayload): Stripe.Checkout.SessionCreateParams.LineItem[] {
-  const lines: Stripe.Checkout.SessionCreateParams.LineItem[] = []
+type LineItem = {
+  quantity: number
+  price_data: {
+    currency: string
+    unit_amount: number
+    product_data: { name: string; description?: string }
+  }
+}
+
+function buildLineItems(cart: CartPayload): LineItem[] {
+  const lines: LineItem[] = []
   for (const entry of cart) {
     const product: Product | undefined = products.find(p => p.id === entry.id)
     if (!product) continue
@@ -79,7 +88,7 @@ router.post('/create-session', async (req: Request, res: Response) => {
 router.get('/session/:id', async (req: Request, res: Response) => {
   if (!stripe) return res.status(500).json({ error: 'Stripe non configuré' })
   try {
-    const session = await stripe.checkout.sessions.retrieve(req.params.id)
+    const session = await stripe.checkout.sessions.retrieve(String(req.params.id))
     res.json({
       status: session.status,
       payment_status: session.payment_status,

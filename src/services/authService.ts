@@ -2,6 +2,7 @@ import { supabase, supabaseAdmin } from '../supabaseClient';
 
 export const authService = {
   async register(email: string, password: string) {
+    if (!supabase) throw new Error('Supabase non configuré')
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -11,6 +12,7 @@ export const authService = {
   },
 
   async login(email: string, password: string) {
+    if (!supabase) throw new Error('Supabase non configuré')
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -29,6 +31,7 @@ export const authService = {
   },
 
   async logout() {
+    if (!supabase) throw new Error('Supabase non configuré')
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     return { message: 'Déconnexion réussie' };

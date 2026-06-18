@@ -7,6 +7,7 @@ import gameRoutes from './routes/gameRoutes';
 import authRoutes from './routes/authRoutes';
 import checkoutRoutes from './routes/checkoutRoutes';
 
+dotenv.config({ path: '.env.local' });
 dotenv.config();
 
 const app = express();
