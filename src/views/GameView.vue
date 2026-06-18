@@ -1996,7 +1996,6 @@ onUnmounted(() => {
   background-position: center;
   padding: 5vmin;
   border-radius: 12px;
-  border: 5px solid #3d1c10;
   box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.3);
   text-align: center;
   max-width: 600px;
@@ -2083,8 +2082,6 @@ onUnmounted(() => {
   background-position: center;
   padding: 4vmin;
   border-radius: 8px;
-  border: 4px solid #3d1c10;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
   text-align: center;
   max-width: 90vw;
   animation: fadeIn 0.3s ease-out;
