@@ -1098,10 +1098,7 @@ const updateDPI = () => {
   document.body.removeChild(div);
 };
 
-onMounted(async () => {
-  try {
-    await fetch('/api/games');
-  } catch (e) { /* ignore test error */ }
+onMounted(() => {
   updateDPI();
   window.addEventListener('resize', updateDPI);
 });
