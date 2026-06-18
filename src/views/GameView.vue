@@ -374,10 +374,59 @@ const startRound = () => {
   playRevealSound();
 };
 
+const isAttacking = ref(false);
+const showDamageModal = ref(false);
+const cardBeingPlayed = ref(null);
+
 const acknowledgeEvent = () => {
   showEventPhase.value = false;
   showResourcePhase.value = true;
   playUiTap();
+};
+
+const isGameOver = ref(false);
+const winner = ref(null);
+
+const nextTurn = () => {
+  // Reset des états de tour
+  isAttacking.value = false;
+  showDamageModal.value = false;
+  cardBeingPlayed.value = null;
+  showShop.value = false;
+  showResourcePhase.value = false;
+  showEventPhase.value = false;
+  currentEvent.value = null;
+
+  // Joueurs vivants
+  const alivePlayers = players.value.filter(p => p.hp > 0);
+
+  // Condition de victoire : un seul survivant
+  if (alivePlayers.length <= 1) {
+    isGameOver.value = true;
+    winner.value = alivePlayers[0] ?? null;
+    return;
+  }
+
+  // Trouver le prochain joueur vivant en sens horaire
+  const total = players.value.length;
+  let next = (currentTurn.value + 1) % total;
+  let guard = total;
+  while (players.value[next].hp <= 0 && guard-- > 0) {
+    next = (next + 1) % total;
+  }
+  currentTurn.value = next;
+
+  // Si on revient au premier siège, on incrémente le round
+  if (next <= currentTurn.value && next === 0) currentRound.value += 1;
+
+  // Reset des pouvoirs actifs 1x/tour pour le joueur qui va jouer
+  const ship = allBoats[players.value[next].boatIndex];
+  if (ship && (ship.abilityId === 'sloop' || ship.abilityId === 'jonque' || ship.abilityId === 'clipper')) {
+    players.value[next].abilityUsed = false;
+  }
+
+  playUiTap();
+  startRound();
 };
 
 const gameDeck = [
@@ -475,11 +524,8 @@ const buyItem = (item) => {
     playHitSound(); // use as error sound
   }
 };
-const isAttacking = ref(false);
 const selectedDamage = ref(1);
-const showDamageModal = ref(false);
 const damageInput = ref(String(selectedDamage.value));
-const cardBeingPlayed = ref(null);
 
 const playCard = (playerIndex, card) => {
   if (playerIndex !== currentTurn.value) return;
