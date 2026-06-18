@@ -24,7 +24,7 @@
 
       <main class="reg-content">
         <section id="bienvenue" class="reg-section">
-          <h2>Bienvenu à bord !</h2>
+          <h2>Bienvenue à bord !</h2>
           <p class="reg-lead">
             Dans <strong>ChatBordage</strong>, chaque joueur commande un navire de pirates félins.
             <em>Mais attention</em> : sous ta carte de matelot se cache un secret. Une mission que <strong>toi seul connais</strong>.
