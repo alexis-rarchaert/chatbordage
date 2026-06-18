@@ -6,6 +6,7 @@ import FormulaireView from '../views/FormulaireView.vue'
 import BoutiqueView from '../views/BoutiqueView.vue'
 import ProductView from '../views/ProductView.vue'
 import CartView from '../views/CartView.vue'
+import CheckoutSuccessView from '../views/CheckoutSuccessView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,11 @@ const router = createRouter({
       path: '/panier',
       name: 'cart',
       component: CartView
+    },
+    {
+      path: '/commande/merci',
+      name: 'checkout-success',
+      component: CheckoutSuccessView
     }
   ]
 })

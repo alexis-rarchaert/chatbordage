@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import { specs } from './swagger';
 import gameRoutes from './routes/gameRoutes';
 import authRoutes from './routes/authRoutes';
+import checkoutRoutes from './routes/checkoutRoutes';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use('/api/games', gameRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Bienvenue sur l\'API ChatBordage !' });

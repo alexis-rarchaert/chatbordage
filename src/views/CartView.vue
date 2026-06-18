@@ -61,11 +61,12 @@
             <span>Total</span>
             <span>{{ formatPrice(totalPrice) }}</span>
           </div>
-          <button class="btn-primary summary-cta" @click="onCheckout" :disabled="!lines.length">
-            Passer commande
+          <button class="btn-primary summary-cta" @click="onCheckout" :disabled="!lines.length || checkoutLoading">
+            {{ checkoutLoading ? 'Redirection…' : 'Passer commande' }}
           </button>
+          <p v-if="checkoutError" class="checkout-error">{{ checkoutError }}</p>
           <p class="summary-note">
-            Les commandes seront expédiées dès la sortie officielle du jeu.
+            Paiement sécurisé via Stripe. Tu seras redirigé sur leur page.
           </p>
           <RouterLink to="/boutique" class="summary-back">← Continuer mes achats</RouterLink>
         </aside>
@@ -81,20 +82,31 @@ import { RouterLink, useRouter } from 'vue-router'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import QuantitySelector from '../components/QuantitySelector.vue'
+import { ref } from 'vue'
 import { useCart } from '../lib/cart'
 import { formatPrice } from '../lib/products'
+import { startCheckout } from '../lib/checkout'
 
 const cart = useCart()
 const { lines, totalItems, totalPrice } = cart
 const router = useRouter()
 
+const checkoutLoading = ref(false)
+const checkoutError = ref('')
+
 function onClear() {
   if (confirm('Vider le panier ?')) cart.clear()
 }
 
-function onCheckout() {
-  alert(`Commande de ${totalItems.value} article(s) — ${formatPrice(totalPrice.value)}\n\nLe paiement sera disponible dès l'ouverture officielle. En attendant, préinscris-toi pour être prévenu !`)
-  router.push('/preinscription')
+async function onCheckout() {
+  checkoutError.value = ''
+  checkoutLoading.value = true
+  const payload = lines.value.map(l => ({ id: l.product.id, quantity: l.quantity }))
+  const { ok, error } = await startCheckout(payload)
+  if (!ok) {
+    checkoutError.value = error || 'Une erreur est survenue'
+    checkoutLoading.value = false
+  }
 }
 </script>
 
@@ -278,6 +290,16 @@ function onCheckout() {
   font-size: 14px;
 }
 .summary-cta:disabled { opacity: 0.5; cursor: not-allowed; }
+.checkout-error {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 80, 80, 0.12);
+  border-left: 3px solid #ff8080;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #ffb3b3;
+  text-align: left;
+}
 .summary-note {
   font-size: 12px;
   font-style: italic;
