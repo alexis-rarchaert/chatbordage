@@ -24,28 +24,15 @@
       <h2>{{ $t('sections.inShort') }}</h2>
     </div>
     <section class="section-inshort">
-      <div class="container inshort-grid">
-        <div class="deck-stack" aria-hidden="true">
-          <div class="card-mini">Carte</div>
-          <div class="card-mini offset">Carte</div>
-        </div>
-
-        <div class="carousel">
-          <div class="carousel-head">{{ currentSlide.title }}</div>
-          <button class="carousel-arrow left" @click="prevSlide" aria-label="Précédent">‹</button>
-          <div class="carousel-body">
-            <img :src="currentSlide.image" :alt="currentSlide.title" class="carousel-image" />
-          </div>
-          <button class="carousel-arrow right" @click="nextSlide" aria-label="Suivant">›</button>
-          <p class="carousel-caption">{{ currentSlide.description }}</p>
-        </div>
-
-        <div class="coin-stack" aria-hidden="true">
-          <img src="/coin.png" alt="" class="coin coin-1" />
-          <img src="/coin.png" alt="" class="coin coin-2" />
-          <img src="/coin.png" alt="" class="coin coin-3" />
-          <img src="/coin.png" alt="" class="coin coin-4" />
-          <img src="/coin.png" alt="" class="coin coin-5" />
+      <div class="container">
+        <div class="stats-grid">
+          <article class="stat-card" v-for="stat in stats" :key="stat.key">
+            <div class="stat-icon-wrap">
+              <span class="stat-icon">{{ stat.icon }}</span>
+            </div>
+            <h3 class="stat-title">{{ stat.title }}</h3>
+            <p class="stat-text">{{ stat.text }}</p>
+          </article>
         </div>
       </div>
     </section>
@@ -106,12 +93,12 @@
           </div>
           <img src="/bateaux/Galion.webp" alt="" class="mech-image" />
         </div>
-        <div class="mech-row reverse">
-          <img src="/bateaux/Fregate.webp" alt="" class="mech-image" />
+        <div class="mech-row">
           <div class="mech-text">
             <h3>{{ $t('mechanics.attacks.title') }}</h3>
             <p>{{ $t('mechanics.attacks.text') }}</p>
           </div>
+          <img src="/bateaux/Fregate.webp" alt="" class="mech-image" />
         </div>
         <div class="mech-row">
           <div class="mech-text">
@@ -169,15 +156,11 @@ import SiteFooter from '../components/SiteFooter.vue'
 
 const { t } = useI18n()
 
-const slides = computed(() => [
-  { title: t('slides.gameType.title'), description: t('slides.gameType.description'), image: '/chats/escobarre.png' },
-  { title: t('slides.duration.title'), description: t('slides.duration.description'), image: '/chats/harry.png' },
-  { title: t('slides.mechanics.title'), description: t('slides.mechanics.description'), image: '/chats/pablo.png' }
+const stats = computed(() => [
+  { key: 'type', icon: '🃏', title: t('slides.gameType.title'), text: t('slides.gameType.description') },
+  { key: 'duration', icon: '⏱', title: t('slides.duration.title'), text: t('slides.duration.description') },
+  { key: 'mechanics', icon: '⚔', title: t('slides.mechanics.title'), text: t('slides.mechanics.description') }
 ])
-const slideIdx = ref(0)
-const currentSlide = computed(() => slides.value[slideIdx.value])
-const nextSlide = () => { slideIdx.value = (slideIdx.value + 1) % slides.value.length }
-const prevSlide = () => { slideIdx.value = (slideIdx.value - 1 + slides.value.length) % slides.value.length }
 
 const ships = [
   { name: 'La Frégate', image: '/bateaux/Fregate.webp' },
@@ -338,36 +321,67 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .section-inshort {
   padding: var(--section-py) 0;
 }
-.inshort-grid {
+.stats-grid {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: clamp(20px, 4vw, 48px);
-  align-items: center;
-  justify-items: center;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.5vw, 32px);
 }
-.deck-stack {
+.stat-card {
+  background: linear-gradient(160deg, rgba(79, 18, 25, 0.95) 0%, rgba(60, 12, 18, 0.95) 100%);
+  background-image:
+    linear-gradient(160deg, rgba(79, 18, 25, 0.94) 0%, rgba(60, 12, 18, 0.94) 100%),
+    url('/paper.png');
+  background-blend-mode: multiply;
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  text-align: center;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(245, 233, 212, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.deck-stack .card-mini.offset { transform: translateX(20px); }
-.coin-stack {
-  position: relative;
-  width: 140px;
-  height: 180px;
-}
-.coin {
+.stat-card::before {
+  content: '';
   position: absolute;
-  width: 60px;
-  height: 60px;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+  top: 8px; left: 8px; right: 8px; bottom: 8px;
+  border: 1px solid rgba(200, 162, 74, 0.35);
+  border-radius: calc(var(--radius-lg) - 4px);
+  pointer-events: none;
 }
-.coin-1 { top: 0; left: 30px; transform: rotate(-8deg); }
-.coin-2 { top: 30px; left: 0; transform: rotate(12deg); }
-.coin-3 { top: 30px; left: 60px; transform: rotate(-4deg); }
-.coin-4 { top: 70px; left: 30px; transform: rotate(6deg); }
-.coin-5 { top: 100px; left: 50px; transform: rotate(-10deg); }
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(245, 233, 212, 0.12);
+}
+.stat-icon-wrap {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
+  border: 3px solid var(--color-burgundy-dark);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 -3px 6px rgba(107, 25, 34, 0.3);
+}
+.stat-icon {
+  font-size: 38px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.25));
+}
+.stat-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--color-gold);
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 var(--color-burgundy-dark);
+}
+.stat-text {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-text-light);
+}
 
 /* ========= CAROUSEL ========= */
 .carousel {
@@ -656,8 +670,7 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   }
   .hero-deck { justify-content: center; }
   .hero-card { margin: 0 auto; }
-  .inshort-grid { grid-template-columns: 1fr; }
-  .deck-stack, .coin-stack { display: none; }
+  .stats-grid { grid-template-columns: 1fr; gap: 20px; }
   .concept-grid,
   .mech-row,
   .mech-row.reverse,
