@@ -1,7 +1,43 @@
 <template>
   <div class="game-view">
+    <!-- --- ÉCRAN DE VERROUILLAGE BOÎTE --- -->
+    <template v-if="!isUnlocked">
+      <div class="unlock-overlay">
+        <div class="unlock-card">
+          <div class="pirate-skull-icon" aria-hidden="true">🏴‍☠️</div>
+          <h1 class="unlock-title">{{ $t('game.unlock.title') }}</h1>
+          <p class="unlock-desc">{{ $t('game.unlock.desc') }}</p>
+          
+          <form @submit.prevent="validateCode" class="unlock-form">
+            <div class="input-wrap">
+              <input 
+                :value="boxCode" 
+                @input="formatCodeInput"
+                type="text" 
+                :placeholder="$t('game.unlock.placeholder')" 
+                class="unlock-input"
+                :class="{ 'input-error': unlockError }"
+                :disabled="validatingCode"
+                required
+              />
+            </div>
+            <p v-if="unlockError" class="unlock-error-msg">{{ $t('game.unlock.error') }}</p>
+            
+            <div class="unlock-buttons">
+              <button type="submit" class="btn-primary unlock-btn" :disabled="validatingCode">
+                {{ validatingCode ? $t('game.unlock.validating') : $t('game.unlock.submit') }}
+              </button>
+              <RouterLink to="/" class="btn-secondary unlock-cancel-btn" :class="{ disabled: validatingCode }">
+                {{ $t('game.unlock.cancel') }}
+              </RouterLink>
+            </div>
+          </form>
+        </div>
+      </div>
+    </template>
+
     <!-- --- ÉCRAN DE LOBBY --- -->
-    <template v-if="!isStarted && !isRouletteVisible">
+    <template v-else-if="!isStarted && !isRouletteVisible">
       <div class="lobby-overlay" :class="`players-${playerCount}`">
         <!-- Titres dupliqués pour les deux côtés de la table -->
         <div class="lobby-titles">
@@ -323,8 +359,53 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { SHOP_ITEMS as GAME_SHOP_ITEMS } from '../game';
+import { verifyActivationCode } from '../lib/supabase';
 
 const { t } = useI18n();
+
+const isUnlocked = ref(localStorage.getItem('game_unlocked') === 'true');
+const boxCode = ref('');
+const unlockError = ref(false);
+const validatingCode = ref(false);
+
+const formatCodeInput = (event) => {
+  // Strip non-alphanumeric, force uppercase
+  let value = event.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  
+  // Truncate to 16 characters
+  if (value.length > 16) {
+    value = value.slice(0, 16);
+  }
+  
+  // Group into blocks of 4 separated by hyphens
+  const parts = [];
+  for (let i = 0; i < value.length; i += 4) {
+    parts.push(value.slice(i, i + 4));
+  }
+  
+  boxCode.value = parts.join('-');
+};
+
+const validateCode = async () => {
+  if (validatingCode.value) return;
+  validatingCode.value = true;
+  unlockError.value = false;
+
+  try {
+    const isValid = await verifyActivationCode(boxCode.value);
+    if (isValid) {
+      isUnlocked.value = true;
+      localStorage.setItem('game_unlocked', 'true');
+    } else {
+      unlockError.value = true;
+    }
+  } catch (err) {
+    console.error('Error validating code:', err);
+    unlockError.value = true;
+  } finally {
+    validatingCode.value = false;
+  }
+};
 
 const popupData = ref(null);
 let popupTimeout = null;
@@ -2698,5 +2779,122 @@ onUnmounted(() => {
   font-size: 1.2rem;
   margin: 0;
   white-space: pre-line;
+}
+
+/* ========= UNLOCK OVERLAY Scoped Styles ========= */
+.unlock-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--color-burgundy);
+  background-image:
+    radial-gradient(ellipse at top, rgba(200, 162, 74, 0.1) 0%, transparent 60%),
+    url('/paper.png');
+  background-size: auto, 600px;
+  background-blend-mode: normal, overlay;
+  background-repeat: repeat;
+}
+.unlock-card {
+  width: 100%;
+  max-width: 440px;
+  background: linear-gradient(160deg, rgba(79, 18, 25, 0.98) 0%, rgba(60, 12, 18, 0.98) 100%);
+  background-image:
+    linear-gradient(160deg, rgba(79, 18, 25, 0.94) 0%, rgba(60, 12, 18, 0.98) 100%),
+    url('/paper.png');
+  background-blend-mode: multiply;
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(245, 233, 212, 0.08);
+  position: relative;
+  text-align: center;
+}
+.unlock-card::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 8px; right: 8px; bottom: 8px;
+  border: 1px solid rgba(200, 162, 74, 0.3);
+  border-radius: calc(var(--radius-lg) - 4px);
+  pointer-events: none;
+}
+.pirate-skull-icon {
+  font-size: 54px;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  animation: float-ship 4s ease-in-out infinite;
+}
+.unlock-title {
+  font-family: var(--font-display);
+  font-size: 38px;
+  color: var(--color-gold);
+  margin-bottom: 12px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.04em;
+}
+.unlock-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-light);
+  margin-bottom: 28px;
+}
+.unlock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.input-wrap {
+  width: 100%;
+}
+.unlock-input {
+  width: 100%;
+  background: var(--color-burgundy-dark);
+  border: 2px solid var(--color-gold-dark);
+  color: var(--color-text-light);
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-family: inherit;
+  text-align: center;
+  letter-spacing: 0.05em;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.unlock-input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(200, 162, 74, 0.25);
+  transform: scale(1.02);
+}
+.unlock-input.input-error {
+  border-color: #d9534f;
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.25);
+}
+.unlock-error-msg {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin: -10px 0 0 0;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.unlock-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+.unlock-btn {
+  width: 100%;
+  padding: 14px 20px;
+}
+.unlock-cancel-btn {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 13px;
+}
+.unlock-cancel-btn.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }
 </style>

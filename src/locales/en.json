@@ -101,6 +101,15 @@
     "error": "Something went wrong. Please try again later."
   },
   "game": {
+    "unlock": {
+      "title": "Restricted Access",
+      "desc": "Please enter the secret code found in your ChatBordage game box to unlock the companion app.",
+      "placeholder": "e.g. A1B2-C3D4-E5F6-G7H8",
+      "submit": "Unlock",
+      "validating": "Checking...",
+      "cancel": "Back to Home",
+      "error": "Invalid code, matey! Look closely at the bottom of your game box."
+    },
     "lobby": {
       "title": "Crew Preparation",
       "player": "Player",

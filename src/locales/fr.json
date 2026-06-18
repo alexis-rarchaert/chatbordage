@@ -101,6 +101,15 @@
     "error": "Une erreur est survenue. Réessayez plus tard."
   },
   "game": {
+    "unlock": {
+      "title": "Accès Réservé",
+      "desc": "Veuillez entrer le code secret inscrit dans votre boîte de jeu ChatBordage pour débloquer l'application compagnon.",
+      "placeholder": "Ex: A1B2-C3D4-E5F6-G7H8",
+      "submit": "Débloquer",
+      "validating": "Vérification...",
+      "cancel": "Retour à l'accueil",
+      "error": "Code invalide, moussaillon ! Regardez bien au fond de votre boîte de jeu."
+    },
     "lobby": {
       "title": "Préparation de l'équipage",
       "player": "Joueur",
