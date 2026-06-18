@@ -85,7 +85,7 @@
           <h2 class="roulette-title">Désignation du Capitaine</h2>
           
           <div class="wheel-outer">
-            <div class="wheel-pointer" :style="{ transform: `translateX(-50%) rotate(${pointerRotation}deg)` }">▼</div>
+            <div class="wheel-pointer">▼</div>
             <div class="wheel" :class="{ 'small-wheel': players.length <= 2 }" :style="wheelStyle">
               <div 
                 v-for="(player, index) in players" 
@@ -558,8 +558,10 @@ const spinRoulette = () => {
   // Calculer l'angle du centre du segment choisi
   let centerAngle = randomSegment * segmentAngle + segmentAngle / 2;
   if (players.value.length <= 2) centerAngle -= 90;
-  const extraRotation = spins * 360 + centerAngle;
-  rouletteRotation.value = (rouletteRotation.value || 0) + extraRotation;
+
+  const currentRotation = rouletteRotation.value || 0;
+  const extraRotation = spins * 360 + (centerAngle - (currentRotation % 360) + 360) % 360;
+  rouletteRotation.value = currentRotation + extraRotation;
 
   const spinDuration = 4000;
   setTimeout(() => {
@@ -608,11 +610,6 @@ const getCatContainerStyle = (index) => {
   };
 };
 
-const pointerRotation = computed(() => {
-  const angle = 360 / players.value.length;
-  return angle / 2;
-});
-
 const wheelBackground = computed(() => {
   const n = players.value.length || 1;
   const angle = 360 / n;
@@ -622,7 +619,8 @@ const wheelBackground = computed(() => {
     const to = (i + 1) * angle;
     return `${color} ${from}deg ${to}deg`;
   }).join(', ');
-  return `conic-gradient(${stops})`;
+  const startAngle = n <= 2 ? -90 : 0;
+  return `conic-gradient(from ${startAngle}deg, ${stops})`;
 });
 
 const wheelStyle = computed(() => ({
