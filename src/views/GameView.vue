@@ -115,7 +115,7 @@
             </button>
 
             <div v-else class="winner-reveal">
-              <h3>Le Capitaine est {{ allCats[players[winnerIndex].catIndex].name }} !</h3>
+              <h3>Le Capitaine est {{ allBoats[players[winnerIndex].boatIndex].name }} !</h3>
               <p class="bonus-text">+1 Point de Vie bonus !</p>
               <button class="confirm-button" @click="confirmCaptain">Commencer l'aventure</button>
             </div>
@@ -195,10 +195,7 @@
         </div>
       </div>
 
-      <div class="center-decks">
-        <div class="deck-slot"><span class="deck-label">Pioche</span></div>
-        <div class="deck-slot"><span class="deck-label">Défausse</span></div>
-      </div>
+
 
       <div class="deck-area-controls bottom-area">
         <div class="turn-display bottom-turn">{{ $t('game.turn.activePlayer') }} {{ currentTurn + 1 }}</div>
@@ -1165,48 +1162,7 @@ onUnmounted(() => {
   100% { transform: scale(1); }
 }
 
-.center-decks {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  gap: 5vmin;
-}
 
-.deck-slot {
-  width: calc(7 * var(--ppcm) * 1px);
-  height: calc(9 * var(--ppcm) * 1px);
-  max-width: 35vw;
-  max-height: 35vh;
-  border: 3px dashed rgba(241, 211, 161, 0.5);
-  border-radius: 12px;
-  background-color: rgba(93, 42, 24, 0.2);
-  background-image: radial-gradient(circle, rgba(241, 211, 161, 0.15) 1px, transparent 1px);
-  background-size: 15px 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.deck-slot::after {
-  content: '';
-  position: absolute;
-  top: 5px; left: 5px; right: 5px; bottom: 5px;
-  border: 1px dashed rgba(241, 211, 161, 0.2);
-  border-radius: 8px;
-}
-
-.deck-label {
-  font-family: 'Georgia', serif;
-  color: rgba(241, 211, 161, 0.6);
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: clamp(0.6rem, 2vmin, 1.1rem);
-}
-
-/* POSITIONS */
 .top-left { top: 2vh; left: 2vw; transform: rotate(135deg); }
 .top-right { top: 2vh; right: 2vw; transform: rotate(-135deg); }
 .top-center { top: 2vh; left: 50%; transform: translateX(-50%) rotate(180deg); }
