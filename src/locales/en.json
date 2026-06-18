@@ -76,13 +76,14 @@
     "tos": "Terms of Service"
   },
   "form": {
+    "bannerTitle": "Sign up",
     "lead": "Pre-register now to stay in the loop!",
     "firstName": "First name",
     "firstNamePh": "John",
     "lastName": "Last name",
     "lastNamePh": "Doe",
     "email": "Email address",
-    "emailPh": "john.doe@gmail.com",
+    "emailPh": "john.doe{'@'}gmail.com",
     "tosAccept": "I accept the",
     "submit": "PRE-REGISTER",
     "sending": "Sending…",

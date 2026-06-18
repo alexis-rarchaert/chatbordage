@@ -347,22 +347,37 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .hero-card {
   position: relative;
   z-index: 1;
-  background: var(--color-burgundy);
-  border: 2px solid var(--color-gold);
+  background: linear-gradient(160deg, rgba(107, 25, 34, 0.96) 0%, rgba(79, 18, 25, 0.96) 100%);
+  background-image:
+    linear-gradient(160deg, rgba(107, 25, 34, 0.92) 0%, rgba(79, 18, 25, 0.96) 100%),
+    url('/paper.png');
+  background-blend-mode: multiply;
+  border: 3px solid var(--color-gold);
   border-radius: var(--radius-lg);
-  padding: 32px;
-  max-width: 460px;
-  box-shadow: var(--shadow-card);
+  padding: 36px;
+  max-width: 480px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(245, 233, 212, 0.08);
+}
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 8px; right: 8px; bottom: 8px;
+  border: 1px solid rgba(200, 162, 74, 0.4);
+  border-radius: calc(var(--radius-lg) - 4px);
+  pointer-events: none;
 }
 .hero-title {
-  font-size: clamp(40px, 6vw, 64px);
-  color: var(--color-cream);
-  margin-bottom: 16px;
+  font-size: clamp(44px, 6.5vw, 68px);
+  color: var(--color-gold);
+  margin-bottom: 18px;
+  text-shadow: 0 3px 0 var(--color-burgundy-dark), 0 6px 14px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.04em;
 }
 .hero-desc {
   font-size: 15px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   color: var(--color-text-light);
+  line-height: 1.65;
 }
 .hero-deck {
   position: relative;
@@ -376,14 +391,26 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .card-mini {
   width: 90px;
   height: 130px;
-  background: #888;
+  background: linear-gradient(160deg, #5a5a5a 0%, #3d3d3d 100%);
+  border: 2px solid #2a2a2a;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: 600;
-  box-shadow: var(--shadow-card);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(245, 233, 212, 0.08);
+  position: relative;
+}
+.card-mini::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(245, 233, 212, 0.15);
+  border-radius: 5px;
+  pointer-events: none;
 }
 .card-mini-1 { transform: rotate(-6deg); }
 .card-mini-2 { transform: translateY(-8px); }
@@ -440,71 +467,94 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   position: absolute;
   width: 60px;
   height: 60px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
 }
-.coin-1 { top: 0; left: 30px; }
-.coin-2 { top: 30px; left: 0; }
-.coin-3 { top: 30px; left: 60px; }
-.coin-4 { top: 70px; left: 30px; }
-.coin-5 { top: 100px; left: 50px; }
+.coin-1 { top: 0; left: 30px; transform: rotate(-8deg); }
+.coin-2 { top: 30px; left: 0; transform: rotate(12deg); }
+.coin-3 { top: 30px; left: 60px; transform: rotate(-4deg); }
+.coin-4 { top: 70px; left: 30px; transform: rotate(6deg); }
+.coin-5 { top: 100px; left: 50px; transform: rotate(-10deg); }
 
 /* ========= CAROUSEL ========= */
 .carousel {
-  background: var(--color-burgundy-dark);
-  border: 2px solid var(--color-gold);
+  background: linear-gradient(160deg, rgba(79, 18, 25, 0.95) 0%, rgba(60, 12, 18, 0.95) 100%);
+  background-image:
+    linear-gradient(160deg, rgba(79, 18, 25, 0.94) 0%, rgba(60, 12, 18, 0.94) 100%),
+    url('/paper.png');
+  background-blend-mode: multiply;
+  border: 3px solid var(--color-gold);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 22px 26px 26px;
   position: relative;
   max-width: 420px;
   width: 100%;
   text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(245, 233, 212, 0.08);
 }
 .carousel-head {
   background: var(--color-cream);
   color: var(--color-burgundy);
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
+  letter-spacing: 0.06em;
   padding: 8px 16px;
   border-radius: 8px;
   margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 .carousel-body {
   background: var(--color-cream);
   border-radius: var(--radius-md);
-  padding: 16px;
-  min-height: 180px;
+  padding: 12px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 .carousel-image {
   max-height: 180px;
+  max-width: 100%;
   width: auto;
+  object-fit: contain;
 }
 .carousel-caption {
   margin-top: 16px;
   font-size: 14px;
   color: var(--color-text-light);
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.5;
 }
 .carousel-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: var(--color-gold);
-  border: none;
-  color: var(--color-burgundy);
-  width: 36px;
-  height: 36px;
+  background: linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
+  border: 2px solid var(--color-burgundy-dark);
+  color: var(--color-burgundy-dark);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  font-size: 24px;
+  font-size: 26px;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  transition: background 0.15s;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  z-index: 2;
 }
-.carousel-arrow:hover { background: var(--color-gold-dark); }
-.carousel-arrow.left { left: -18px; }
-.carousel-arrow.right { right: -18px; }
+.carousel-arrow:hover {
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45);
+}
+.carousel-arrow:active { transform: translateY(-50%) scale(0.96); }
+.carousel-arrow.left { left: -20px; }
+.carousel-arrow.right { right: -20px; }
 
 /* ========= CONCEPT ========= */
 .section-concept {
@@ -527,8 +577,14 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .bullet-divider {
   display: block;
   color: var(--color-gold);
-  font-size: 18px;
-  margin: 8px 0;
+  font-size: 20px;
+  margin: 12px 0;
+  letter-spacing: 8px;
+  opacity: 0.7;
+}
+.concept-text :deep(strong) {
+  color: var(--color-gold);
+  font-weight: 600;
 }
 
 /* ========= SHIPS ========= */
@@ -537,27 +593,46 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 }
 .ship-carousel {
   position: relative;
-  background: var(--color-burgundy-dark);
-  border: 2px solid var(--color-gold);
+  background: linear-gradient(160deg, rgba(79, 18, 25, 0.95) 0%, rgba(60, 12, 18, 0.95) 100%);
+  background-image:
+    linear-gradient(160deg, rgba(79, 18, 25, 0.94) 0%, rgba(60, 12, 18, 0.94) 100%),
+    url('/paper.png');
+  background-blend-mode: multiply;
+  border: 3px solid var(--color-gold);
   border-radius: var(--radius-lg);
-  padding: 32px;
-  max-width: 560px;
+  padding: 40px 48px;
+  max-width: 600px;
   margin: 0 auto;
   text-align: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(245, 233, 212, 0.08);
+}
+.ship-carousel::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 10px; right: 10px; bottom: 10px;
+  border: 1px solid rgba(200, 162, 74, 0.35);
+  border-radius: calc(var(--radius-lg) - 4px);
+  pointer-events: none;
 }
 .ship-body {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  height: 280px;
+  justify-content: center;
 }
 .ship-image {
   max-height: 220px;
+  max-width: 100%;
   width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.4));
 }
 .ship-name {
-  font-size: 28px;
+  font-size: 32px;
   color: var(--color-gold);
+  text-shadow: 0 2px 0 var(--color-burgundy-dark);
 }
 .ships-caption {
   text-align: center;
@@ -588,15 +663,21 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .mech-row.reverse > * { direction: ltr; }
 .mech-text h3 {
   color: var(--color-gold);
-  font-family: var(--font-body);
-  font-size: 18px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
   margin-bottom: 12px;
+  letter-spacing: 0.04em;
 }
 .mech-text p { font-size: 15px; line-height: 1.7; }
 .mech-image {
   max-width: 280px;
   margin: 0 auto;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.4));
+  transition: transform 0.4s ease;
+}
+.mech-image:hover {
+  transform: translateY(-6px) rotate(-1deg);
 }
 
 /* ========= DIGITAL ========= */
@@ -619,41 +700,52 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 }
 .digital-bullets li {
   position: relative;
-  padding-left: 24px;
-  margin-bottom: 20px;
+  padding-left: 32px;
+  margin-bottom: 24px;
   font-size: 15px;
   line-height: 1.7;
 }
 .digital-bullets li::before {
-  content: '•';
+  content: '⚓';
   position: absolute;
   left: 0;
+  top: 2px;
   color: var(--color-gold);
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1;
 }
 
 /* ========= CTA ========= */
 .section-cta {
-  padding: var(--section-py) 0;
+  padding: var(--section-py) 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 32px;
-  flex-wrap: wrap;
+  gap: 40px;
+  flex-wrap: nowrap;
 }
 .cta-coins-left, .cta-coins-right {
   display: flex;
-  gap: 8px;
+  gap: 4px;
+  flex-shrink: 0;
 }
-.cta-coins-left img, .cta-coins-right img { width: 48px; height: 48px; }
+.cta-coins-left img, .cta-coins-right img {
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+}
+.cta-coins-left img:nth-child(1) { transform: rotate(-12deg) translateY(8px); }
+.cta-coins-left img:nth-child(2) { transform: rotate(6deg); }
+.cta-coins-right img:nth-child(1) { transform: rotate(-6deg); }
+.cta-coins-right img:nth-child(2) { transform: rotate(12deg) translateY(8px); }
 .cta-center { text-align: center; }
-.cta-buy { font-size: 18px; padding: 16px 40px; }
+.cta-buy { font-size: 18px; padding: 16px 44px; }
 .stars {
   color: var(--color-gold);
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 4px;
-  margin-top: 16px;
+  margin-top: 18px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
 }
 .review {
   color: var(--color-text-muted);
@@ -663,37 +755,51 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 
 /* ========= FOOTER ========= */
 .site-footer {
-  background: var(--color-gold-dark);
-  color: var(--color-burgundy);
-  padding: 32px 20px;
+  background-color: var(--color-gold-dark);
+  background-image:
+    linear-gradient(180deg, rgba(168, 133, 47, 0) 0%, rgba(107, 25, 34, 0.15) 100%),
+    url('/bois.png');
+  background-size: auto, 400px;
+  background-blend-mode: overlay, multiply;
+  color: var(--color-burgundy-dark);
+  padding: 40px 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  border-top: 3px solid var(--color-burgundy-dark);
 }
 .site-footer a {
-  color: var(--color-burgundy);
+  color: var(--color-burgundy-dark);
   text-decoration: underline;
   font-size: 14px;
+  font-weight: 500;
+  transition: color 0.15s;
 }
+.site-footer a:hover { color: var(--color-ink); }
 .socials {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 8px;
 }
 .dot {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--color-burgundy);
+  border: 2px solid var(--color-burgundy-dark);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
 }
+.dot:hover { transform: translateY(-2px); }
 
 /* ========= RESPONSIVE ========= */
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
     text-align: center;
+    min-height: clamp(420px, 90vw, 560px);
   }
   .hero-deck { justify-content: center; }
   .hero-card { margin: 0 auto; }
@@ -721,5 +827,27 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   .nav-links.open { display: flex; }
   .burger { display: flex; }
   .site-header { position: relative; }
+
+  /* CTA section mobile : pièces plus petites en ligne, pas wrappées */
+  .section-cta {
+    gap: 16px;
+    padding: clamp(40px, 12vw, 60px) 16px;
+  }
+  .cta-coins-left img, .cta-coins-right img {
+    width: 36px;
+    height: 36px;
+  }
+  .cta-buy { font-size: 16px; padding: 14px 28px; }
+}
+
+@media (max-width: 480px) {
+  .section-cta {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .cta-coins-left, .cta-coins-right {
+    order: 2;
+  }
+  .cta-center { order: 1; }
 }
 </style>

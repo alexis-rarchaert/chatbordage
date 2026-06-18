@@ -76,13 +76,14 @@
     "tos": "Conditions Générales de Vente"
   },
   "form": {
+    "bannerTitle": "Formulaire",
     "lead": "Préinscrivez-vous dès maintenant pour ne rien rater !",
     "firstName": "Prénom",
     "firstNamePh": "Jean",
     "lastName": "Nom",
     "lastNamePh": "Valjean",
     "email": "Adresse e-mail",
-    "emailPh": "jean.valjean@gmail.com",
+    "emailPh": "jean.valjean{'@'}gmail.com",
     "tosAccept": "J'accepte les",
     "submit": "SE PRÉINSCRIRE",
     "sending": "Envoi en cours…",

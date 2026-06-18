@@ -42,6 +42,15 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  background-image:
+    radial-gradient(ellipse at top, rgba(200, 162, 74, 0.08) 0%, transparent 60%),
+    url('/paper.png');
+  background-size: auto, 600px;
+  background-blend-mode: normal, overlay;
+  background-repeat: repeat;
+}
+
 h1,
 h2,
 h3,
@@ -74,15 +83,35 @@ img {
 }
 
 .section-banner {
-  background: var(--color-gold);
-  padding: 18px 24px;
+  position: relative;
+  background-color: var(--color-gold);
+  background-image:
+    linear-gradient(180deg, rgba(168, 133, 47, 0) 0%, rgba(168, 133, 47, 0.25) 100%),
+    url('/bois.png');
+  background-size: auto, 400px;
+  background-blend-mode: overlay, multiply;
+  padding: 22px 24px;
   text-align: center;
+  border-top: 3px solid var(--color-gold-dark);
+  border-bottom: 3px solid var(--color-gold-dark);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
 }
 
 .section-banner h2 {
+  color: var(--color-burgundy-dark);
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 0 rgba(245, 233, 212, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+}
+.section-banner h2::before,
+.section-banner h2::after {
+  content: '✦';
+  font-size: 0.55em;
   color: var(--color-burgundy);
-  font-size: clamp(28px, 4vw, 40px);
-  letter-spacing: 0.04em;
+  opacity: 0.65;
 }
 
 .container {
@@ -93,19 +122,28 @@ img {
 }
 
 .btn-primary {
-  background: var(--color-gold);
-  color: var(--color-burgundy);
+  display: inline-block;
+  background: linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
+  color: var(--color-burgundy-dark);
   font-weight: 700;
   font-size: 15px;
-  letter-spacing: 0.08em;
-  border: none;
+  letter-spacing: 0.1em;
+  border: 2px solid var(--color-gold-dark);
   padding: 14px 32px;
   border-radius: var(--radius-md);
   text-transform: uppercase;
-  transition: transform 0.15s ease, background 0.15s ease;
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 4px 0 var(--color-burgundy-dark), 0 6px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .btn-primary:hover {
-  background: var(--color-gold-dark);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--color-burgundy-dark), 0 10px 20px rgba(0, 0, 0, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--color-burgundy-dark), 0 3px 8px rgba(0, 0, 0, 0.3);
 }

@@ -14,8 +14,9 @@
       </nav>
     </header>
 
-    <div class="hero-banner placeholder-scene" aria-hidden="true">
-      <span class="placeholder-label">[ Bannière "Formulaire" à intégrer ]</span>
+    <div class="hero-banner" aria-hidden="true">
+      <img src="/hero-banner.webp" alt="" class="hero-banner-img" />
+      <h1 class="hero-banner-title">{{ $t('form.bannerTitle') }}</h1>
     </div>
 
     <main class="form-main container">
@@ -152,31 +153,36 @@ async function submit() {
 .burger span { display: block; width: 22px; height: 2px; background: var(--color-cream); }
 
 .hero-banner {
+  position: relative;
   min-height: clamp(220px, 32vw, 360px);
-  margin: 0;
-  border-radius: 0;
-  border-left: none;
-  border-right: none;
-  border-top: none;
-  border-bottom: 2px solid var(--color-gold);
-}
-.placeholder-scene {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(200, 162, 74, 0.12),
-    rgba(200, 162, 74, 0.12) 12px,
-    rgba(200, 162, 74, 0.06) 12px,
-    rgba(200, 162, 74, 0.06) 24px
-  );
-  border: 2px dashed var(--color-gold);
+  border-bottom: 3px solid var(--color-gold);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.placeholder-label {
+.hero-banner-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(107, 25, 34, 0.35) 100%);
+  pointer-events: none;
+}
+.hero-banner-title {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-display);
-  font-size: 22px;
   color: var(--color-gold);
+  font-size: clamp(48px, 8vw, 80px);
+  text-shadow: 0 3px 0 var(--color-burgundy-dark), 0 6px 16px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.05em;
 }
 
 .form-main {
@@ -200,12 +206,14 @@ async function submit() {
 .field-label { font-size: 15px; font-weight: 500; }
 .field input {
   background: var(--color-burgundy-dark);
-  border: 1px solid var(--color-gold-dark);
+  border: 2px solid var(--color-gold-dark);
   color: var(--color-text-light);
   padding: 12px 16px;
   border-radius: var(--radius-md);
   font-size: 15px;
   font-family: inherit;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .field input::placeholder { color: var(--color-text-muted); opacity: 0.7; }
 .field input:focus {
@@ -238,24 +246,33 @@ async function submit() {
 .msg.err { background: rgba(255, 80, 80, 0.18); color: #ffb3b3; }
 
 .site-footer {
-  background: var(--color-gold-dark);
-  color: var(--color-burgundy);
-  padding: 32px 20px;
+  background-color: var(--color-gold-dark);
+  background-image:
+    linear-gradient(180deg, rgba(168, 133, 47, 0) 0%, rgba(107, 25, 34, 0.15) 100%),
+    url('/bois.png');
+  background-size: auto, 400px;
+  background-blend-mode: overlay, multiply;
+  color: var(--color-burgundy-dark);
+  padding: 40px 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  border-top: 3px solid var(--color-burgundy-dark);
 }
 .site-footer a {
-  color: var(--color-burgundy);
+  color: var(--color-burgundy-dark);
   text-decoration: underline;
   font-size: 14px;
+  font-weight: 500;
 }
-.socials { display: flex; gap: 12px; margin-bottom: 8px; }
+.socials { display: flex; gap: 14px; margin-bottom: 8px; }
 .dot {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 38px; height: 38px; border-radius: 50%;
   background: var(--color-burgundy);
+  border: 2px solid var(--color-burgundy-dark);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
 }
 
 @media (max-width: 720px) {
