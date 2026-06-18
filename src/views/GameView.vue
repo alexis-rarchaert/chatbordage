@@ -1586,6 +1586,7 @@ onUnmounted(() => {
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+  padding-bottom: 24px;
 }
 
 .wheel-boat-img.winner-anim {
