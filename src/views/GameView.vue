@@ -280,6 +280,10 @@ const selectedSegment = ref(null);
 const winnerAnimVisible = ref(false);
 const pixelsPerCm = ref(38);
 const playerCount = ref(4);
+const showShop = ref(false);
+const shopRotation = ref(0);
+const currentTurn = ref(0);
+
 const shopItems = ref([
   { id: 'heal', name: 'Réparations d\'urgence', icon: '❤️', price: 8, purchased: false },
   { id: 'dmg', name: 'Poudre noire', icon: '💣', price: 6, purchased: false },
