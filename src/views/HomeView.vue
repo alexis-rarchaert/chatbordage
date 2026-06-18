@@ -167,10 +167,10 @@
     </div>
     <section class="section-digital">
       <div class="container digital-grid">
-        <div class="packshot placeholder-scene">
-          <span class="placeholder-label">[ Packshot du jeu à intégrer ]</span>
+        <div class="packshot" v-reveal="'left'">
+          <img src="/packshot.webp" alt="Boîte du jeu ChatBordage en boutique" class="packshot-img" />
         </div>
-        <ul class="digital-bullets">
+        <ul class="digital-bullets" v-reveal="'right'">
           <li v-html="$t('digital.app')"></li>
           <li v-html="$t('digital.events')"></li>
           <li v-html="$t('digital.shop')"></li>
@@ -849,7 +849,21 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   align-items: center;
 }
 .packshot {
-  min-height: 320px;
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.packshot:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+.packshot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .digital-bullets {
   list-style: none;
