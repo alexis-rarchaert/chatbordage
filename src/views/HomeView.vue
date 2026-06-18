@@ -25,8 +25,8 @@
 
     <!-- ============ HERO ============ -->
     <section class="hero">
-      <div class="hero-scene placeholder-scene" aria-hidden="true">
-        <span class="placeholder-label">[ Bannière hero à intégrer ]</span>
+      <div class="hero-scene" aria-hidden="true">
+        <img src="/hero-banner.webp" alt="" class="hero-banner-img" />
       </div>
       <div class="hero-card">
         <h1 class="hero-title">ChatBordage !</h1>
@@ -329,6 +329,20 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
+}
+.hero-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.hero-scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(107, 25, 34, 0.55) 0%, rgba(107, 25, 34, 0.15) 45%, rgba(107, 25, 34, 0) 70%);
+  pointer-events: none;
 }
 .hero-card {
   position: relative;
