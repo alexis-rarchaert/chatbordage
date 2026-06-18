@@ -2,7 +2,7 @@
   <div class="game-view">
     <!-- --- ÉCRAN DE LOBBY --- -->
     <template v-if="!isStarted && !isRouletteVisible">
-      <div class="lobby-overlay">
+      <div class="lobby-overlay" :class="`players-${playerCount}`">
         <!-- Titres dupliqués pour les deux côtés de la table -->
         <div class="lobby-titles">
           <h1 class="lobby-title title-top">{{ $t('game.lobby.title') }}</h1>
@@ -26,21 +26,18 @@
           :class="['corner-group', playerPositions[index]]"
         >
           <div class="selection-card" :class="{ 'is-ready': player.ready }">
-            <h2 class="player-name">{{ index + 1 }}</h2>
+            <h2 class="player-name">Vous êtes le joueur {{ index + 1 }}</h2>
             
             <!-- SÉLECTEUR DE BATEAU -->
             <div class="selector">
               <button @click.stop="prevBoat(index)" :disabled="player.ready">◀</button>
               <div class="preview-box">
-                <div class="boat-preview">
-                  <img :src="`/bateaux/${allBoats[player.boatIndex].file}`" class="preview-img" />
-                  <div class="info-icon">i</div>
-                  <div class="ability-tooltip">{{ allBoats[player.boatIndex].ability }}</div>
-                </div>
+                <img :src="`/bateaux/${allBoats[player.boatIndex].file}`" class="preview-img" />
               </div>
               <button @click.stop="nextBoat(index)" :disabled="player.ready">▶</button>
             </div>
             <p class="item-name">{{ allBoats[player.boatIndex].name }}</p>
+            <p class="boat-ability-text">{{ allBoats[player.boatIndex].ability }}</p>
 
 
 
@@ -135,6 +132,9 @@
               <button class="action-button finish-turn-btn" @click.stop="nextTurn">
                 {{ $t('game.turn.finish') }}
               </button>
+              <button class="action-button attack-btn" @click.stop="initiateAttack">
+                Attaque
+              </button>
               <button
                 v-if="allBoats[player.boatIndex].type === 'actif' && !player.abilityUsed"
                 class="action-button ability-btn"
@@ -146,23 +146,7 @@
               </button>
             </div>
             
-            <!-- AFFICHAGE DES CARTES EN MAIN -->
-            <div v-if="currentTurn === index && player.hand.length > 0" class="player-hand-container">
-              <div class="player-hand">
-                <div 
-                  v-for="card in player.hand" 
-                  :key="card.uid" 
-                  class="playing-card"
-                  :class="card.type"
-                  @click.stop="playCard(index, card)"
-                >
-                  <div class="card-icon">{{ card.icon }}</div>
-                  <div class="card-name">{{ card.name }}</div>
-                  <div v-if="card.type === 'attack'" class="card-value">-{{ card.damage }} PV</div>
-                  <div v-else-if="card.type === 'heal'" class="card-value">+{{ card.value }} PV</div>
-                </div>
-              </div>
-            </div>
+
 
             <div v-if="isAttacking && currentTurn === index" class="attack-prompt">
               {{ $t('game.turn.selectTarget') }} (-{{ selectedDamage }})
@@ -257,7 +241,7 @@
               <img src="/coin.png" class="btn-icon" /> Prendre 2 Pièces
             </button>
             <button class="resource-button cards-btn" @click="chooseCards">
-              <span class="btn-icon">🎴</span> Piocher 2 Cartes
+              <span class="btn-icon">🎴</span> Piocher {{ cardsToDrawAmount }} cartes physiques
             </button>
           </div>
         </div>
@@ -318,13 +302,40 @@
           </div>
         </div>
       </div>
+      <!-- --- MODALE POPUP UNIVERSELLE (DANS LES DEUX SENS) --- -->
+      <div v-if="popupData" class="universal-popup-overlay" @click="closePopup">
+        <div class="popup-container">
+          <div class="popup-card popup-top">
+            <h2 class="popup-title">{{ popupData.title }}</h2>
+            <p class="popup-desc">{{ popupData.message }}</p>
+          </div>
+          <div class="popup-card popup-bottom">
+            <h2 class="popup-title">{{ popupData.title }}</h2>
+            <p class="popup-desc">{{ popupData.message }}</p>
+          </div>
+        </div>
+      </div>
     </template>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import { CARDS as GAME_CARDS, SHOP_ITEMS as GAME_SHOP_ITEMS } from '../game';
+import { SHOP_ITEMS as GAME_SHOP_ITEMS } from '../game';
+
+const popupData = ref(null);
+let popupTimeout = null;
+const triggerPopup = (title, message) => {
+  popupData.value = { title, message };
+  if (popupTimeout) clearTimeout(popupTimeout);
+  popupTimeout = setTimeout(() => {
+    popupData.value = null;
+  }, 4000);
+};
+const closePopup = () => {
+  popupData.value = null;
+  if (popupTimeout) clearTimeout(popupTimeout);
+};
 
 const allCats = [
   { file: 'antoine.png', name: 'Antoine' },
@@ -394,9 +405,9 @@ const nextRoleReveal = () => {
       roleRevealStep.value = 'pass';
       playUiTap();
     } else {
-      // Tous les joueurs ont vu leur rôle, on lance la partie
+      // Tous les joueurs ont vu leur rôle → premier tour, pas d'événement
       showRoleReveal.value = false;
-      startRound();
+      showResourcePhase.value = true;
     }
   }
 };
@@ -502,7 +513,7 @@ const restartGame = () => {
   roleRevealStep.value = 'pass';
   isAttacking.value = false;
   showDamageModal.value = false;
-  cardBeingPlayed.value = null;
+
   currentTurn.value = 0;
   currentRound.value = 1;
   // Reset shop items
@@ -511,7 +522,6 @@ const restartGame = () => {
   players.value.forEach(p => {
     p.hp = 5;
     p.gold = 0;
-    p.hand = [];
     p.ready = false;
     p.roleId = null;
     p.eliminations = 0;
@@ -544,7 +554,10 @@ const nextTurn = () => {
   while (players.value[next].hp <= 0 && guard-- > 0) {
     next = (next + 1) % total;
   }
-  if (next <= currentTurn.value && next === 0) currentRound.value += 1;
+
+  // Détecte si on reboucle vers le début (fin du tour du dernier joueur)
+  const isEndOfRound = next <= currentTurn.value;
+  if (isEndOfRound) currentRound.value += 1;
   currentTurn.value = next;
 
   // Reset des pouvoirs actifs 1x/tour pour le joueur qui va jouer
@@ -557,57 +570,24 @@ const nextTurn = () => {
   if (players.value[next].truceTurnsLeft > 0) players.value[next].truceTurnsLeft -= 1;
 
   playUiTap();
-  startRound();
-};
 
-// Adapter : projette les cartes du moteur src/game/cards.ts vers le format UI (attack/heal/defense)
-const FAMILY_ICONS = { ABORDAGE: '⚔️', VOILE: '🛡️', MAREE: '🍺', RUMEUR: '🦜', TRESOR: '💎' };
-function familyToUiType(card) {
-  if (card.family === 'ABORDAGE') return 'attack';
-  if (card.family === 'MAREE' && card.heal) return 'heal';
-  if (card.family === 'VOILE') return 'defense';
-  return null;
-}
-const gameDeck = GAME_CARDS
-  .map(c => {
-    const type = familyToUiType(c);
-    if (!type) return null;
-    return {
-      id: c.id,
-      name: c.name,
-      type,
-      damage: c.damage,
-      value: c.heal,
-      desc: c.description,
-      icon: FAMILY_ICONS[c.family]
-    };
-  })
-  .filter(Boolean);
+  if (isEndOfRound) {
+    // Fin du dernier tour du round → événement de mer d'abord
+    startRound();
+  } else {
+    // Tour intermédiaire → directement la phase de ressources
+    showResourcePhase.value = true;
+  }
+};
 
 const useBoatAbility = (playerIndex) => {
   const player = players.value[playerIndex];
   const boat = allBoats[player.boatIndex];
-  
   if (player.abilityUsed || boat.type !== 'actif') return;
-
-  // Implémentation basique des pouvoirs actifs
-  if (boat.abilityId === 'sloop') {
-    if (player.hand.length > 0) {
-      player.hand.shift(); // Défausse la 1ère carte
-      const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
-      player.hand.push(randomCard);
-      playSuccessChime();
-    }
-  } else if (boat.abilityId === 'jonque') {
-    // Affiche juste un message pour l'instant (la pioche n'est pas un vrai deck trié)
-    alert("Pouvoir Jonque activé ! (Regarde la prochaine carte)");
-    playSuccessChime();
-  } else {
-    alert(`Pouvoir ${boat.name} activé !`);
-    playSuccessChime();
-  }
-
+  // Les pouvoirs qui concernent la pioche physique : rappeler au joueur verbalement
+  triggerPopup('Pouvoir Activé', `${boat.name} :\n${boat.ability}`);
   player.abilityUsed = true;
+  playSuccessChime();
 };
 
 const chooseGold = () => {
@@ -627,22 +607,26 @@ const chooseGold = () => {
   evaluateVictory();
 };
 
-const chooseCards = () => {
+const cardsToDrawAmount = computed(() => {
+  if (!players.value || players.value.length === 0) return 2;
   const player = players.value[currentTurn.value];
-  const boat = allBoats[player.boatIndex];
-  const hand = player.hand;
+  if (!player) return 2;
   
-  let cardsToDraw = 2;
-  // Pouvoir passif: La Caravelle (+1 carte)
-  if (boat.abilityId === 'caravelle') {
-    cardsToDraw += 1;
-  }
+  const boat = allBoats[player.boatIndex];
+  let amount = 2;
+  
+  // Bonus navire
+  if (boat.abilityId === 'caravelle') amount += 1;
+  // Bonus événement
+  if (currentEvent.value && currentEvent.value.id === 'tresor') amount += 1;
+  
+  return amount;
+});
 
-  for (let i = 0; i < cardsToDraw; i++) {
-    if (hand.length < 5) { // Main max 5
-      const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
-      hand.push(randomCard);
-    }
+const chooseCards = () => {
+  const amount = cardsToDrawAmount.value;
+  if (amount > 2) {
+    triggerPopup('Pioche Bonus !', `Vous piochez ${amount} cartes physiques ce tour-ci grâce à vos bonus.`);
   }
   showResourcePhase.value = false;
   playSuccessChime();
@@ -692,10 +676,7 @@ const buyItem = (item) => {
       player.buffNextAttack = (player.buffNextAttack || 0) + 2;
       break;
     case 'DRAW_3':
-      for (let i = 0; i < 3 && player.hand.length < 5; i++) {
-        const c = gameDeck[Math.floor(Math.random() * gameDeck.length)];
-        player.hand.push({ ...c, uid: Math.random().toString(36).substr(2, 9) });
-      }
+      triggerPopup('Coffre de Contrebande', 'Piochez 3 cartes physiques !');
       break;
     case 'TRUCE_2':
       player.truceTurnsLeft = 2;
@@ -713,34 +694,37 @@ const buyItem = (item) => {
 const selectedDamage = ref(1);
 const damageInput = ref(String(selectedDamage.value));
 
-const playCard = (playerIndex, card) => {
-  if (playerIndex !== currentTurn.value) return;
-
-  if (card.type === 'attack') {
-    cardBeingPlayed.value = card;
-    selectedDamage.value = card.damage;
-    isAttacking.value = true;
-    playAttackSound();
-  } else if (card.type === 'heal') {
-    // Jouer la carte de soin immédiatement sur soi-même
-    players.value[playerIndex].hp += card.value;
-    removeCardFromHand(playerIndex, card);
-    playSuccessChime();
-  } else {
-    // Autres types de cartes à implémenter (ex: défense)
+const initiateAttack = () => {
+  showDamageModal.value = true;
+  selectedDamage.value = 1;
+  damageInput.value = "1";
+  playUiTap();
+};
+const decreaseDamage = () => {
+  if (selectedDamage.value > 1) {
+    selectedDamage.value--;
+    damageInput.value = String(selectedDamage.value);
     playUiTap();
   }
 };
-
-const removeCardFromHand = (playerIndex, cardToRemove) => {
-  const hand = players.value[playerIndex].hand;
-  const index = hand.findIndex(c => c.uid === cardToRemove.uid);
-  if (index > -1) {
-    hand.splice(index, 1);
-  }
+const increaseDamage = () => {
+  selectedDamage.value++;
+  damageInput.value = String(selectedDamage.value);
+  playUiTap();
 };
-
-const performAttack = (targetIdx) => {
+const cancelDamage = () => {
+  showDamageModal.value = false;
+  isAttacking.value = false;
+  playUiTap();
+};
+const confirmDamage = () => {
+  let val = parseInt(damageInput.value, 10);
+  if (isNaN(val) || val < 1) val = 1;
+  selectedDamage.value = val;
+  showDamageModal.value = false;
+  isAttacking.value = true;
+  playUiTap();
+};const performAttack = (targetIdx) => {
   if (!isAttacking.value || targetIdx === currentTurn.value) return;
   // Ne pas attaquer un joueur déjà éliminé
   if (players.value[targetIdx].hp <= 0) return;
@@ -755,7 +739,7 @@ const performAttack = (targetIdx) => {
 
   // Trêve : impossible d'attaquer une cible sous protection
   if (target.truceTurnsLeft && target.truceTurnsLeft > 0) {
-    alert(`${allCats[target.catIndex].name} est sous Drapeau de trêve, intouchable !`);
+    triggerPopup('Drapeau de trêve', `${allCats[target.catIndex].name} est intouchable ce tour-ci !`);
     // Carte non consommée — on garde le tour pour rejouer
     isAttacking.value = true;
     playHitSound();
@@ -786,7 +770,7 @@ const performAttack = (targetIdx) => {
 
   // Gérer la brume (50% de chance d'échec)
   if (currentEvent.value && currentEvent.value.id === 'brume' && Math.random() < 0.5) {
-    alert("L'attaque a manqué à cause de la brume !");
+    triggerPopup('Échec de l\'attaque', 'L\'attaque a manqué à cause de la brume !');
     playHitSound(); // Bruit d'échec
   } else {
     // Appliquer le dégât choisi par l'attaquant
@@ -794,10 +778,9 @@ const performAttack = (targetIdx) => {
     playShopSound();
     playHitSound();
 
-    // Pouvoir passif: Le Brick (pioche 1 carte quand attaqué)
-    if (targetBoat.abilityId === 'brick' && target.hp > 0 && target.hand.length < 5) {
-      const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
-      target.hand.push(randomCard);
+    // Pouvoir passif: Le Brick (pioche 1 carte physique quand attaqué)
+    if (targetBoat.abilityId === 'brick' && target.hp > 0) {
+      triggerPopup('Pouvoir Brick', `${allBoats[target.boatIndex].name} pioche 1 carte physique !`);
     }
   }
 
@@ -807,21 +790,15 @@ const performAttack = (targetIdx) => {
   if (target.revivePending) {
     target.revivePending = false;
     target.hp = 1;
-    alert(`${allCats[target.catIndex].name} revient à la vie avec 1 PV !`);
+    triggerPopup('Revivre', `${allCats[target.catIndex].name} revient à la vie avec 1 PV !`);
   } else {
   attacker.eliminations += 1;
+  // Pouvoir passif: Le Brigantin (pioche 2 cartes physiques à l'élimination)
   if (attackerBoat.abilityId === 'brigantin') {
-    for (let i = 0; i < 2; i++) {
-      if (attacker.hand.length < 5) {
-        const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
-        attacker.hand.push(randomCard);
-      }
-    }
+    triggerPopup('Pouvoir Brigantin', 'Piochez 2 cartes physiques bonus !');
   }
-  // Transfert des cartes & pièces du joueur éliminé
-  attacker.hand.push(...target.hand);
+  // Transfert des pièces du joueur éliminé
   attacker.gold += target.gold;
-  target.hand = [];
   target.gold = 0;
   // Pouvoir passif: La Frégate (+1 PV si on élimine un joueur)
   if (attackerBoat.abilityId === 'fregate') {
@@ -830,11 +807,7 @@ const performAttack = (targetIdx) => {
   }
   }
 
-  // Retirer la carte jouée de la main
-  if (cardBeingPlayed.value) {
-    removeCardFromHand(currentTurn.value, cardBeingPlayed.value);
-    cardBeingPlayed.value = null;
-  }
+
 
   playUiTap();
   // RÈGLE : Jouer une carte attaque met fin au tour immédiatement (et relance startRound pour le prochain)
@@ -881,7 +854,6 @@ const players = ref(Array.from({ length: 4 }, () => ({
   ready: false, 
   hp: 5, 
   gold: 0,
-  hand: [],
   boatConflict: false,
   roleId: null,
   eliminations: 0 // Pour le Chasseur de primes
@@ -1025,6 +997,41 @@ const playHitSound = () => {
   setTimeout(() => ctx.close(), 600);
 };
 
+const playSuccessChime = () => {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+  const ctx = new AudioContextClass();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(440, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+  gain.gain.setValueAtTime(0.1, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.4);
+  setTimeout(() => ctx.close(), 500);
+};
+
+const playShopSound = () => {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+  const ctx = new AudioContextClass();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1200, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime + 0.05);
+  gain.gain.setValueAtTime(0.1, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.3);
+  setTimeout(() => ctx.close(), 400);
+};
 const spinRoulette = () => {
   if (isSpinning.value) return;
   
@@ -1192,6 +1199,13 @@ onUnmounted(() => {
   z-index: 10;
 }
 
+.players-2 .lobby-titles,
+.players-3 .lobby-titles,
+.players-5 .lobby-titles,
+.players-6 .lobby-titles {
+  gap: 2vmin;
+}
+
 .lobby-title {
   font-family: 'Georgia', serif;
   color: #f1d3a1;
@@ -1227,12 +1241,11 @@ onUnmounted(() => {
   font-size: 0.9rem;
   margin: 0;
   background: #3d1c10;
-  width: 25px;
-  height: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 4px;
+  padding: 4px 6px;
   border: 1px solid #f1d3a1;
 }
 
@@ -1294,52 +1307,14 @@ onUnmounted(() => {
   z-index: 5;
 }
 
-.ability-tooltip {
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28vmin;
-  min-height: 40px;
-  background-image: url('/paper.png');
-  background-size: cover;
-  background-position: center;
-  color: #3d1c10;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 0.75rem;
+.boat-ability-text {
+  font-size: 0.72rem;
   font-style: italic;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-  border: 2px solid #3d1c10;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s ease;
-  pointer-events: none;
-  z-index: 50;
+  color: #c8a24a;
   text-align: center;
-  line-height: 1.3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.boat-preview:hover .ability-tooltip {
-  opacity: 1;
-  visibility: visible;
-  bottom: 130%;
-}
-
-/* On inverse la position de la bulle pour les joueurs du haut pour éviter qu'elle sorte de l'écran */
-.top-left .ability-tooltip, .top-right .ability-tooltip, .top-center .ability-tooltip {
-  bottom: auto;
-  top: 130%;
-  transform: translateX(-50%);
-}
-
-.top-left .boat-preview:hover .ability-tooltip, 
-.top-right .boat-preview:hover .ability-tooltip,
-.top-center .boat-preview:hover .ability-tooltip {
-  top: 140%;
+  margin: 4px 8px 0;
+  line-height: 1.35;
+  min-height: 2.7em;
 }
 
 .preview-img {
@@ -1540,6 +1515,15 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
+.attack-btn {
+  background: #c0392b;
+  color: white;
+  border: 2px solid #922b21;
+  font-size: 0.7rem;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
 .ability-btn {
   position: relative;
   background: #f39c12;
@@ -1588,6 +1572,98 @@ onUnmounted(() => {
 .ability-btn:focus .ability-tooltip-bubble {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+.damage-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(93, 42, 24, 0.98);
+  border: 2px solid #f1d3a1;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+  z-index: 250;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.damage-modal-title {
+  color: #f1d3a1;
+  font-family: 'Georgia', serif;
+  text-align: center;
+  font-size: 1.1rem;
+}
+.damage-input-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.damage-step {
+  background: #3d1c10;
+  color: #f1d3a1;
+  border: 1px solid #f1d3a1;
+  width: 35px;
+  height: 35px;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.damage-input {
+  width: 50px;
+  height: 35px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background: #1a0f10;
+  color: #f1d3a1;
+  border: 1px solid #f1d3a1;
+  border-radius: 4px;
+}
+.damage-modal-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+.attack-confirm {
+  margin-top: 10px;
+  background: #c0392b;
+  color: white;
+  border: 1px solid #922b21;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+.cancel-button {
+  background: #3d1c10;
+  color: white;
+  border: 1px solid #555;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.turn-badge {
+  position: absolute;
+  top: 10px;
+  right: -20px;
+  background-color: #c0392b;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  animation: pulse 2s infinite;
+  z-index: 10;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 /* --- CARDS IN HAND STYLES --- */
@@ -1904,8 +1980,6 @@ onUnmounted(() => {
   background-position: center;
   padding: 5vmin;
   border-radius: 12px;
-  border: 5px solid #3d1c10;
-  box-shadow: 0 0 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.3);
   text-align: center;
   max-width: 600px;
   width: 80vw;
@@ -2579,5 +2653,47 @@ onUnmounted(() => {
 .end-button.primary:active {
   transform: translateY(2px);
   box-shadow: 0 2px 0 #4f1219;
+}
+
+.universal-popup-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15vmin;
+}
+.popup-card {
+  background: rgba(93, 42, 24, 0.95);
+  border: 2px solid #f1d3a1;
+  border-radius: 12px;
+  padding: 20px 30px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  max-width: 80vw;
+}
+.popup-top {
+  transform: rotate(180deg);
+}
+.popup-title {
+  font-family: 'Georgia', serif;
+  color: #f1d3a1;
+  font-size: 1.8rem;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+}
+.popup-desc {
+  color: white;
+  font-size: 1.2rem;
+  margin: 0;
+  white-space: pre-line;
 }
 </style>
