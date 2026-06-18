@@ -64,13 +64,6 @@
       </div>
     </template>
 
-    <!-- --- ANIMATION INTRO BATEAU --- -->
-    <template v-else-if="isBoatAnimVisible">
-      <div class="boat-intro-overlay" @click.self>
-        <img :src="`/bateaux/${animBoatFile}`" class="boat-intro-img" alt="bateau" :style="{ animationDuration: boatAnimDuration + 'ms' }" />
-      </div>
-    </template>
-
     <!-- --- ROULETTE CAPITAINE --- -->
     <template v-else-if="isRouletteVisible">
       <div class="roulette-overlay">
@@ -189,7 +182,6 @@
             </div>
 
             <img :src="`/bateaux/${allBoats[player.boatIndex].file}`" class="boat-img" />
-            <img :src="`/chats/${allCats[player.catIndex].file}`" class="cat-img" />
             <div v-if="currentTurn === index" class="turn-badge">{{ $t('game.turn.yourTurn') }}</div>
           </div>
           
@@ -517,13 +509,16 @@ const performAttack = (targetIdx) => {
   }
 
   // Pouvoir passif: Le Brigantin (pioche 2 cartes si on élimine un joueur)
-  if (target.hp === 0 && attackerBoat.abilityId === 'brigantin') {
+  if (target.hp === 0) {
+  attacker.eliminations += 1;
+  if (attackerBoat.abilityId === 'brigantin') {
     for (let i = 0; i < 2; i++) {
       if (attacker.hand.length < 5) {
         const randomCard = { ...gameDeck[Math.floor(Math.random() * gameDeck.length)], uid: Math.random().toString(36).substr(2, 9) };
         attacker.hand.push(randomCard);
       }
     }
+  }
   }
 
   // Pouvoir passif: La Frégate (+1 PV si on élimine un joueur)
@@ -568,6 +563,14 @@ const playerPositions = computed(() => {
 
 const getRandomIndex = (max) => Math.floor(Math.random() * max);
 
+const allRoles = [
+  { id: 'capitaine', name: 'Capitaine', isPublic: true, desc: 'Survivre jusqu\'au duel final.' },
+  { id: 'protecteur', name: 'Protecteur', isPublic: false, desc: 'Garder le Capitaine en vie jusqu\'à la fin.' },
+  { id: 'chasseur', name: 'Chasseur de Primes', isPublic: false, desc: 'Couler (éliminer) 2 navires ennemis avant tout le monde.' },
+  { id: 'renegat', name: 'Renégat', isPublic: false, desc: 'Être le dernier survivant (voir l\'élimination de tous les autres).' },
+  { id: 'contrebandier', name: 'Contrebandier', isPublic: false, desc: 'Accumuler 15 pièces à n\'importe quel moment.' }
+];
+
 const players = ref(Array.from({ length: 4 }, () => ({ 
   boatIndex: getRandomIndex(allBoats.length), 
   catIndex: getRandomIndex(allCats.length), 
@@ -575,7 +578,9 @@ const players = ref(Array.from({ length: 4 }, () => ({
   hp: 5, 
   gold: 0,
   hand: [],
-  boatConflict: false
+  boatConflict: false,
+  roleId: null,
+  eliminations: 0 // Pour le Chasseur de primes
 })));
 
 watch(playerCount, (newCount) => {
@@ -589,7 +594,9 @@ watch(playerCount, (newCount) => {
         hp: 5, 
         gold: 0,
         hand: [],
-        boatConflict: false
+        boatConflict: false,
+        roleId: null,
+        eliminations: 0
       });
     }
   } else if (newCount < currentCount) {
@@ -631,17 +638,7 @@ const boatAnimDuration = 1800; // ms
 const startGame = () => {
   // Marquer la partie comme démarrée pour quitter l'écran de lobby
   isStarted.value = true;
-
-  // Choisir un bateau aléatoire depuis le dossier /bateaux pour l'animation
-  const idx = Math.floor(Math.random() * allBoats.length);
-  animBoatFile.value = allBoats[idx].file;
-  isBoatAnimVisible.value = true;
-
-  // Après l'animation, afficher la roulette
-  setTimeout(() => {
-    isBoatAnimVisible.value = false;
-    isRouletteVisible.value = true;
-  }, boatAnimDuration);
+  isRouletteVisible.value = true;
 };
 
 const playRevealSound = () => {
@@ -720,9 +717,30 @@ const spinRoulette = () => {
 
 const confirmCaptain = () => {
   if (winnerIndex.value !== null) {
+    // Le Capitaine gagne +1 PV et reçoit le rôle 'capitaine'
     players.value[winnerIndex.value].hp += 1;
+    players.value[winnerIndex.value].roleId = 'capitaine';
+
+    // Distribuer les autres rôles aux autres joueurs
+    const availableHiddenRoles = allRoles.filter(r => r.id !== 'capitaine').map(r => r.id);
+    // Mélanger les rôles cachés
+    for (let i = availableHiddenRoles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availableHiddenRoles[i], availableHiddenRoles[j]] = [availableHiddenRoles[j], availableHiddenRoles[i]];
+    }
+
+    let roleIndex = 0;
+    players.value.forEach((player, idx) => {
+      if (idx !== winnerIndex.value) {
+        player.roleId = availableHiddenRoles[roleIndex % availableHiddenRoles.length];
+        roleIndex++;
+      }
+    });
+
     isRouletteVisible.value = false;
     isStarted.value = true;
+    currentTurn.value = 0;
+    startRound(); // Lancer le premier événement de mer
   }
 };
 
@@ -1744,45 +1762,7 @@ onUnmounted(() => {
   gap: 4vmin;
 }
 
-/* --- BOAT INTRO ANIMATION --- */
-.boat-intro-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85));
-  z-index: 2500;
-}
 
-.boat-intro-img {
-  width: 40vmin;
-  max-width: 420px;
-  transform-origin: 50% 60%;
-  /* animation name is set in CSS; duration provided inline */
-  animation: boatAcross ease-in-out forwards;
-}
-
-@keyframes boatAcross {
-  0% {
-    transform: translateX(120vw) translateY(6vh) scale(0.9) scaleX(-1) rotate(-6deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(10vw) translateY(6vh) scale(1) scaleX(-1) rotate(0deg);
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-120vw) translateY(6vh) scale(0.9) scaleX(-1) rotate(6deg);
-    opacity: 0;
-  }
-}
 
 .roulette-title {
   color: #f1d3a1;
