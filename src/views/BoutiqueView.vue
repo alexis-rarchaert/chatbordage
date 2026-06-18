@@ -9,44 +9,49 @@
 
     <main class="shop-main container">
       <p class="shop-intro" v-reveal>
-        Embarquez l'aventure chez vous : le jeu, et quelques babioles dignes des plus fins corsaires.
+        Embarque l'aventure chez toi : le jeu, des goodies, et l'édition collector pour les vrais loups de mer.
       </p>
 
       <div class="shop-grid">
         <article
-          v-for="(item, idx) in items"
+          v-for="(item, idx) in products"
           :key="item.id"
           class="product-card"
           v-reveal="'zoom'"
-          :style="{ transitionDelay: `${idx * 100}ms` }"
+          :style="{ transitionDelay: `${idx * 80}ms` }"
         >
-          <span v-if="item.badge" class="product-badge">{{ item.badge }}</span>
+          <RouterLink :to="`/boutique/${item.slug}`" class="product-link">
+            <span v-if="item.badge" class="product-badge">{{ item.badge }}</span>
 
-          <div class="product-media">
-            <img v-if="item.image" :src="item.image" :alt="item.name" class="product-img" />
-            <div v-else class="product-placeholder" aria-hidden="true">
-              <span class="product-placeholder-icon">{{ item.icon }}</span>
+            <div class="product-media">
+              <img v-if="item.image" :src="item.image" :alt="item.name" class="product-img" />
+              <div v-else class="product-placeholder" aria-hidden="true">
+                <span class="product-placeholder-icon">{{ item.icon }}</span>
+              </div>
             </div>
-          </div>
 
-          <div class="product-body">
-            <h3 class="product-name">{{ item.name }}</h3>
-            <p class="product-desc">{{ item.desc }}</p>
+            <div class="product-body">
+              <h3 class="product-name">{{ item.name }}</h3>
+              <p class="product-desc">{{ item.shortDesc }}</p>
+              <div class="product-price">{{ formatPrice(item.price) }}</div>
+            </div>
+          </RouterLink>
 
-            <ul v-if="item.features" class="product-features">
-              <li v-for="f in item.features" :key="f">{{ f }}</li>
-            </ul>
-
-            <div class="product-foot">
-              <div class="product-price">{{ item.price }}<span class="currency">€</span></div>
-              <button
-                class="btn-primary product-btn"
-                :class="{ added: addedId === item.id }"
-                @click="addToCart(item.id)"
-              >
-                {{ addedId === item.id ? 'Ajouté ✓' : 'Ajouter au panier' }}
+          <div class="product-foot">
+            <template v-if="cart.getQuantity(item.id) === 0">
+              <button class="btn-primary product-btn" @click="cart.add(item.id)">
+                Ajouter au panier
               </button>
-            </div>
+            </template>
+            <template v-else>
+              <QuantitySelector
+                :model-value="cart.getQuantity(item.id)"
+                :min="0"
+                :max="99"
+                @update:model-value="v => cart.setQuantity(item.id, v)"
+              />
+              <span class="product-incart">{{ cart.getQuantity(item.id) }} dans le panier</span>
+            </template>
           </div>
         </article>
       </div>
@@ -63,70 +68,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
+import QuantitySelector from '../components/QuantitySelector.vue'
+import { products, formatPrice } from '../lib/products'
+import { useCart } from '../lib/cart'
 
-type Product = {
-  id: string
-  name: string
-  desc: string
-  price: number
-  image?: string
-  icon?: string
-  badge?: string
-  features?: string[]
-}
-
-const items: Product[] = [
-  {
-    id: 'jeu',
-    name: 'ChatBordage — Le jeu',
-    desc: 'Le jeu de cartes à rôles cachés dans un univers de chats pirates. 4 à 6 joueurs, ~30 minutes de pure trahison féline.',
-    price: 34.9,
-    image: '/packshot.webp',
-    badge: 'Nouveauté',
-    features: [
-      '100 cartes à jouer',
-      'Application compagnon (15 navires + 5 rôles)',
-      'Des pièces façon doublons',
-      '7 à 77 ans'
-    ]
-  },
-  {
-    id: 'stickers',
-    name: 'Pack de 5 stickers',
-    desc: 'Les 5 chats pirates en stickers vinyle waterproof. Décore ta gamelle, ton ordi, ton tonneau de rhum.',
-    price: 7.5,
-    icon: '🐾',
-    features: [
-      'Vinyle découpé waterproof',
-      'Chat-rles Henri, Miranda, Kim, Sylas, Maskey',
-      'Format ~7 cm'
-    ]
-  },
-  {
-    id: 'mug',
-    name: 'Mug Capitaine',
-    desc: 'Un mug 33cl à l\'effigie de Chat-rles Henri. Idéal pour siroter ton café avant de couler tes amis.',
-    price: 14.9,
-    icon: '☕',
-    features: [
-      'Céramique 33 cl',
-      'Passe au lave-vaisselle',
-      'Impression haute définition'
-    ]
-  }
-]
-
-const addedId = ref<string | null>(null)
-function addToCart(id: string) {
-  addedId.value = id
-  setTimeout(() => {
-    if (addedId.value === id) addedId.value = null
-  }, 1500)
-}
+const cart = useCart()
 </script>
 
 <style scoped>
@@ -170,10 +119,7 @@ function addToCart(id: string) {
   letter-spacing: 0.05em;
 }
 
-.shop-main {
-  padding: clamp(40px, 6vw, 64px) 20px;
-  flex: 1;
-}
+.shop-main { padding: clamp(40px, 6vw, 64px) 20px; flex: 1; }
 .shop-intro {
   text-align: center;
   font-size: clamp(16px, 1.6vw, 18px);
@@ -203,11 +149,18 @@ function addToCart(id: string) {
   display: flex;
   flex-direction: column;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .product-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.5);
+}
+.product-link {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
 }
 .product-badge {
   position: absolute;
@@ -228,7 +181,7 @@ function addToCart(id: string) {
 
 .product-media {
   position: relative;
-  height: 260px;
+  height: 220px;
   background: var(--color-cream);
   border-bottom: 2px solid var(--color-gold-dark);
   overflow: hidden;
@@ -252,12 +205,12 @@ function addToCart(id: string) {
     linear-gradient(135deg, var(--color-cream) 0%, #ddc69a 100%);
 }
 .product-placeholder-icon {
-  font-size: 110px;
+  font-size: 90px;
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
 }
 
 .product-body {
-  padding: 24px;
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -265,65 +218,42 @@ function addToCart(id: string) {
 .product-name {
   font-family: var(--font-display);
   color: var(--color-gold);
-  font-size: 26px;
-  margin-bottom: 10px;
+  font-size: 24px;
+  margin-bottom: 8px;
   letter-spacing: 0.03em;
   text-shadow: 0 2px 0 var(--color-burgundy-dark);
 }
 .product-desc {
-  font-size: 14.5px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--color-text-light);
-  margin-bottom: 16px;
-}
-.product-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 20px;
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--color-text-muted);
-}
-.product-features li {
-  position: relative;
-  padding-left: 18px;
-}
-.product-features li::before {
-  content: '✦';
-  position: absolute;
-  left: 0;
-  color: var(--color-gold);
-  font-size: 11px;
-  top: 3px;
-}
-.product-foot {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(200, 162, 74, 0.25);
+  margin-bottom: 14px;
+  flex: 1;
 }
 .product-price {
   font-family: var(--font-display);
-  font-size: 32px;
+  font-size: 28px;
   color: var(--color-gold);
   line-height: 1;
-  text-shadow: 0 2px 0 var(--color-burgundy-dark);
 }
-.product-price .currency {
-  font-size: 0.6em;
-  margin-left: 2px;
+
+.product-foot {
+  padding: 16px 22px 22px;
+  border-top: 1px solid rgba(200, 162, 74, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 .product-btn {
+  width: 100%;
   font-size: 13px;
-  padding: 10px 18px;
-  white-space: nowrap;
+  padding: 10px 14px;
 }
-.product-btn.added {
-  background: linear-gradient(180deg, var(--color-turquoise) 0%, #2d8a90 100%);
-  color: var(--color-cream);
+.product-incart {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-style: italic;
 }
 
 .shop-note {
@@ -337,14 +267,5 @@ function addToCart(id: string) {
   color: var(--color-gold);
   font-weight: 600;
   text-decoration: underline;
-}
-
-@media (max-width: 640px) {
-  .product-media { height: 220px; }
-  .product-foot {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .product-btn { width: 100%; }
 }
 </style>

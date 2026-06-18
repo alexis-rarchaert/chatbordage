@@ -4,6 +4,8 @@ import ReglementView from '../views/ReglementView.vue'
 import GameView from '../views/GameView.vue'
 import FormulaireView from '../views/FormulaireView.vue'
 import BoutiqueView from '../views/BoutiqueView.vue'
+import ProductView from '../views/ProductView.vue'
+import CartView from '../views/CartView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +34,16 @@ const router = createRouter({
       path: '/boutique',
       name: 'boutique',
       component: BoutiqueView
+    },
+    {
+      path: '/boutique/:id',
+      name: 'product',
+      component: ProductView
+    },
+    {
+      path: '/panier',
+      name: 'cart',
+      component: CartView
     }
   ]
 })
