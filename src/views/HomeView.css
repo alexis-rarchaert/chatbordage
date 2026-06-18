@@ -1,0 +1,293 @@
+/* ========================================================
+   IMPORT DES POLICES DEPUIS GOOGLE FONTS
+   ======================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Pirata+One&display=swap');
+
+/* ========================================================
+   1. VARIABLES DE LA CHARTE GRAPHIQUE & WRAPPER
+   ======================================================== */
+.chatbordage-wrapper {
+  --color-dark-red: #6F1323;  
+  --color-gold: #C2A151;      
+  --color-navy: #18315B;      
+  --color-cream: #EDEBDF;     
+  --color-mint: #B0D7B9;      
+  --color-dark-teal: #305D5C; 
+
+  background-color: var(--color-cream);
+  color: var(--color-navy);
+  font-family: 'Nunito', sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh; 
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding: 1.5rem 1rem 0 1rem; /* Modifié pour que le footer touche le bas */
+}
+
+/* ========================================================
+   2. EN-TÊTE
+   ======================================================== */
+.header { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 2rem; flex-shrink: 0; }
+.logo-box { background-color: var(--color-dark-red); color: var(--color-cream); padding: 0.5rem 2rem; border-radius: 20px; font-weight: 800; font-size: 1.1rem; font-family: 'Pirata One', serif; letter-spacing: 1px; border: 2px solid var(--color-gold); text-decoration: none; }
+.menu-icon { position: absolute; right: 0; display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+.menu-icon .bar { width: 24px; height: 3px; background-color: var(--color-navy); border-radius: 3px; }
+.nav-links { display: none; }
+
+/* ========================================================
+   3. HERO SECTION (Haut de page)
+   ======================================================== */
+.main-content { display: flex; flex-direction: column; flex: 1 0 auto; justify-content: flex-start; align-items: center; gap: 3rem; }
+.text-section { text-align: center; width: 100%; }
+.title { font-family: 'Pirata One', serif; font-size: clamp(2.5rem, 12vw, 4rem); font-weight: normal; margin-bottom: 1rem; line-height: 1.1; color: var(--color-dark-red); text-shadow: 2px 2px 0px rgba(0,0,0,0.05); word-wrap: break-word; }
+.description { font-size: clamp(0.9rem, 4vw, 1.1rem); color: var(--color-navy); margin-bottom: 2.5rem; line-height: 1.6; font-weight: 700; padding: 0 0.5rem; }
+.buy-button { background-color: var(--color-gold); color: var(--color-navy); border: none; padding: 1rem 3rem; border-radius: 25px; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 0 var(--color-navy); transition: all 0.2s ease; }
+.buy-button:active { transform: translateY(4px); box-shadow: 0 0 0 var(--color-navy); }
+
+.visual-section { display: flex; justify-content: center; align-items: center; width: 100%; padding-bottom: 1rem; }
+.cards-container { position: relative; max-width: 100%; width: 260px; height: 220px; display: flex; justify-content: center; align-items: center; }
+.card { width: 130px; height: 200px; border: 4px solid var(--color-gold); border-radius: 12px; background-color: var(--color-cream); display: flex; flex-direction: column; position: absolute; overflow: hidden; box-shadow: 2px 4px 8px rgba(0,0,0,0.15); }
+.card-content { display: flex; flex-direction: column; height: 100%; }
+.card-top { padding: 0.8rem; font-family: 'Pirata One', serif; font-size: 1.5rem; color: var(--color-cream); flex: 0 0 auto; text-align: center; border-bottom: 3px solid var(--color-gold); }
+.bg-red { background-color: var(--color-dark-red); }
+.bg-navy { background-color: var(--color-navy); color: var(--color-cream); }
+.bg-teal { background-color: var(--color-dark-teal); }
+.card-bottom { flex: 1; background-color: var(--color-mint); background-image: radial-gradient(circle, transparent 20%, var(--color-cream) 20%, var(--color-cream) 80%, transparent 80%, transparent); background-size: 10px 10px; }
+.left-card { transform: rotate(-15deg) translate(-45px, 15px); z-index: 1; }
+.center-card { transform: rotate(0deg) translate(0, -5px); z-index: 3; }
+.right-card { transform: rotate(15deg) translate(45px, 15px); z-index: 1; }
+
+/* ========================================================
+   4. SECTION : EN BREF (Carrousel)
+   ======================================================== */
+.en-bref-section { width: 100%; margin-top: 4rem; display: flex; flex-direction: column; align-items: center; color: var(--color-navy); }
+.banner-en-bref { width: 100vw; position: relative; left: 50%; transform: translateX(-50%); background-color: var(--color-mint); padding: 1.2rem 0; text-align: center; margin-bottom: 3rem; border-top: 3px solid var(--color-gold); border-bottom: 3px solid var(--color-gold); }
+.banner-en-bref h2 { font-family: 'Pirata One', serif; font-size: 2.5rem; color: var(--color-navy); margin: 0; letter-spacing: 2px; }
+
+.carousel-container { width: 100%; max-width: 400px; background-color: var(--color-cream); border: 4px solid var(--color-gold); border-radius: 16px; padding: 1.5rem 1rem; display: flex; align-items: center; justify-content: space-between; min-height: 340px; box-shadow: 0 8px 16px rgba(0,0,0,0.08); }
+.arrow-btn { background: none; border: none; font-size: 2.5rem; color: var(--color-navy); cursor: pointer; padding: 0 0.5rem; transition: transform 0.2s ease, color 0.2s ease; }
+.arrow-btn:hover { transform: scale(1.2); color: var(--color-gold); }
+.carousel-content { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 0.5rem; }
+.carousel-title { font-family: 'Pirata One', serif; font-size: 2rem; color: var(--color-dark-teal); margin: 0 0 1rem 0; }
+.carousel-illustration { width: 150px; height: 150px; background-color: var(--color-dark-red); color: var(--color-cream); display: flex; align-items: center; justify-content: center; border-radius: 12px; margin-bottom: 1.5rem; font-size: 1.2rem; font-family: 'Pirata One', serif; border: 3px solid var(--color-gold); }
+.carousel-description { font-size: 1.05rem; color: var(--color-navy); margin: 0; line-height: 1.5; font-weight: 700; }
+
+/* ========================================================
+   5. SECTION : LE CONCEPT
+   ======================================================== */
+.concept-section { width: 100%; margin-top: 5rem; display: flex; flex-direction: column; align-items: center; }
+.banner-concept { width: 100vw; position: relative; left: 50%; transform: translateX(-50%); background-color: var(--color-mint); padding: 1.2rem 0; text-align: center; margin-bottom: 3rem; border-top: 3px solid var(--color-gold); border-bottom: 3px solid var(--color-gold); }
+.banner-concept h2 { font-family: 'Pirata One', serif; font-size: 2.5rem; color: var(--color-navy); margin: 0; letter-spacing: 2px; }
+.concept-content { width: 100%; max-width: 600px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+.concept-content p { font-size: 1.1rem; color: var(--color-navy); line-height: 1.6; margin: 0; padding: 0 1rem; }
+.concept-content strong { font-weight: 800; color: var(--color-dark-red); }
+.concept-dot { display: inline-block; width: 8px; height: 8px; background-color: var(--color-dark-red); border-radius: 50%; }
+
+/* ========================================================
+   6. SECTION : CHATS PIRATES / NAVIRES
+   ======================================================== */
+.ships-section { width: 100%; margin-top: 5rem; display: flex; flex-direction: column; align-items: center; color: var(--color-navy); }
+.carousel-container-ships { width: 100%; max-width: 400px; background-color: var(--color-cream); border: 4px solid var(--color-gold); border-radius: 16px; padding: 2rem 1rem; display: flex; align-items: center; justify-content: space-between; min-height: 380px; box-shadow: 0 8px 16px rgba(0,0,0,0.08); }
+.carousel-title-ships { font-family: 'Pirata One', serif; font-size: 1.8rem; color: var(--color-dark-red); margin: 0 0 1.5rem 0; text-align: center; line-height: 1.2; }
+.carousel-illustration-ships { width: 160px; height: 100px; background-color: var(--color-dark-teal); color: var(--color-cream); display: flex; align-items: center; justify-content: center; border-radius: 16px; margin-bottom: 1.5rem; font-size: 1.2rem; font-family: 'Pirata One', serif; border: 3px solid var(--color-gold); }
+.carousel-description-ships { font-size: 1.05rem; color: var(--color-navy); margin: 0; line-height: 1.6; font-weight: 700; }
+.carousel-description-ships strong { color: var(--color-dark-red); font-weight: 800; }
+.carousel-description-ships u { text-decoration: underline; color: var(--color-navy); font-weight: 800; }
+
+/* ========================================================
+   7. SECTION : UNE MÉCANIQUE IMPITOYABLE
+   ======================================================== */
+.mechanics-section { width: 100%; margin-top: 5rem; display: flex; flex-direction: column; align-items: center; }
+.banner-mechanics { width: 100vw; position: relative; left: 50%; transform: translateX(-50%); background-color: var(--color-mint); padding: 1.2rem 0; text-align: center; margin-bottom: 3rem; border-top: 3px solid var(--color-gold); border-bottom: 3px solid var(--color-gold); }
+.banner-mechanics h2 { font-family: 'Pirata One', serif; font-size: 2.2rem; color: var(--color-navy); margin: 0; letter-spacing: 1px; }
+
+.mechanics-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 2.5rem; }
+.mechanic-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.mechanic-row.reverse { flex-direction: row-reverse; }
+
+.mechanic-text { flex: 1; color: var(--color-navy); font-size: 0.95rem; line-height: 1.4; }
+.mechanic-text p { margin: 0; }
+.mechanic-text strong { color: var(--color-dark-red); font-weight: 800; display: inline-block; margin-bottom: 0.3rem; font-size: 1.1rem; }
+
+.mechanic-illustration { width: 120px; height: 140px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--color-cream); font-family: 'Pirata One', serif; font-size: 1.1rem; border: 3px solid var(--color-gold); box-shadow: inset 0 0 10px rgba(0,0,0,0.2); flex-shrink: 0; }
+
+/* ========================================================
+   8. SECTION : LE SUPPORT NUMÉRIQUE
+   ======================================================== */
+.digital-section { width: 100%; margin-top: 5rem; display: flex; flex-direction: column; align-items: center; }
+.banner-digital { width: 100vw; position: relative; left: 50%; transform: translateX(-50%); background-color: var(--color-mint); padding: 1.2rem 0; text-align: center; margin-bottom: 3rem; border-top: 3px solid var(--color-gold); border-bottom: 3px solid var(--color-gold); }
+.banner-digital h2 { font-family: 'Pirata One', serif; font-size: 2.5rem; color: var(--color-navy); margin: 0; letter-spacing: 2px; }
+
+.digital-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+.digital-photo { width: 100%; height: 350px; background-color: var(--color-navy); color: var(--color-cream); border: 4px solid var(--color-gold); border-radius: 16px; display: flex; justify-content: center; align-items: center; font-family: 'Pirata One', serif; font-size: 1.8rem; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+
+.digital-list { padding-left: 1.5rem; margin: 0; color: var(--color-navy); display: flex; flex-direction: column; gap: 1.5rem; }
+.digital-list li { font-size: 1.05rem; line-height: 1.6; font-weight: 700; }
+.digital-list strong { color: var(--color-dark-red); font-weight: 800; }
+
+/* ========================================================
+   9. SECTION : CALL TO ACTION FINAL
+   ======================================================== */
+.final-cta-section {
+  width: 100%;
+  margin-top: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem; 
+}
+
+.final-button { font-size: 1.2rem; padding: 1.2rem 4rem; margin-bottom: 0.5rem; }
+.stars-container { color: var(--color-gold); font-size: 1.8rem; letter-spacing: 2px; text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
+.review-text { color: var(--color-navy); font-style: italic; font-size: 1rem; margin: 0; font-weight: 700; opacity: 0.85; }
+
+/* ========================================================
+   10. FOOTER
+   ======================================================== */
+.footer-section {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  /* On assombrit légèrement la couleur crème avec un overlay noir transparent pour respecter le wireframe */
+  background-color: rgba(0, 0, 0, 0.05); 
+  padding: 3rem 1rem;
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  border-top: 2px solid rgba(0,0,0,0.05);
+}
+
+.social-icons {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.social-circle {
+  width: 45px;
+  height: 45px;
+  background-color: var(--color-navy); /* Cercles bleu marine */
+  border-radius: 50%;
+  display: block;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.social-circle:hover {
+  transform: scale(1.1);
+  background-color: var(--color-gold);
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-links a {
+  color: var(--color-navy);
+  text-decoration: underline;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--color-dark-red);
+}
+
+/* ========================================================
+   11. VERSION ORDINATEUR (Si l'écran fait plus de 992px)
+   ======================================================== */
+@media (min-width: 992px) {
+  .chatbordage-wrapper { padding: 0; min-height: 100vh; overflow-x: hidden; }
+
+  /* En-tête */
+  .header { justify-content: space-between; padding: 2rem 5%; margin-bottom: 0; }
+  .logo-box { padding: 0.8rem 3rem; font-size: 1.5rem; }
+  .menu-icon { display: none; }
+  .nav-links { display: flex; gap: 3rem; }
+  .nav-links a { text-decoration: none; color: var(--color-navy); font-weight: 800; font-size: 1.2rem; text-transform: uppercase; transition: color 0.3s ease; }
+  .nav-links a:hover { color: var(--color-gold); } 
+  .lang-selector {
+    background: var(--color-cream);
+    border: 2px solid var(--color-navy);
+    border-radius: 5px;
+    padding: 2px 5px;
+    font-weight: 800;
+    color: var(--color-navy);
+    cursor: pointer;
+  }
+  .lang-selector:hover {
+    border-color: var(--color-gold);
+  }
+
+  /* Accueil */
+  .main-content { flex-direction: row; align-items: center; justify-content: space-between; padding: 0 5%; max-width: 1400px; margin: 0 auto; width: 100%; gap: 0; }
+  .text-section { flex: 1; max-width: 50%; text-align: left; padding-right: 2rem; margin-bottom: 0; }
+  .title { font-size: 5.5rem; margin-bottom: 1.5rem;}
+  .description { font-size: 1.4rem; max-width: 85%; padding: 0; }
+  .buy-button:hover { background-color: var(--color-dark-red); color: var(--color-cream); box-shadow: 0 4px 0 var(--color-navy); }
+  .visual-section { flex: 1; height: auto; align-items: center; margin-top: 0; padding-bottom: 0; }
+  .cards-container { width: 100%; height: 500px; align-items: center; }
+  .card { width: 220px; height: 340px; border-width: 5px; border-radius: 16px; }
+  .card-top { font-size: 2rem; padding: 1rem; border-bottom-width: 5px;}
+  .left-card { transform: rotate(-15deg) translateX(-140px) translateY(20px); }
+  .center-card { transform: rotate(0deg) translateY(-20px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+  .right-card { transform: rotate(15deg) translateX(140px) translateY(20px); }
+
+  /* Bref & Concept */
+  .en-bref-section { margin-top: 4rem; padding-bottom: 4rem; }
+  .banner-en-bref { margin-bottom: 3rem; padding: 1.5rem 0; }
+  .banner-en-bref h2 { font-size: 3rem; }
+  .carousel-container { max-width: 600px; padding: 2.5rem 2rem; min-height: 420px; }
+  .carousel-title { font-size: 2.5rem; }
+  .carousel-illustration { width: 200px; height: 200px; font-size: 1.5rem; }
+  .carousel-description { font-size: 1.1rem; }
+  .concept-section { margin-top: 2rem; padding-bottom: 6rem; }
+  .banner-concept { margin-bottom: 4rem; padding: 1.5rem 0; }
+  .banner-concept h2 { font-size: 3rem; }
+  .concept-content { max-width: 800px; gap: 2.5rem; }
+  .concept-content p { font-size: 1.3rem; }
+  .concept-dot { width: 10px; height: 10px; }
+
+  /* Chats Pirates */
+  .ships-section { margin-top: 4rem; padding-bottom: 6rem; }
+  .carousel-container-ships { max-width: 600px; padding: 2.5rem 2rem; min-height: 440px; }
+  .carousel-title-ships { font-size: 2.3rem; }
+  .carousel-illustration-ships { width: 240px; height: 140px; font-size: 1.5rem; }
+  .carousel-description-ships { font-size: 1.1rem; }
+
+  /* Mécaniques */
+  .mechanics-section { margin-top: 4rem; padding-bottom: 6rem; }
+  .banner-mechanics { margin-bottom: 5rem; padding: 1.5rem 0; }
+  .banner-mechanics h2 { font-size: 3rem; }
+  .mechanics-container { max-width: 900px; gap: 4rem; }
+  .mechanic-row { gap: 4rem; } 
+  .mechanic-text { font-size: 1.2rem; line-height: 1.6; }
+  .mechanic-text strong { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .mechanic-illustration { width: 250px; height: 250px; font-size: 1.8rem; border-width: 5px; }
+
+  /* Support Numérique */
+  .digital-section { margin-top: 4rem; padding-bottom: 6rem; }
+  .banner-digital { margin-bottom: 5rem; padding: 1.5rem 0; }
+  .banner-digital h2 { font-size: 3rem; }
+  .digital-container { max-width: 1200px; flex-direction: row; align-items: center; justify-content: space-between; gap: 4rem; padding: 0 5%; }
+  .digital-photo { flex: 1; height: 450px; border-width: 5px; }
+  .digital-list { flex: 1; gap: 2rem; }
+  .digital-list li { font-size: 1.2rem; }
+
+  /* Call to action final & Footer */
+  .final-cta-section { margin-top: 8rem; padding-bottom: 6rem; }
+  .final-button { font-size: 1.5rem; padding: 1.5rem 5rem; }
+  .stars-container { font-size: 2.2rem; }
+  .review-text { font-size: 1.2rem; }
+  
+  .footer-section { padding: 4rem 2rem; margin-top: 0; }
+  .footer-links { flex-direction: row; gap: 3rem; margin-top: 1rem; }
+  .footer-links a { font-size: 1.1rem; }
+}

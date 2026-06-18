@@ -1,0 +1,105 @@
+{
+  "siteTitle": "ChatBordage: The game of thievery!",
+  "header": {
+    "home": "Home",
+    "theGame": "The Game",
+    "rules": "Rules",
+    "shop": "Shop"
+  },
+  "hero": {
+    "title": "ChatBordage",
+    "description": "Embark as a formidable feline captain! Recruit your crew, loot kibble reserves, and become the ocean's most feared pirate in this boarding board game.",
+    "preorder": "Pre-order"
+  },
+  "cards": {
+    "mage": "Mage",
+    "nekomancer": "Nekomancer",
+    "captain": "Captain"
+  },
+  "sections": {
+    "inShort": "IN SHORT",
+    "concept": "THE CONCEPT",
+    "whichCat": "WHICH PIRATE CAT WILL YOU BE?",
+    "mechanics": "RUTHLESS MECHANICS",
+    "digital": "DIGITAL SUPPORT"
+  },
+  "slides": {
+    "gameType": {
+      "title": "GAME TYPE",
+      "description": "A hidden role card game mixing strategy, luck, and social interaction!"
+    },
+    "duration": {
+      "title": "DURATION",
+      "description": "Fast 20-minute games for 3 to 6 players."
+    },
+    "mechanics": {
+      "title": "MECHANICS",
+      "description": "Bluff, collect coins, and avoid mutinies."
+    }
+  },
+  "concept": {
+    "p1": "In <strong>CHATBORDAGE</strong>, each player embodies a ship visible to all, with its own stats (HP and Damage) and a unique power.",
+    "p2": "Meanwhile, you pursue a <strong>secret mission</strong> known only to you, checked on the tablet at the start of the game.",
+    "p3": "One exception: the <strong>Captain</strong> role is public and revealed aloud! Will you protect them, or try to sink them?"
+  },
+  "catSlides": {
+    "intro": "15 ships with <strong>unique</strong> abilities:<br>Take the hits with <u>The Frigate</u>, manipulate the deck with <u>The Junk</u>, or hide your identity with the <u>Ghost Ship</u>",
+    "frigate": "A robust escort ship ideal for bold cats who like to lead the charge.",
+    "junk": "Agile and sneaky, it allows you to manipulate the deck cards to steal opponent kibble.",
+    "ghostShip": "Perfect for hidden roles, it sows doubt in the crew's minds until the fatal blow."
+  },
+  "mechanics": {
+    "resources": {
+      "title": "Manage your resources:",
+      "text": "Each turn, choose to draw 2 cards or gain 2 coins. Equip yourself with permanent cards, but watch out, they can be stolen or destroyed!"
+    },
+    "attacks": {
+      "title": "Anticipate your attacks:",
+      "text": "You can play as many cards as you want, but be careful: playing an Attack card ends your turn immediately!"
+    },
+    "noMercy": {
+      "title": "No quarter:",
+      "text": "Players start with 5 HP (6 for the Captain). At 0 HP, elimination is permanent and the assassin recovers all the victim's coins and cards."
+    }
+  },
+  "digital": {
+    "app": "The <strong>central app</strong> manages randomness and secrets for a smooth experience",
+    "events": "Sea Events: Each turn, a <strong>random</strong> event applies to all (storm, fog, treasure island)",
+    "shop": "The <strong>Shop</strong>: Spend your coins to buy powerful and unique bonuses (like revealing a player's role, healing, or getting +2 damage on an attack). Once bought, the item disappears for everyone!"
+  },
+  "cta": {
+    "buy": "BUY",
+    "review": "5/5 on Amazon"
+  },
+  "footer": {
+    "legal": "Legal Mentions",
+    "tos": "Terms of Service"
+  },
+  "game": {
+    "lobby": {
+      "title": "Crew Preparation",
+      "player": "Player",
+      "playerCount": "Number of players",
+      "ready": "READY",
+      "notReady": "WAITING",
+      "chooseBoat": "Choose Ship",
+      "chooseCat": "Choose Captain",
+      "start": "START GAME"
+    },
+    "turn": {
+      "yourTurn": "Your Turn!",
+      "finish": "Finish",
+      "attack": "Attack",
+      "selectTarget": "Select Target!",
+      "selectDamage": "How much damage?",
+      "confirm": "Confirm",
+      "activePlayer": "Player's Turn"
+    }
+  },
+  "rulesPage": {
+    "title": "📜 The Pirate Code (Rules)",
+    "back": "⬅ Back to Home",
+    "rule1Title": "Rule #1: No quarter for kibble",
+    "rule1Text": "Here you can write all the rules of Chatbordage..."
+  }
+}

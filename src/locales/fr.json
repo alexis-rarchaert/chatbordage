@@ -1,0 +1,105 @@
+{
+  "siteTitle": "ChatBordage : Le jeu de la chaparderie !",
+  "header": {
+    "home": "Accueil",
+    "theGame": "Le Jeu",
+    "rules": "Règlement",
+    "shop": "Boutique"
+  },
+  "hero": {
+    "title": "ChatBordage",
+    "description": "Incarnez un capitaine félin redoutable ! Recrutez votre équipage, pillez des réserves de croquettes et devenez le pirate le plus craint de l'océan dans ce jeu de société à l'abordage.",
+    "preorder": "Précommander"
+  },
+  "cards": {
+    "mage": "Mage",
+    "nekomancer": "Nekomancer",
+    "captain": "Capitaine"
+  },
+  "sections": {
+    "inShort": "EN BREF",
+    "concept": "LE CONCEPT",
+    "whichCat": "QUEL CHAT PIRATE SEREZ-VOUS ?",
+    "mechanics": "UNE MÉCANIQUE IMPITOYABLE",
+    "digital": "LE SUPPORT NUMÉRIQUE"
+  },
+  "slides": {
+    "gameType": {
+      "title": "TYPE DE JEU",
+      "description": "Un jeu de cartes à rôles cachés mêlant réflexion, hasard et interactions sociales !"
+    },
+    "duration": {
+      "title": "DURÉE",
+      "description": "Des parties rapides de 20 minutes pour 3 à 6 joueurs."
+    },
+    "mechanics": {
+      "title": "MÉCANIQUES",
+      "description": "Bluffez, collectez des pièces et évitez les mutineries."
+    }
+  },
+  "concept": {
+    "p1": "Dans <strong>CHATBORDAGE</strong>, chaque joueur incarne un navire visible de tous, doté de ses propres statistiques (Points de Vie et Dégâts) et d'un pouvoir unique.",
+    "p2": "En parallèle, vous poursuivez une <strong>mission secrète</strong> connue de vous seul, consultée sur la tablette en début de partie.",
+    "p3": "Une seule exception : le rôle du <strong>Capitaine</strong> est public et révélé à la voix haute ! Saurez-vous le protéger, ou tenterez-vous de le faire couler ?"
+  },
+  "catSlides": {
+    "intro": "15 navires aux capacités <strong>uniques</strong> :<br>Encaissez les coups avec <u>La Frégate</u>, manipulez la pioche avec <u>La Jonque</u>, ou cachez votre identité avec le <u>Vaisseau Fantôme</u>",
+    "frigate": "Un navire d'escorte robuste idéal pour les matous fonceurs qui aiment mener les assauts de front.",
+    "junk": "Agile et sournoise, elle permet de manipuler les cartes de la pioche pour voler les croquettes adverses.",
+    "ghostShip": "Parfait pour les rôles cachés, il sème le doute dans l'esprit de l'équipage jusqu'au coup fatal."
+  },
+  "mechanics": {
+    "resources": {
+      "title": "Gérez vos ressources :",
+      "text": "À chaque tour, choisissez de piocher 2 cartes ou de gagner 2 pièces. Équipez-vous de cartes permanentes, mais attention, elles peuvent être volées ou détruites !"
+    },
+    "attacks": {
+      "title": "Anticipez vos attaques :",
+      "text": "Vous pouvez jouer autant de cartes que vous le souhaitez, mais attention : jouer une carte Attaque met fin à votre tour sur-le-champ !"
+    },
+    "noMercy": {
+      "title": "Pas de quartier :",
+      "text": "Les joueurs débutent avec 5 PV (6 pour le Capitaine). À 0 PV, l'élimination est définitive et l'assassin récupère toutes les pièces et les cartes de sa victime."
+    }
+  },
+  "digital": {
+    "app": "L'<strong>application centrale</strong> gère l'aléatoire et les secrets pour une expérience fluide",
+    "events": "Événements de mer : À chaque tour, un événement <strong>aléatoire</strong> s'applique à tous (tempête, brume, île au trésor)",
+    "shop": "La <strong>Boutique</strong> : Dépensez vos pièces pour acheter des bonus puissants et uniques (comme révéler le rôle d'un joueur, se soigner, ou obtenir +2 dégâts sur une attaque). Une fois acheté, l'objet disparaît pour tout le monde !"
+  },
+  "cta": {
+    "buy": "ACHETER",
+    "review": "5/5 sur Amazon"
+  },
+  "footer": {
+    "legal": "Mentions légales",
+    "tos": "Conditions Générales de Vente"
+  },
+  "game": {
+    "lobby": {
+      "title": "Préparation de l'équipage",
+      "player": "Joueur",
+      "playerCount": "Nombre de joueurs",
+      "ready": "PRÊT",
+      "notReady": "EN ATTENTE",
+      "chooseBoat": "Choisir le Navire",
+      "chooseCat": "Choisir le Capitaine",
+      "start": "LANCER LA PARTIE"
+    },
+    "turn": {
+      "yourTurn": "C'est ton tour !",
+      "finish": "Finir",
+      "attack": "Attaque",
+      "selectTarget": "Choisis ta cible !",
+      "selectDamage": "Combien de dégâts ?",
+      "confirm": "Confirmer",
+      "activePlayer": "Tour du Joueur"
+    }
+  },
+  "rulesPage": {
+    "title": "📜 Le Code des Pirates (Règlement)",
+    "back": "⬅ Retour à l'accueil",
+    "rule1Title": "Règle n°1 : Pas de quartier pour les croquettes",
+    "rule1Text": "Ici, vous pourrez écrire toutes les règles de Chatbordage..."
+  }
+}
