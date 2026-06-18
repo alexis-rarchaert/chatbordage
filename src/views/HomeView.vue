@@ -110,11 +110,11 @@
           <img src="/bateaux/Galion.webp" alt="" class="mech-image" />
         </div>
         <div class="mech-row reverse">
-          <img src="/bateaux/Fregate.webp" alt="" class="mech-image" />
           <div class="mech-text">
             <h3>{{ $t('mechanics.attacks.title') }}</h3>
             <p>{{ $t('mechanics.attacks.text') }}</p>
           </div>
+          <img src="/bateaux/Fregate.webp" alt="" class="mech-image" />
         </div>
         <div class="mech-row">
           <div class="mech-text">
@@ -626,7 +626,7 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .mech-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 48px;
+  gap: 32px;
   align-items: center;
   margin-bottom: 56px;
 }
@@ -642,7 +642,8 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 }
 .mech-text p { font-size: 15px; line-height: 1.7; }
 .mech-image {
-  max-width: 280px;
+  max-width: 360px;
+  width: 100%;
   margin: 0 auto;
   filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.4));
   transition: transform 0.4s ease;
