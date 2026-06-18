@@ -337,16 +337,20 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   max-width: 900px;
   margin: 0 auto;
   padding: clamp(40px, 6vw, 64px) clamp(28px, 5vw, 72px);
-  background:
-    linear-gradient(160deg, rgba(245, 233, 212, 0.96) 0%, rgba(232, 215, 180, 0.96) 100%),
+  background-color: #f0e0c0;
+  background-image:
+    linear-gradient(160deg, rgba(245, 233, 212, 0.78) 0%, rgba(220, 195, 150, 0.78) 100%),
     url('/paper.png');
+  background-size: 100% 100%, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
   background-blend-mode: multiply;
   border: 4px double var(--color-gold-dark);
   border-radius: var(--radius-lg);
   box-shadow:
     0 14px 36px rgba(0, 0, 0, 0.45),
     inset 0 0 0 1px rgba(168, 133, 47, 0.4),
-    inset 0 0 80px rgba(168, 133, 47, 0.15);
+    inset 0 0 80px rgba(168, 133, 47, 0.18);
   text-align: center;
   color: var(--color-burgundy-dark);
 }
@@ -429,16 +433,17 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   line-height: 1.65;
   color: var(--color-burgundy-dark);
   position: relative;
-  padding-top: 20px;
+  padding-top: 24px;
 }
 .brief-tagline::before {
-  content: '⚓';
+  content: '';
   position: absolute;
-  top: -4px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  color: var(--color-gold-dark);
-  font-size: 18px;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-gold-dark) 50%, transparent 100%);
 }
 
 /* ========= CAROUSEL ========= */
