@@ -37,6 +37,12 @@
       "description": "Bluffez, collectez des pièces et évitez les mutineries."
     }
   },
+  "brief": {
+    "players": "Joueurs",
+    "duration": "Durée",
+    "ships": "Navires",
+    "tagline": "Un jeu de cartes à rôles cachés mêlant réflexion, hasard et interactions sociales dans un univers de chats pirates."
+  },
   "concept": {
     "p1": "Dans <strong>CHATBORDAGE</strong>, chaque joueur incarne un navire visible de tous, doté de ses propres statistiques (Points de Vie et Dégâts) et d'un pouvoir unique.",
     "p2": "En parallèle, vous poursuivez une <strong>mission secrète</strong> connue de vous seul, consultée sur la tablette en début de partie.",

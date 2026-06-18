@@ -37,6 +37,12 @@
       "description": "Bluff, collect coins, and avoid mutinies."
     }
   },
+  "brief": {
+    "players": "Players",
+    "duration": "Duration",
+    "ships": "Ships",
+    "tagline": "A hidden-role card game blending strategy, luck, and social interaction in a world of pirate cats."
+  },
   "concept": {
     "p1": "In <strong>CHATBORDAGE</strong>, each player embodies a ship visible to all, with its own stats (HP and Damage) and a unique power.",
     "p2": "Meanwhile, you pursue a <strong>secret mission</strong> known only to you, checked on the tablet at the start of the game.",

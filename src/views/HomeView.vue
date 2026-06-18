@@ -25,14 +25,30 @@
     </div>
     <section class="section-inshort">
       <div class="container">
-        <div class="stats-grid">
-          <article class="stat-card" v-for="stat in stats" :key="stat.key">
-            <div class="stat-icon-wrap">
-              <span class="stat-icon">{{ stat.icon }}</span>
+        <div class="brief-scroll">
+          <span class="corner tl" aria-hidden="true">✦</span>
+          <span class="corner tr" aria-hidden="true">✦</span>
+          <span class="corner bl" aria-hidden="true">✦</span>
+          <span class="corner br" aria-hidden="true">✦</span>
+
+          <div class="brief-stats">
+            <div class="brief-stat">
+              <div class="brief-stat-value">4–8</div>
+              <div class="brief-stat-label">{{ $t('brief.players') }}</div>
             </div>
-            <h3 class="stat-title">{{ stat.title }}</h3>
-            <p class="stat-text">{{ stat.text }}</p>
-          </article>
+            <span class="brief-sep" aria-hidden="true"></span>
+            <div class="brief-stat">
+              <div class="brief-stat-value">~30<span class="unit">min</span></div>
+              <div class="brief-stat-label">{{ $t('brief.duration') }}</div>
+            </div>
+            <span class="brief-sep" aria-hidden="true"></span>
+            <div class="brief-stat">
+              <div class="brief-stat-value">15</div>
+              <div class="brief-stat-label">{{ $t('brief.ships') }}</div>
+            </div>
+          </div>
+
+          <p class="brief-tagline">{{ $t('brief.tagline') }}</p>
         </div>
       </div>
     </section>
@@ -93,12 +109,12 @@
           </div>
           <img src="/bateaux/Galion.webp" alt="" class="mech-image" />
         </div>
-        <div class="mech-row">
+        <div class="mech-row reverse">
+          <img src="/bateaux/Fregate.webp" alt="" class="mech-image" />
           <div class="mech-text">
             <h3>{{ $t('mechanics.attacks.title') }}</h3>
             <p>{{ $t('mechanics.attacks.text') }}</p>
           </div>
-          <img src="/bateaux/Fregate.webp" alt="" class="mech-image" />
         </div>
         <div class="mech-row">
           <div class="mech-text">
@@ -156,11 +172,6 @@ import SiteFooter from '../components/SiteFooter.vue'
 
 const { t } = useI18n()
 
-const stats = computed(() => [
-  { key: 'type', icon: '🃏', title: t('slides.gameType.title'), text: t('slides.gameType.description') },
-  { key: 'duration', icon: '⏱', title: t('slides.duration.title'), text: t('slides.duration.description') },
-  { key: 'mechanics', icon: '⚔', title: t('slides.mechanics.title'), text: t('slides.mechanics.description') }
-])
 
 const ships = [
   { name: 'La Frégate', image: '/bateaux/Fregate.webp' },
@@ -321,66 +332,113 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .section-inshort {
   padding: var(--section-py) 0;
 }
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(20px, 2.5vw, 32px);
-}
-.stat-card {
-  background: linear-gradient(160deg, rgba(79, 18, 25, 0.95) 0%, rgba(60, 12, 18, 0.95) 100%);
-  background-image:
-    linear-gradient(160deg, rgba(79, 18, 25, 0.94) 0%, rgba(60, 12, 18, 0.94) 100%),
+.brief-scroll {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 64px) clamp(28px, 5vw, 72px);
+  background:
+    linear-gradient(160deg, rgba(245, 233, 212, 0.96) 0%, rgba(232, 215, 180, 0.96) 100%),
     url('/paper.png');
   background-blend-mode: multiply;
-  border: 3px solid var(--color-gold);
+  border: 4px double var(--color-gold-dark);
   border-radius: var(--radius-lg);
-  padding: 32px 24px;
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(168, 133, 47, 0.4),
+    inset 0 0 80px rgba(168, 133, 47, 0.15);
   text-align: center;
-  position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(245, 233, 212, 0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  color: var(--color-burgundy-dark);
 }
-.stat-card::before {
+.brief-scroll::before,
+.brief-scroll::after {
   content: '';
   position: absolute;
-  top: 8px; left: 8px; right: 8px; bottom: 8px;
-  border: 1px solid rgba(200, 162, 74, 0.35);
-  border-radius: calc(var(--radius-lg) - 4px);
-  pointer-events: none;
-}
-.stat-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(245, 233, 212, 0.12);
-}
-.stat-icon-wrap {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 14px;
   background: linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
-  border: 3px solid var(--color-burgundy-dark);
-  border-radius: 50%;
+  border: 2px solid var(--color-burgundy-dark);
+  border-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+.brief-scroll::before { top: -12px; }
+.brief-scroll::after { bottom: -12px; }
+.corner {
+  position: absolute;
+  color: var(--color-gold-dark);
+  font-size: 22px;
+  line-height: 1;
+  opacity: 0.85;
+}
+.corner.tl { top: 14px; left: 18px; }
+.corner.tr { top: 14px; right: 18px; }
+.corner.bl { bottom: 14px; left: 18px; }
+.corner.br { bottom: 14px; right: 18px; }
+
+.brief-stats {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 -3px 6px rgba(107, 25, 34, 0.3);
+  gap: clamp(20px, 4vw, 56px);
+  flex-wrap: nowrap;
 }
-.stat-icon {
-  font-size: 38px;
-  line-height: 1;
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.25));
+.brief-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
 }
-.stat-title {
+.brief-stat-value {
   font-family: var(--font-display);
-  font-size: 26px;
-  color: var(--color-gold);
-  margin-bottom: 12px;
-  letter-spacing: 0.04em;
-  text-shadow: 0 2px 0 var(--color-burgundy-dark);
+  font-size: clamp(48px, 7vw, 80px);
+  line-height: 1;
+  color: var(--color-burgundy);
+  text-shadow: 0 2px 0 rgba(168, 133, 47, 0.4);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
-.stat-text {
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: var(--color-text-light);
+.brief-stat-value .unit {
+  font-size: 0.45em;
+  color: var(--color-gold-dark);
+  letter-spacing: 0.05em;
+}
+.brief-stat-label {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.4vw, 19px);
+  color: var(--color-gold-dark);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.brief-sep {
+  width: 2px;
+  height: 70px;
+  background: linear-gradient(180deg, transparent 0%, rgba(168, 133, 47, 0.5) 20%, rgba(168, 133, 47, 0.5) 80%, transparent 100%);
+  flex-shrink: 0;
+}
+.brief-tagline {
+  margin: clamp(28px, 4vw, 40px) auto 0;
+  max-width: 640px;
+  font-style: italic;
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 1.65;
+  color: var(--color-burgundy-dark);
+  position: relative;
+  padding-top: 20px;
+}
+.brief-tagline::before {
+  content: '⚓';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--color-gold-dark);
+  font-size: 18px;
 }
 
 /* ========= CAROUSEL ========= */
@@ -670,7 +728,15 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   }
   .hero-deck { justify-content: center; }
   .hero-card { margin: 0 auto; }
-  .stats-grid { grid-template-columns: 1fr; gap: 20px; }
+  .brief-stats {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .brief-sep {
+    width: 70%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(168, 133, 47, 0.5) 20%, rgba(168, 133, 47, 0.5) 80%, transparent 100%);
+  }
   .concept-grid,
   .mech-row,
   .mech-row.reverse,
