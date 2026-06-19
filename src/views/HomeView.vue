@@ -16,9 +16,9 @@
         </div>
       </div>
       <div class="hero-deck hero-animate-deck" aria-hidden="true">
-        <div class="card-mini card-mini-1">{{ $t('cards.card') }}</div>
-        <div class="card-mini card-mini-2">{{ $t('cards.card') }}</div>
-        <div class="card-mini card-mini-3">{{ $t('cards.card') }}</div>
+        <img src="/cartes/roles/Fichier 79@10x.png" :alt="$t('cardsPreview.roles.alt')" class="hero-card-img hero-card-1" />
+        <img src="/cartes/navires/Fichier 67@10x.png" :alt="$t('cardsPreview.navires.alt')" class="hero-card-img hero-card-2" />
+        <img src="/cartes/attaques/Fichier 88@10x.png" :alt="$t('cardsPreview.attaques.alt')" class="hero-card-img hero-card-3" />
       </div>
     </section>
 
@@ -415,8 +415,27 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   z-index: 1;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
 }
+
+/* ========= HERO REAL CARDS ========= */
+.hero-card-img {
+  height: clamp(180px, 22vw, 280px);
+  width: auto;
+  max-width: 36%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+}
+.hero-card-1 { transform: rotate(-10deg) translateY(8px); z-index: 1; }
+.hero-card-2 { transform: translateY(-8px) rotate(0deg); z-index: 3; margin: 0 -18px; }
+.hero-card-3 { transform: rotate(10deg) translateY(8px); z-index: 2; }
+.hero-deck:hover .hero-card-1 { transform: rotate(-14deg) translate(-8px, 4px); }
+.hero-deck:hover .hero-card-2 { transform: translateY(-22px) scale(1.06); z-index: 4; box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6); }
+.hero-deck:hover .hero-card-3 { transform: rotate(14deg) translate(8px, 4px); }
 
 /* ========= CARDS MINI ========= */
 .card-mini {
