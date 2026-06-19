@@ -23,8 +23,27 @@
     "inShort": "EN BREF",
     "concept": "LE CONCEPT",
     "whichCat": "QUEL CHAT PIRATE SEREZ-VOUS ?",
+    "cards": "APERÇU DES CARTES",
     "mechanics": "UNE MÉCANIQUE IMPITOYABLE",
     "digital": "LE SUPPORT NUMÉRIQUE"
+  },
+  "cardsPreview": {
+    "intro": "Cinq rôles secrets, quinze navires aux pouvoirs uniques, et une centaine de cartes à jouer pour bluffer, attaquer, voler ou se soigner.",
+    "roles": {
+      "title": "Les Rôles",
+      "alt": "Carte Rôle",
+      "desc": "Tirée en début de partie, ta carte rôle te donne ta mission secrète — Capitaine, Protecteur, Chasseur, Renégat ou Contrebandier."
+    },
+    "navires": {
+      "title": "Les Navires",
+      "alt": "Carte Navire",
+      "desc": "Visible de tous, ton navire affiche tes PV, tes dégâts et son pouvoir spécial."
+    },
+    "attaques": {
+      "title": "Les Cartes à Jouer",
+      "alt": "Carte de jeu",
+      "desc": "Abordages, Voiles, Marées, Rumeurs et Trésors — la centaine de cartes du deck pour mener tes plans à bien."
+    }
   },
   "slides": {
     "gameType": {

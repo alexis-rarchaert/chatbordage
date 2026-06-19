@@ -23,8 +23,27 @@
     "inShort": "IN SHORT",
     "concept": "THE CONCEPT",
     "whichCat": "WHICH PIRATE CAT WILL YOU BE?",
+    "cards": "A LOOK AT THE CARDS",
     "mechanics": "RUTHLESS MECHANICS",
     "digital": "DIGITAL SUPPORT"
+  },
+  "cardsPreview": {
+    "intro": "Five hidden roles, fifteen ships with unique powers, and a hundred play cards to bluff, attack, steal or heal.",
+    "roles": {
+      "title": "Roles",
+      "alt": "Role card",
+      "desc": "Drawn at the start, your role card sets your secret mission — Captain, Protector, Hunter, Renegade or Smuggler."
+    },
+    "navires": {
+      "title": "Ships",
+      "alt": "Ship card",
+      "desc": "Visible to all, your ship shows your HP, damage, and unique power."
+    },
+    "attaques": {
+      "title": "Play Cards",
+      "alt": "Play card",
+      "desc": "Boardings, Sails, Tides, Rumors and Treasures — the hundred cards in the deck for your plans."
+    }
   },
   "slides": {
     "gameType": {
