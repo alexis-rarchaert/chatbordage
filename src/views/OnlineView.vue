@@ -115,13 +115,13 @@ watch(showHowTo, v => { if (!v) safeSet('chatbordage.tutoSeen', '1') })
 </template>
 
 <style scoped>
-/* Fond propre : la texture de parchemin du site se répète en grosses tuiles visibles sur grand écran. */
+/* Même fond bois que le compagnon (/game), avec un voile sombre pour la lisibilité. */
 .online-page {
   min-height: 100dvh; position: relative;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(200, 162, 74, .14) 0%, transparent 55%),
-    linear-gradient(180deg, #6b1922 0%, #4f1219 100%) fixed;
-  background-color: var(--color-burgundy-dark);
+    linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .4)),
+    url('/bois.png') center / cover no-repeat fixed;
+  background-color: #3d1c10;
 }
 .center-box { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .loading { font-family: var(--font-display); font-size: 1.8rem; color: var(--color-gold); animation: pulse 1.4s infinite; }
