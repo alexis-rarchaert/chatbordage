@@ -2,7 +2,7 @@
  * Vue filtrée d'une partie pour UN joueur : c'est tout ce que le serveur lui envoie.
  * Les rôles cachés, les mains adverses et les notes privées des autres n'en font jamais partie.
  */
-import type { Card, ChatMessage, GameState, PlayerState, RoleId, SeaEvent, ShopItem } from './types.ts'
+import type { Card, ChatMessage, GameState, PlayerState, RoleId, RoomChatMessage, SeaEvent, ShopItem } from './types.ts'
 import { blockingCards, canReact } from './engine.ts'
 
 export interface PublicPlayer {
@@ -18,7 +18,7 @@ export interface PublicPlayer {
   eliminationsCount: number
   truceTurnsLeft: number
   powerUsedThisGame: boolean
-  /** Renseigné seulement si le rôle est public (Capitaine), à toi, ou en fin de partie. */
+  /** Renseigné si le rôle est public : Capitaine, toi, joueur éliminé, ou fin de partie. */
   roleId: RoleId | null
 }
 
@@ -45,9 +45,13 @@ export interface GameView {
   status: 'playing' | 'finished'
   id: string
   youId: string
+  /** Vrai si tu regardes la partie sans y participer (tu n'as ni main ni rôle). */
+  isSpectator: boolean
+  spectators: string[]
+  roomChat: RoomChatMessage[]
   you: {
     hand: Card[]
-    roleId: RoleId
+    roleId: RoleId | null
     coins: number
     buffNextAttack: number
     revivePending: boolean
@@ -73,7 +77,8 @@ export interface GameView {
 }
 
 function publicPlayer(p: PlayerState, viewerId: string, finished: boolean): PublicPlayer {
-  const roleVisible = p.roleId === 'capitaine' || p.id === viewerId || finished
+  // Le rôle d'un joueur éliminé est révélé à tous.
+  const roleVisible = p.roleId === 'capitaine' || p.id === viewerId || finished || !p.isAlive
   return {
     id: p.id,
     name: p.name,
@@ -92,13 +97,14 @@ function publicPlayer(p: PlayerState, viewerId: string, finished: boolean): Publ
 }
 
 export function buildGameView(state: GameState, viewerId: string, now: number = Date.now()): GameView {
-  const me = state.players.find(p => p.id === viewerId)!
+  // Un spectateur n'est pas dans la partie : il ne voit que l'information publique.
+  const me = state.players.find(p => p.id === viewerId)
   const finished = state.phase === 'finished'
 
   let pending: GameView['pending'] = null
   const pd = state.pending
   if (pd?.kind === 'attack') {
-    const mustRespond = pd.targetIds.includes(viewerId) && !pd.responses[viewerId]
+    const mustRespond = !!me && pd.targetIds.includes(viewerId) && !pd.responses[viewerId]
     pending = {
       kind: 'attack',
       attackerId: pd.attackerId,
@@ -106,9 +112,9 @@ export function buildGameView(state: GameState, viewerId: string, now: number = 
       targetIds: pd.targetIds,
       respondedIds: Object.keys(pd.responses),
       deadline: pd.deadline,
-      youMustRespond: mustRespond && canReact(me, pd.card),
-      yourBlockers: mustRespond && pd.card.effect !== 'PIERCE' ? blockingCards(me) : [],
-      youCanDodge: mustRespond && me.shipId === 'corvette' && !me.powerUsedThisGame
+      youMustRespond: mustRespond && !!me && canReact(me, pd.card),
+      yourBlockers: mustRespond && me && pd.card.effect !== 'PIERCE' ? blockingCards(me) : [],
+      youCanDodge: mustRespond && !!me && me.shipId === 'corvette' && !me.powerUsedThisGame
     }
   } else if (pd?.kind === 'scry') {
     pending = { kind: 'scry', playerId: pd.playerId, topCard: pd.playerId === viewerId ? state.deck[0] ?? null : null }
@@ -118,15 +124,18 @@ export function buildGameView(state: GameState, viewerId: string, now: number = 
     status: finished ? 'finished' : 'playing',
     id: state.id,
     youId: viewerId,
+    isSpectator: !me,
+    spectators: [],
+    roomChat: [],
     you: {
-      hand: me.hand,
-      roleId: me.roleId,
-      coins: me.coins,
-      buffNextAttack: me.buffNextAttack ?? 0,
-      revivePending: !!me.revivePending,
-      powerUsedThisTurn: !!me.powerUsedThisTurn,
-      noAttackThisTurn: !!me.noAttackThisTurn,
-      notes: (state.notes[viewerId] ?? []).slice(-15)
+      hand: me?.hand ?? [],
+      roleId: me?.roleId ?? null,
+      coins: me?.coins ?? 0,
+      buffNextAttack: me?.buffNextAttack ?? 0,
+      revivePending: !!me?.revivePending,
+      powerUsedThisTurn: !!me?.powerUsedThisTurn,
+      noAttackThisTurn: !!me?.noAttackThisTurn,
+      notes: me ? (state.notes[viewerId] ?? []).slice(-15) : []
     },
     players: state.players.map(p => publicPlayer(p, viewerId, finished)),
     currentPlayerId: state.players[state.currentPlayerIndex]!.id,

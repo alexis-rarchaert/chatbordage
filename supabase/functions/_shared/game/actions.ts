@@ -6,9 +6,8 @@ import type { GameState } from './types.ts'
 import {
   type Ctx, type Res, defaultCtx, ok, fail,
   currentPlayer, getPlayer, drawCards, gainCoins, playCard, respondToAttack, useShipPower,
-  resolveScry, buyShopItem, endTurn, startTurn, forfeit, expireReactions, isFinished
+  resolveScry, buyShopItem, endTurn, startTurn, forfeit, expireReactions, isFinished, evaluateVictory, discardCard
 } from './engine.ts'
-import { checkVictory } from './roles.ts'
 
 export type Action =
   | { type: 'draw' }
@@ -18,6 +17,7 @@ export type Action =
   | { type: 'power'; cardId?: string; targetId?: string }
   | { type: 'scry'; keep: boolean }
   | { type: 'buy'; itemId: string; targetId?: string }
+  | { type: 'discard'; cardId: string }
   | { type: 'end'; discardIds?: string[] }
   | { type: 'chat'; key: string }
   | { type: 'poke' }
@@ -27,26 +27,6 @@ export type Action =
 export const CHAT_PRESETS = ['👍', '😹', '😱', '🏴‍☠️', '🤔', '🔪', '🙏', '⚓', 'traitor', 'gg', 'hurry', 'innocent'] as const
 
 const MAX_IDLE_STRIKES = 3
-
-/** Termine la partie si une mission est accomplie (ou si plus personne ne survit). */
-export function evaluateVictory(state: GameState) {
-  if (state.phase === 'finished') return
-  const alive = state.players.filter(p => p.isAlive)
-  const victory = checkVictory(state)
-  if (victory) {
-    state.phase = 'finished'
-    state.pending = undefined
-    state.turnDeadline = undefined
-    state.winnerIds = victory.winners.map(w => w.id)
-    state.log.push(`Victoire — ${victory.reason}`)
-  } else if (alive.length === 0) {
-    state.phase = 'finished'
-    state.pending = undefined
-    state.turnDeadline = undefined
-    state.winnerIds = []
-    state.log.push('Tout l\'équipage a sombré : match nul.')
-  }
-}
 
 /** Enchaîne ce qui se déclenche tout seul : victoire, puis début du tour suivant. */
 export function advance(state: GameState, ctx: Ctx) {
@@ -74,7 +54,7 @@ export function processTimers(state: GameState, ctx: Ctx): boolean {
         forfeit(state, p.id, ctx)
       } else {
         if (state.pending?.kind === 'scry') resolveScry(state, p.id, true)
-        if (state.phase === 'draw') gainCoins(state, p.id)
+        if (state.phase === 'draw') gainCoins(state, p.id, ctx)
         if (state.phase === 'action') endTurn(state, ctx)
       }
       changed = true
@@ -114,7 +94,8 @@ export function applyAction(state: GameState, playerId: string, action: Action, 
   } else {
     switch (action.type) {
       case 'draw': res = drawCards(state, playerId, ctx); break
-      case 'coins': res = gainCoins(state, playerId); break
+      case 'coins': res = gainCoins(state, playerId, ctx); break
+      case 'discard': res = discardCard(state, playerId, action.cardId); break
       case 'play': res = playCard(state, playerId, action.cardId, { targetId: action.targetId, targetIds: action.targetIds }, ctx); break
       case 'react': res = respondToAttack(state, playerId, { defenseCardId: action.defenseCardId, dodge: action.dodge }, ctx); break
       case 'power': res = useShipPower(state, playerId, { cardId: action.cardId, targetId: action.targetId }, ctx); break

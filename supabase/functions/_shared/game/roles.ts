@@ -12,7 +12,7 @@ export const ROLES: Role[] = [
     catImage: '/chats/chat-rles-henri.png',
     isPublic: true,
     startingHpBonus: 1,
-    mission: 'Survivre jusqu\'au duel final. Tu gagnes si, à la fin, il ne reste que toi-même et ton Protecteur.'
+    mission: 'Survivre jusqu\'au duel final : tu gagnes dès qu\'il ne reste qu\'un seul autre joueur en vie que toi.'
   },
   {
     id: 'protecteur',
@@ -83,11 +83,11 @@ export function assignRoles(playerCount: number, rand: () => number = Math.rando
 }
 
 /**
- * Départage quand plusieurs missions sont accomplies au même instant (règle validée) :
- * Contrebandier > Chasseur de primes > Capitaine + Protecteur > dernier survivant (Renégat / Capitaine).
- * L'ordre des blocs ci-dessous EST la priorité.
+ * Conditions de victoire (document de conception + livret de règles).
+ * Il n'y a pas de priorité entre missions : la partie est vérifiée après CHAQUE événement (élimination,
+ * gain de pièces…), donc la première mission réellement accomplie, dans l'ordre des actions, termine la partie.
+ * L'ordre ci-dessous ne sert qu'à départager deux missions qui se réaliseraient dans un même instant.
  */
-/** Renvoie l'id du joueur gagnant (ou liste de gagnants) si une condition est remplie. */
 export function checkVictory(state: GameState): { winners: PlayerState[]; reason: string } | null {
   const alive = state.players.filter(p => p.isAlive)
 
@@ -98,34 +98,29 @@ export function checkVictory(state: GameState): { winners: PlayerState[]; reason
     }
   }
 
-  // Chasseur de primes : a éliminé 2 ennemis
+  // Chasseur de primes : a éliminé 2 ennemis avant tout le monde
   for (const p of state.players) {
     if (p.roleId === 'chasseur' && p.eliminationsCount >= 2) {
       return { winners: [p], reason: `${p.name} (Chasseur de primes) a coulé 2 navires.` }
     }
   }
 
-  // Capitaine + Protecteur : il ne reste qu'eux deux (ou eux seul si protecteur mort mais capitaine seul)
-  if (alive.length === 2) {
-    const cap = alive.find(p => p.roleId === 'capitaine')
+  // Duel final : il ne reste qu'un seul autre joueur que le Capitaine → le Capitaine a survécu.
+  // Le Protecteur gagne avec lui s'il est encore en vie.
+  const cap = alive.find(p => p.roleId === 'capitaine')
+  if (cap && alive.length <= 2) {
     const prot = alive.find(p => p.roleId === 'protecteur')
-    if (cap && prot) {
-      return { winners: [cap, prot], reason: `${cap.name} (Capitaine) et ${prot.name} (Protecteur) survivent ensemble.` }
-    }
+    return prot
+      ? { winners: [cap, prot], reason: `${cap.name} (Capitaine) et ${prot.name} (Protecteur) survivent ensemble au duel final.` }
+      : { winners: [cap], reason: `${cap.name} (Capitaine) survit jusqu'au duel final.` }
   }
 
-  // Renégat : seul survivant
+  // Capitaine éliminé : on joue jusqu'au dernier survivant (Renégat, ou à défaut le dernier debout).
   if (alive.length === 1) {
     const last = alive[0]!
-    if (last.roleId === 'renegat') {
-      return { winners: [last], reason: `${last.name} (Renégat) est le dernier survivant.` }
-    }
-    // Capitaine seul (protecteur déjà mort) — il gagne quand même selon le livret
-    if (last.roleId === 'capitaine') {
-      return { winners: [last], reason: `${last.name} (Capitaine) reste le dernier debout.` }
-    }
-    // Tout autre dernier survivant l'emporte : la partie ne peut pas rester bloquée.
-    return { winners: [last], reason: `${last.name} est le dernier survivant.` }
+    return last.roleId === 'renegat'
+      ? { winners: [last], reason: `${last.name} (Renégat) est le dernier survivant.` }
+      : { winners: [last], reason: `${last.name} est le dernier survivant.` }
   }
 
   return null

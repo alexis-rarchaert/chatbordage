@@ -1,31 +1,47 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Action, Card, GameView } from '../../game'
+import type { Action, Card, GameView, PublicPlayer } from '../../game'
 import { CHAT_EMOJIS, CHAT_PHRASES, cardTargets, isPlayable, roleOf, shipI18nKey, shipOf } from '../../lib/gameLabels'
 import { safeGet, safeSet } from '../../lib/online'
+import { muted, play, setMuted, unlockAudio } from '../../lib/sfx'
 import CardFace from './CardFace.vue'
 import PlayerSeat from './PlayerSeat.vue'
 import TargetPicker from './TargetPicker.vue'
 import CardPicker from './CardPicker.vue'
+import RoomChat from './RoomChat.vue'
 
 const props = defineProps<{ game: GameView; serverNow: number; busy: boolean; realtimeUp: boolean }>()
-const emit = defineEmits<{ (e: 'act', a: Action): void; (e: 'leave'): void; (e: 'howto'): void }>()
+const emit = defineEmits<{
+  (e: 'act', a: Action): void; (e: 'leave'): void; (e: 'howto'): void
+  (e: 'chat', text: string): void; (e: 'rematch'): void
+}>()
 
 const { t } = useI18n()
 
 // ---------- données dérivées ----------
-const me = computed(() => props.game.players.find(p => p.id === props.game.youId)!)
+// Un spectateur n'est pas dans la liste des joueurs : on lui donne un joueur « vide » (éliminé), ce qui
+// désactive naturellement toutes les actions ; la partie « mon plateau » est de toute façon masquée.
+const SPECTATOR_STUB: PublicPlayer = {
+  id: '', name: '', shipId: 'fregate', hp: 0, maxHp: 0, coins: 0, isAlive: false, handCount: 0,
+  permanents: [], eliminationsCount: 0, truceTurnsLeft: 0, powerUsedThisGame: false, roleId: null
+}
+const spectator = computed(() => props.game.isSpectator)
+const me = computed(() => props.game.players.find(p => p.id === props.game.youId) ?? SPECTATOR_STUB)
 const others = computed(() => props.game.players.filter(p => p.id !== props.game.youId))
 const livingOthers = computed(() => others.value.filter(p => p.isAlive))
 const current = computed(() => props.game.players.find(p => p.id === props.game.currentPlayerId)!)
 const isMyTurn = computed(() => props.game.currentPlayerId === props.game.youId && me.value.isAlive)
 const finished = computed(() => props.game.status === 'finished')
 const myShip = computed(() => shipOf(me.value.shipId))
-const myRole = computed(() => roleOf(props.game.you.roleId))
+const myRole = computed(() => (props.game.you.roleId ? roleOf(props.game.you.roleId) : null))
 const handMax = computed(() => (me.value.shipId === 'galion' ? 6 : 5))
-const drawAmount = computed(() => 2 + (me.value.shipId === 'caravelle' ? 1 : 0) + (props.game.event?.id === 'vents' ? 1 : 0))
+const drawAmount = computed(() => 2 + (props.game.event?.id === 'vents' ? 1 : 0))
 const coinAmount = computed(() => 2 + (me.value.shipId === 'gabare' ? 1 : 0))
+// Les Rumeurs peuvent viser n'importe quel joueur vivant, soi-même compris ; les attaques, les autres seulement.
+const targetPlayers = computed(() =>
+  selectedCard.value?.family === 'RUMEUR' ? props.game.players.filter(p => p.isAlive) : livingOthers.value
+)
 const shopDiscount = computed(() => (props.game.event?.id === 'aubaine' ? 1 : 0))
 const priceOf = (price: number) => Math.max(1, price - shopDiscount.value)
 
@@ -69,6 +85,13 @@ function onTargetCard(ids: string[]) {
   selectedId.value = null
 }
 
+function discardSelected() {
+  const c = selectedCard.value
+  if (!c || !canAct.value) return
+  emit('act', { type: 'discard', cardId: c.id })
+  selectedId.value = null
+}
+
 function endTurn() {
   if (!canAct.value) return
   if (props.game.you.hand.length > handMax.value) sheet.value = 'discard'
@@ -107,9 +130,46 @@ const reactionOpen = computed(() => !!pendingAttack.value?.youMustRespond)
 
 // ---------- rôle secret : à révéler en maintenant appuyé ----------
 const roleKey = computed(() => `chatbordage.roleSeen.${props.game.id}`)
-const roleGate = ref(safeGet(roleKey.value) !== '1')
+const roleGate = ref(!props.game.isSpectator && safeGet(roleKey.value) !== '1')
 const roleHeld = ref(false)
 function closeRoleGate() { roleGate.value = false; safeSet(roleKey.value, '1') }
+
+// ---------- sons ----------
+watch(isMyTurn, (now, before) => { if (now && !before) play('turn') })
+watch(() => props.game.turnNumber, (now, before) => { if (now !== before) play('event') })
+watch(pendingAttack, (a, before) => {
+  if (a && !before) play(a.youMustRespond ? 'alarm' : 'attack')
+})
+watch(() => props.game.players.map(p => `${p.id}|${p.hp}|${p.isAlive}|${p.coins}|${p.handCount}`).join(','), (now, before) => {
+  if (!before) return
+  const prev = new Map(before.split(',').map(x => x.split('|') as [string, string, string, string, string]).map(x => [x[0], x]))
+  for (const p of props.game.players) {
+    const o = prev.get(p.id)
+    if (!o) continue
+    if (o[2] === 'true' && !p.isAlive) { play('sink'); continue }
+    if (p.hp < Number(o[1])) play('hit')
+    else if (p.hp > Number(o[1]) && p.id === props.game.youId) play('heal')
+    if (p.id === props.game.youId) {
+      if (p.coins > Number(o[3])) play('coin')
+      if (p.handCount > Number(o[4])) play('draw')
+      else if (p.handCount < Number(o[4]) && !pendingAttack.value) play('play')
+    }
+  }
+})
+watch(() => props.game.log.length, (now, before) => {
+  if (now <= before) return
+  const fresh = props.game.log.slice(-(now - before))
+  if (fresh.some(l => /esquive|amortit|renvoie/i.test(l))) play('block')
+})
+watch(() => props.game.chat.length, (now, before) => { if (now > before) play('chat') })
+watch(() => props.game.roomChat.at(-1)?.id, (id, before) => {
+  const last = props.game.roomChat.at(-1)
+  if (id !== undefined && id !== before && last && last.userId !== props.game.youId) play('chat')
+})
+watch(() => props.game.status, st => {
+  if (st !== 'finished') return
+  play(spectator.value || props.game.winnerIds.includes(props.game.youId) ? 'victory' : 'defeat')
+})
 
 // ---------- effets visuels ----------
 const hurt = ref(false)
@@ -134,6 +194,13 @@ const shownChat = computed(() => props.game.chat.filter(m => chatVisible.value[m
 const chatText = (key: string) => (CHAT_PHRASES.includes(key) ? t('online.chat.' + key) : key)
 function sendChat(key: string) { emit('act', { type: 'chat', key }); sheet.value = null }
 
+// Chat libre du salon : compteur de messages non lus tant que la fenêtre est fermée.
+const lastSeenChat = ref(props.game.roomChat.at(-1)?.id ?? 0)
+const unreadChat = computed(() => props.game.roomChat.filter(m => m.id > lastSeenChat.value && m.userId !== props.game.youId).length)
+watch([sheet, () => props.game.roomChat.length], () => {
+  if (sheet.value === 'chat') lastSeenChat.value = props.game.roomChat.at(-1)?.id ?? 0
+})
+
 // ---------- fin de partie ----------
 const iWon = computed(() => props.game.winnerIds.includes(props.game.youId))
 const winnerNames = computed(() => props.game.winnerIds.map(nameOf).join(' & '))
@@ -143,6 +210,7 @@ const mainLog = computed(() => props.game.log.filter(l => l.startsWith('Victoire
 
 const phaseHint = computed(() => {
   if (finished.value) return ''
+  if (spectator.value) return t('online.hint.watching', { name: current.value.name })
   if (!me.value.isAlive) return t('online.hint.spectating')
   if (pendingAttack.value) return t('online.hint.reaction', { who: nameOf(pendingAttack.value.attackerId) })
   if (pendingScry.value) return t('online.hint.scry')
@@ -153,7 +221,7 @@ const phaseHint = computed(() => {
 </script>
 
 <template>
-  <div class="table" :class="{ hurt }">
+  <div class="table" :class="{ hurt }" @pointerdown.once="unlockAudio">
     <!-- ===== barre du haut ===== -->
     <header class="topbar">
       <button class="chip" @click="emit('leave')" :title="$t('online.leave')">⬅</button>
@@ -162,6 +230,9 @@ const phaseHint = computed(() => {
         <span>{{ game.event.description }}</span>
       </div>
       <div class="timer" v-if="secondsLeft !== null" :class="{ urgent: secondsLeft <= 10 }">⏳ {{ secondsLeft }}s</div>
+      <span v-if="game.spectators.length" class="chip" :title="game.spectators.join(', ')">👁 {{ game.spectators.length }}</span>
+      <button class="chip" :class="{ ping: unreadChat }" @click="sheet = 'chat'" :aria-label="$t('online.chatTitle')">💬<b v-if="unreadChat" class="badge">{{ unreadChat }}</b></button>
+      <button class="chip" @click="setMuted(!muted)" :title="muted ? $t('online.soundOn') : $t('online.soundOff')">{{ muted ? '🔇' : '🔊' }}</button>
       <span class="net" :class="{ up: realtimeUp }" :title="realtimeUp ? 'Temps réel' : 'Reconnexion…'">●</span>
       <button class="chip" @click="emit('howto')" :title="$t('online.howto')">?</button>
     </header>
@@ -194,11 +265,11 @@ const phaseHint = computed(() => {
     <p class="hint" :class="{ mine: isMyTurn && !finished }">{{ phaseHint }}</p>
 
     <!-- ===== mon plateau ===== -->
-    <section class="mine" :class="{ dead: !me.isAlive }">
+    <section v-if="!spectator" class="mine" :class="{ dead: !me.isAlive }">
       <div class="mine-head">
         <PlayerSeat :player="me" :active="isMyTurn" you class="mine-seat" />
         <div class="mine-side">
-          <button class="chip wide" @click="sheet = 'role'">🎭 {{ $t('roles.' + myRole.id + '.name') }}</button>
+          <button v-if="myRole" class="chip wide" @click="sheet = 'role'">🎭 {{ $t('roles.' + myRole.id + '.name') }}</button>
           <button class="chip wide" @click="sheet = 'ship'">🚢 {{ $t('ships.' + shipI18nKey(me.shipId) + '.name') }}</button>
           <button class="chip wide" @click="sheet = 'notes'" :class="{ ping: game.you.notes.length }">🔎 {{ $t('online.secret') }} ({{ game.you.notes.length }})</button>
           <p v-if="game.you.buffNextAttack" class="mini">💣 +{{ game.you.buffNextAttack }} {{ $t('online.nextAttack') }}</p>
@@ -210,6 +281,7 @@ const phaseHint = computed(() => {
       <div v-if="isMyTurn && game.phase === 'draw' && !game.pending" class="resources">
         <button class="btn-gold big" :disabled="busy" @click="emit('act', { type: 'draw' })">🃏 {{ $t('online.drawN', { n: drawAmount }) }}</button>
         <button class="btn-gold big" :disabled="busy" @click="emit('act', { type: 'coins' })">🪙 {{ $t('online.coinsN', { n: coinAmount }) }}</button>
+        <p v-if="me.shipId === 'caravelle'" class="mini center-t full">🃏 {{ $t('online.caravelleFree') }}</p>
       </div>
 
       <!-- main -->
@@ -232,6 +304,7 @@ const phaseHint = computed(() => {
           {{ selectedCard ? (selectedCard.family === 'VOILE' ? $t('online.voileHint') : $t('online.play', { name: selectedCard.name })) : $t('online.pickCard') }}
         </button>
         <div class="row">
+          <button v-if="selectedCard" class="btn-ghost" @click="discardSelected">🗑 {{ $t('online.discardOne') }}</button>
           <button class="btn-ghost" @click="sheet = 'shop'">🛒 {{ $t('online.shop') }}</button>
           <button v-if="activePower" class="btn-ghost" :disabled="!activePower.usable" :title="activePower.hint" @click="usePower">⚡ {{ $t('online.power') }}</button>
           <button class="btn-ghost" @click="endTurn">⏭ {{ $t('online.endTurn') }}</button>
@@ -244,11 +317,10 @@ const phaseHint = computed(() => {
           <button class="btn-ghost" @click="sheet = 'shop'">🛒 {{ $t('online.shop') }}</button>
         </div>
       </div>
-      <button class="chat-fab" @click="sheet = 'chat'" :aria-label="$t('online.chatTitle')">💬</button>
     </section>
 
     <!-- ===== feuilles ===== -->
-    <TargetPicker v-if="sheet === 'target-card' && selectedCard" :title="$t('online.pickTarget', { name: selectedCard.name })" :players="livingOthers" :max="cardTargets(selectedCard) === 'two' ? 2 : 1" @pick="onTargetCard" @cancel="sheet = null" />
+    <TargetPicker v-if="sheet === 'target-card' && selectedCard" :title="$t('online.pickTarget', { name: selectedCard.name })" :players="targetPlayers" :max="cardTargets(selectedCard) === 'two' ? 2 : 1" @pick="onTargetCard" @cancel="sheet = null" />
     <TargetPicker v-if="sheet === 'cotre'" :title="$t('online.cotrePick')" :players="livingOthers.filter(p => p.handCount > 0)" @pick="ids => { sheet = null; emit('act', { type: 'power', targetId: ids[0] }) }" @cancel="sheet = null" />
     <TargetPicker v-if="sheet === 'reveal'" :title="$t('online.revealPick')" :players="livingOthers" @pick="onReveal" @cancel="sheet = null; revealItemId = null" />
     <CardPicker v-if="sheet === 'sloop'" :title="$t('online.sloopPick')" :cards="game.you.hand" @pick="ids => { sheet = null; emit('act', { type: 'power', cardId: ids[0] }) }" @cancel="sheet = null" />
@@ -282,16 +354,18 @@ const phaseHint = computed(() => {
     <!-- chat -->
     <div v-if="sheet === 'chat'" class="sheet-backdrop" @click.self="sheet = null">
       <div class="sheet">
-        <h3>{{ $t('online.chatTitle') }}</h3>
-        <div class="chat-grid">
+        <h3>💬 {{ $t('online.chatTitle') }}</h3>
+        <RoomChat :messages="game.roomChat" :you-id="game.youId" @send="emit('chat', $event)" />
+        <div v-if="!spectator && me.isAlive" class="chat-grid">
           <button v-for="e in CHAT_EMOJIS" :key="e" class="chat-btn emoji" @click="sendChat(e)">{{ e }}</button>
           <button v-for="p in CHAT_PHRASES" :key="p" class="chat-btn" @click="sendChat(p)">{{ $t('online.chat.' + p) }}</button>
         </div>
+        <div class="actions"><button class="btn-ghost" @click="sheet = null">{{ $t('online.close') }}</button></div>
       </div>
     </div>
 
     <!-- rôle / navire / notes -->
-    <div v-if="sheet === 'role'" class="sheet-backdrop" @click.self="sheet = null">
+    <div v-if="sheet === 'role' && myRole" class="sheet-backdrop" @click.self="sheet = null">
       <div class="sheet info">
         <h3>{{ $t('roles.' + myRole.id + '.name') }}</h3>
         <img :src="myRole.catImage" :alt="myRole.catName" class="cat" />
@@ -359,7 +433,7 @@ const phaseHint = computed(() => {
     </div>
 
     <!-- révélation privée du rôle -->
-    <div v-if="roleGate && !finished" class="sheet-backdrop role-gate">
+    <div v-if="roleGate && !finished && myRole" class="sheet-backdrop role-gate">
       <div class="sheet info">
         <h3>🎭 {{ $t('online.roleGateTitle') }}</h3>
         <p class="center-t">{{ $t('online.roleGateText') }}</p>
@@ -384,14 +458,18 @@ const phaseHint = computed(() => {
         <h3>{{ game.winnerIds.length ? (iWon ? '🏆 ' + $t('online.victory') : '☠️ ' + $t('online.defeat')) : $t('online.draw') }}</h3>
         <p v-if="game.winnerIds.length" class="center-t">{{ $t('online.winners', { names: winnerNames }) }}</p>
         <p class="center-t mini">{{ mainLog }}</p>
-        <ul class="reveal">
+        <ul class="final-roles">
           <li v-for="p in game.players" :key="p.id" :class="{ win: game.winnerIds.includes(p.id) }">
             <img :src="shipOf(p.shipId)!.image" alt="" />
             <span class="rn">{{ p.name }}</span>
             <span class="rr">{{ p.roleId ? $t('roles.' + p.roleId + '.name') : '' }}</span>
           </li>
         </ul>
-        <div class="actions"><button class="btn-gold" @click="emit('leave')">{{ $t('online.backToMenu') }}</button></div>
+        <div class="actions col">
+          <button v-if="!spectator" class="btn-gold" :disabled="busy" @click="emit('rematch')">🔁 {{ $t('online.rematch') }}</button>
+          <button class="btn-ghost" @click="emit('leave')">{{ $t('online.backToMenu') }}</button>
+        </div>
+        <p v-if="!spectator" class="mini center-t">{{ $t('online.rematchHint') }}</p>
       </div>
     </div>
   </div>
@@ -400,13 +478,13 @@ const phaseHint = computed(() => {
 <style scoped>
 .table { min-height: 100dvh; display: flex; flex-direction: column; gap: 8px; padding: 8px 10px calc(12px + env(safe-area-inset-bottom)); max-width: 980px; margin: 0 auto; transition: box-shadow .2s; }
 .table.hurt { box-shadow: inset 0 0 0 4px rgba(255, 70, 60, .8), inset 0 0 60px rgba(255, 70, 60, .45); }
-.topbar { display: flex; align-items: center; gap: 8px; }
+.topbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .chip { background: rgba(26, 15, 16, .6); color: var(--color-text-light); border: 1px solid rgba(200, 162, 74, .5); border-radius: 999px; padding: 6px 12px; font-size: .9rem; cursor: pointer; min-height: 36px; }
 .chip.wide { width: 100%; text-align: left; }
 .chip.ping { border-color: var(--color-gold); box-shadow: 0 0 10px rgba(200, 162, 74, .7); }
-.event { flex: 1; min-width: 0; padding: 4px 10px; border-radius: 12px; background: rgba(58, 170, 176, .18); border: 1px solid rgba(58, 170, 176, .55); font-size: .78rem; line-height: 1.2; animation: pop .5s ease; }
+.event { order: 5; flex: 1 1 100%; min-width: 0; padding: 4px 10px; border-radius: 12px; background: rgba(58, 170, 176, .18); border: 1px solid rgba(58, 170, 176, .55); font-size: .78rem; line-height: 1.2; animation: pop .5s ease; }
 .event strong { display: block; font-family: var(--font-display); font-size: 1rem; color: var(--color-turquoise); }
-.timer { font-variant-numeric: tabular-nums; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(0, 0, 0, .35); }
+.timer { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(0, 0, 0, .35); }
 .timer.urgent, .timer-big.urgent { color: #ff7268; animation: pulse .8s infinite; }
 .net { font-size: .7rem; color: #d18a3a; }
 .net.up { color: #59d17a; }
@@ -452,6 +530,8 @@ const phaseHint = computed(() => {
 .actions .row > * { flex: 1 1 100px; }
 .sheet .actions { flex-direction: row; justify-content: center; margin-top: 14px; }
 .sheet .actions.col { flex-direction: column; }
+.badge { margin-left: 4px; padding: 0 6px; border-radius: 999px; background: #d1584f; color: #fff; font-size: .72rem; }
+.resources .full { flex: 1 1 100%; margin: 0; }
 .chat-fab { position: absolute; right: 10px; top: -22px; width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--color-gold); background: var(--color-burgundy); font-size: 1.3rem; cursor: pointer; }
 .shop { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .shop li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(0, 0, 0, .25); }
@@ -476,10 +556,10 @@ const phaseHint = computed(() => {
 .role-card.held { background: var(--color-cream); color: var(--color-ink); border-style: solid; }
 .role-card span { font-size: .85rem; }
 .role-card .hold { font-size: 1.1rem; color: var(--color-gold); }
-.reveal { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 6px; }
-.reveal li { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; align-items: center; padding: 4px 10px; border-radius: 10px; background: rgba(0, 0, 0, .25); text-align: left; }
-.reveal li.win { background: rgba(200, 162, 74, .25); outline: 1px solid var(--color-gold); }
-.reveal img { max-height: 32px; max-width: 44px; object-fit: contain; }
+.final-roles { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.final-roles li { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; align-items: center; padding: 4px 10px; border-radius: 10px; background: rgba(0, 0, 0, .25); text-align: left; }
+.final-roles li.win { background: rgba(200, 162, 74, .25); outline: 1px solid var(--color-gold); }
+.final-roles img { max-height: 32px; max-width: 44px; object-fit: contain; }
 .rr { color: var(--color-gold); font-size: .85rem; }
 .sheet-backdrop.over, .sheet-backdrop.role-gate { z-index: 80; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }

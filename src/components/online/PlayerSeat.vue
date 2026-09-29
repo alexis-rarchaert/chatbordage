@@ -15,6 +15,7 @@ const ship = computed(() => shipOf(props.player.shipId))
       <span v-if="!player.isAlive" class="skull">☠️</span>
     </div>
     <div class="seat-name">{{ player.name }}<span v-if="you"> ({{ $t('online.you') }})</span></div>
+    <div v-if="!player.isAlive && player.roleId" class="seat-role">🎭 {{ $t('roles.' + player.roleId + '.name') }}</div>
     <div class="seat-hp" :aria-label="`${player.hp}/${player.maxHp} PV`">
       <span v-for="i in player.maxHp" :key="i" class="heart" :class="{ empty: i > player.hp }">❤</span>
     </div>
@@ -43,6 +44,7 @@ const ship = computed(() => shipOf(props.player.shipId))
 .crown { position: absolute; top: -8px; right: 2px; font-size: 1rem; }
 .skull { position: absolute; font-size: 1.6rem; }
 .seat-name { font-family: var(--font-display); font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seat-role { font-size: .68rem; color: var(--color-gold); line-height: 1.1; padding: 1px 0; }
 .seat-hp { line-height: 1; font-size: .7rem; min-height: 14px; }
 .heart { color: #ff5b6b; }
 .heart.empty { color: rgba(255, 255, 255, .18); }

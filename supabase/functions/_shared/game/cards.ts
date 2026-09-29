@@ -26,9 +26,11 @@ const RAW: CardDef[] = [
   { name: 'Trahison',          family: 'RUMEUR',   description: 'Échange ta main avec celle d\'un joueur ciblé.',                 rarity: 'epique', copies: 1,  effect: 'SWAP_HAND' },
   { name: 'Murmure',           family: 'RUMEUR',   description: 'Cible un joueur : il doit te révéler son rôle en secret.',       rarity: 'rare',   copies: 2,  effect: 'PEEK_ROLE' },
   { name: 'Pavillon noir',     family: 'RUMEUR',   description: 'Cible un joueur : il défausse 1 carte au hasard.',               rarity: 'rare',   copies: 3,  effect: 'DISCARD_RANDOM' },
+  { name: 'Pillage',           family: 'RUMEUR',   description: 'Vole 1 carte Équipement en jeu à un joueur ciblé.',              rarity: 'rare',   copies: 2,  effect: 'STEAL_TREASURE' },
   { name: 'Sabotage',          family: 'RUMEUR',   description: 'Détruit 1 carte Trésor d\'un joueur ciblé.',                     rarity: 'rare',   copies: 3,  effect: 'DESTROY_TREASURE' },
 
   // TRÉSORS (équipement permanent)
+  { name: 'Coffre au trésor',  family: 'TRESOR',   description: 'Usage unique : gagne 4 pièces d\'un coup.',                       rarity: 'rare',   copies: 3,  effect: 'COINS_4' },
   { name: 'Coque renforcée',   family: 'TRESOR',   description: 'Permanent : +1 PV max au moment où tu la poses.',                 rarity: 'rare',   copies: 3,  permanent: true, effect: 'PERM_MAXHP_1' },
   { name: 'Pavois doré',       family: 'TRESOR',   description: 'Permanent : la première attaque par tour est réduite de 1.',     rarity: 'rare',   copies: 2,  permanent: true, effect: 'PERM_ARMOR_FIRST' },
   { name: 'Lunette d\'approche', family: 'TRESOR', description: 'Permanent : à chaque tour, regarde la première carte de la pioche.', rarity: 'rare', copies: 2, permanent: true, effect: 'PERM_SCRY' },

@@ -229,7 +229,7 @@
       "capitaine": "Capitaine — dernier debout.",
       "contrebandier": "Contrebandier — 15 pièces accumulées.",
       "chasseur": "Chasseur de primes — 2 navires coulés.",
-      "duo": "Capitaine et Protecteur — duo survivant."
+      "duo": "Capitaine — survit au duel final (avec son Protecteur s'il est en vie)."
     }
   },
   "rulesPage": {
@@ -324,12 +324,12 @@
   "roles": {
     "capitaine": {
       "name": "Le Capitaine",
-      "mission": "Survivre et faire en sorte qu'il ne reste, à la fin, que lui-même et son Protecteur (qu'il ne connaît pas !). +1 PV de départ.",
+      "mission": "Survivre jusqu'au duel final : tu gagnes dès qu'il ne reste qu'un seul autre joueur en vie que toi (ton Protecteur, que tu ne connais pas, gagne avec toi s'il est encore en vie). +1 PV de départ.",
       "desc": "Survivre jusqu'au duel final."
     },
     "protecteur": {
       "name": "Le Protecteur",
-      "mission": "Garder le Capitaine en vie jusqu'à la fin de la partie. Si le Capitaine survit et que le Protecteur est en vie, les deux gagnent ensemble !",
+      "mission": "Garder le Capitaine en vie jusqu'à la fin de la partie. Si le Capitaine survit jusqu'au duel final et que tu es encore en vie, vous gagnez ensemble !",
       "desc": "Garder le Capitaine en vie jusqu'à la fin."
     },
     "chasseur": {
@@ -689,7 +689,7 @@
     "aubaine": "Aubaine : −1 pièce",
     "shopEmpty": "La boutique est vide.",
     "logTitle": "Journal de bord",
-    "chatTitle": "Réaction rapide",
+    "chatTitle": "Discussion",
     "chat": {
       "traitor": "Traître !",
       "gg": "Bien joué !",
@@ -722,7 +722,8 @@
       "scry": "Décide du sort de la carte.",
       "waiting": "Tour de {name}…",
       "resources": "Pioche ou prends des pièces.",
-      "action": "Joue tes cartes, puis termine ton tour. Une attaque met fin au tour !"
+      "action": "Joue tes cartes, puis termine ton tour. Une attaque met fin au tour !",
+      "watching": "Tu regardes la partie — tour de {name}."
     },
     "next": "Suivant",
     "letsGo": "À l'abordage !",
@@ -737,7 +738,8 @@
       "network": "Connexion impossible. Vérifie ta connexion et réessaie.",
       "auth_disabled": "Les connexions anonymes sont désactivées sur le serveur (Supabase > Authentication).",
       "offline_unavailable": "Le mode en ligne n'est pas configuré sur ce site.",
-      "too_many_rooms": "Tu as déjà plusieurs salons ouverts. Termine-les ou patiente un peu avant d'en créer un nouveau."
+      "too_many_rooms": "Tu as déjà plusieurs salons ouverts. Termine-les ou patiente un peu avant d'en créer un nouveau.",
+      "slow_down": "Doucement, moussaillon : un message par seconde."
     },
     "tuto": {
       "goal": {
@@ -754,7 +756,7 @@
       },
       "roles": {
         "title": "Les rôles secrets",
-        "text": "<strong>Capitaine</strong> + <strong>Protecteur</strong> : finir seuls ensemble.<br><strong>Chasseur de primes</strong> : couler 2 navires.<br><strong>Renégat</strong> : dernier survivant.<br><strong>Contrebandier</strong> : 15 pièces.<br>Ton rôle n'est visible que par toi (bouton 🎭)."
+        "text": "<strong>Capitaine</strong> : survivre jusqu'au duel final (il ne reste que 2 joueurs) — le <strong>Protecteur</strong> gagne avec lui s'il est en vie.<br><strong>Chasseur de primes</strong> : couler 2 navires.<br><strong>Renégat</strong> : dernier survivant.<br><strong>Contrebandier</strong> : 15 pièces.<br>La première mission accomplie termine la partie. Le rôle d'un joueur éliminé est révélé à tous."
       },
       "shop": {
         "title": "Boutique et infos secrètes",
@@ -762,9 +764,22 @@
       },
       "tips": {
         "title": "Bon à savoir",
-        "text": "⏳ Un minuteur évite les tours interminables. 💬 Utilise les <strong>réactions rapides</strong> pour bluffer ou accuser. Tu peux fermer l'onglet : reviens sur la page et tu retrouves ta partie."
+        "text": "⏳ Un minuteur évite les tours interminables. 💬 Discute dans le chat ou utilise les réactions rapides pour bluffer. 👁 Tu peux rejoindre une partie en cours en spectateur. Tu peux fermer l'onglet : reviens sur la page et tu retrouves ta partie."
       }
     },
-    "backHome": "Retour à l'accueil"
+    "backHome": "Retour à l'accueil",
+    "chatEmpty": "Aucun message. Dis bonjour !",
+    "chatPlaceholder": "Écris un message…",
+    "spectatorsList": "Spectateurs : {names}",
+    "spectatorLobby": "Tu regardes ce salon. Prends une place pour jouer.",
+    "takeSeat": "Prendre une place",
+    "shipFull": "Le navire est plein",
+    "caravelleFree": "Caravelle : 1 carte gratuite en plus, quel que soit ton choix.",
+    "discardOne": "Défausser",
+    "soundOn": "Activer le son",
+    "soundOff": "Couper le son",
+    "rematch": "Revanche !",
+    "rematchHint": "Tous les joueurs retrouvent le salon avec leurs navires.",
+    "spectatorBanner": "Tu regardes la partie"
   }
 }

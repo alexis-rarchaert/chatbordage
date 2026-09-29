@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import type { LobbyView } from '../../game'
 import { SHIPS } from '../../game'
 import { shipI18nKey } from '../../lib/gameLabels'
+import RoomChat from './RoomChat.vue'
 
 const props = defineProps<{ lobby: LobbyView; busy: boolean }>()
 const emit = defineEmits<{
@@ -10,12 +11,17 @@ const emit = defineEmits<{
   (e: 'kick', id: string): void
   (e: 'start'): void
   (e: 'leave'): void
+  (e: 'chat', text: string): void
+  (e: 'sit'): void
   (e: 'settings', s: Record<string, number>): void
 }>()
 
-const me = computed(() => props.lobby.seats.find(s => s.userId === props.lobby.youId)!)
+const me = computed(() => props.lobby.seats.find(s => s.userId === props.lobby.youId))
+const spectator = computed(() => props.lobby.isSpectator)
+const full = computed(() => props.lobby.seats.length >= props.lobby.maxPlayers)
 const isHost = computed(() => props.lobby.hostId === props.lobby.youId)
 const takenBy = (shipId: string) => props.lobby.seats.find(s => s.shipId === shipId)
+const iAmReady = computed(() => !!me.value?.ready)
 const enough = computed(() => props.lobby.seats.length >= props.lobby.minPlayers)
 const allReady = computed(() => props.lobby.seats.every(s => s.userId === props.lobby.hostId || s.ready))
 const canStart = computed(() => isHost.value && enough.value && allReady.value && !props.busy)
@@ -61,13 +67,16 @@ const turnOptions = [60, 90, 120, 0]
       <li v-for="i in Math.max(0, lobby.minPlayers - lobby.seats.length)" :key="'empty' + i" class="empty">{{ $t('online.waitingPlayer') }}</li>
     </ul>
 
+    <p v-if="lobby.spectators.length" class="mini">👁 {{ $t('online.spectatorsList', { names: lobby.spectators.join(', ') }) }}</p>
+
+    <template v-if="!spectator && me">
     <h2>{{ $t('online.chooseShip') }}</h2>
     <div class="ships">
-      <button class="ship random" :class="{ on: me.shipId === null }" :disabled="me.ready" @click="emit('seat', { shipId: null })">🎲<span>{{ $t('online.random') }}</span></button>
+      <button class="ship random" :class="{ on: me.shipId === null }" :disabled="iAmReady" @click="emit('seat', { shipId: null })">🎲<span>{{ $t('online.random') }}</span></button>
       <button
         v-for="s in SHIPS" :key="s.id" class="ship"
         :class="{ on: me.shipId === s.id, taken: takenBy(s.id) && takenBy(s.id)!.userId !== me.userId }"
-        :disabled="me.ready || (!!takenBy(s.id) && takenBy(s.id)!.userId !== me.userId)"
+        :disabled="iAmReady || (!!takenBy(s.id) && takenBy(s.id)!.userId !== me.userId)"
         @click="emit('seat', { shipId: s.id })"
       >
         <img :src="s.image" :alt="s.name" />
@@ -78,6 +87,8 @@ const turnOptions = [60, 90, 120, 0]
       </button>
     </div>
 
+    </template>
+
     <div v-if="isHost" class="settings">
       <label>{{ $t('online.turnTimer') }}
         <select :value="lobby.settings.turnSeconds" @change="emit('settings', { turnSeconds: Number(($event.target as HTMLSelectElement).value) })">
@@ -87,14 +98,21 @@ const turnOptions = [60, 90, 120, 0]
     </div>
     <p v-else class="mini">{{ $t('online.turnTimer') }} : {{ lobby.settings.turnSeconds ? lobby.settings.turnSeconds + ' s' : $t('online.noTimer') }}</p>
 
+    <h2>💬 {{ $t('online.chatTitle') }}</h2>
+    <RoomChat :messages="lobby.roomChat" :you-id="lobby.youId" @send="emit('chat', $event)" />
+
     <div class="cta">
-      <button v-if="!notifAsked" class="btn-ghost" @click="askNotifications">🔔 {{ $t('online.enableNotifs') }}</button>
-      <template v-if="isHost">
+      <template v-if="spectator">
+        <p class="mini">👁 {{ $t('online.spectatorLobby') }}</p>
+        <button class="btn-gold big" :disabled="busy || full" @click="emit('sit')">{{ full ? $t('online.shipFull') : $t('online.takeSeat') }}</button>
+      </template>
+      <button v-if="!notifAsked && !spectator" class="btn-ghost" @click="askNotifications">🔔 {{ $t('online.enableNotifs') }}</button>
+      <template v-if="isHost && !spectator">
         <button class="btn-gold big" :disabled="!canStart" @click="emit('start')">⚓ {{ $t('online.startGame') }}</button>
         <p v-if="!enough" class="mini">{{ $t('online.needPlayers', { n: lobby.minPlayers }) }}</p>
         <p v-else-if="!allReady" class="mini">{{ $t('online.notAllReady') }}</p>
       </template>
-      <button v-else class="btn-gold big" :disabled="busy" @click="emit('seat', { ready: !me.ready })">{{ me.ready ? $t('online.notReady') : $t('online.imReady') }}</button>
+      <button v-else-if="!spectator && me" class="btn-gold big" :disabled="busy" @click="emit('seat', { ready: !me.ready })">{{ me.ready ? $t('online.notReady') : $t('online.imReady') }}</button>
       <button class="btn-ghost" @click="emit('leave')">{{ $t('online.leave') }}</button>
     </div>
   </div>

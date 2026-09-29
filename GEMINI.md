@@ -235,11 +235,37 @@ la DA pirate.
 
 ---
 Mise à jour — mode en ligne (septembre 2026)
-• Le jeu se joue de 4 à 8 joueurs, un téléphone par joueur (route /online), sans cartes physiques.
-• Règle de départage (missions accomplies simultanément), validée : Contrebandier > Chasseur de primes > Capitaine + Protecteur > dernier survivant.
-• Un dernier survivant sans mission correspondante l'emporte (la partie ne peut pas rester bloquée).
-• Attaque : la cible dispose de ~20 s pour réagir (Voile, ou esquive de la Corvette) ; sans réponse elle encaisse.
-• Minuteur de tour (90 s par défaut, réglable ou désactivable par l'hôte). 3 tours ratés d'affilée = le joueur est retiré de la partie.
-• Événement « Chant des sirènes » adapté au numérique : les mains de 4+ cartes défaussent 1 carte au hasard.
-• Événement « Mutinerie » : la carte donnée au voisin de gauche est tirée au hasard.
-• Si la pioche est vide, la défausse est mélangée pour la reconstituer.
+
+Le jeu se joue de 4 à 8 joueurs, un téléphone par joueur (route /online), sans cartes physiques. Le serveur (Edge
+Function `game`) fait autorité. Règles tranchées en croisant ce document et le livret de règles du site :
+
+Victoire
+• Il n'y a PAS de priorité entre missions : la partie est vérifiée après chaque événement (élimination, gain de
+  pièces) ; la première mission accomplie dans l'ordre réel des actions termine la partie (livret de règles).
+• Capitaine : gagne au « duel final », dès qu'il ne reste qu'un seul autre joueur en vie que lui. Le Protecteur gagne
+  avec lui s'il est encore en vie.
+• Chasseur de primes : 2 éliminations, avant tout le monde. Contrebandier : 15 pièces à tout moment.
+• Capitaine éliminé : on joue jusqu'au dernier survivant (Renégat, ou à défaut le dernier debout).
+• Le rôle d'un joueur éliminé (ou qui quitte) est révélé à tous.
+
+Tour et cartes
+• Défausse volontaire possible à tout moment du tour. Une Rumeur peut viser n'importe quel joueur, soi-même compris.
+• Attaque : la cible dispose de ~20 s pour réagir (Voile ou esquive de la Corvette) ; sans réponse elle encaisse.
+• Quitter la partie = être traité comme éliminé : cartes et pièces au joueur suivant, équipements à la défausse.
+• À l'élimination, les équipements du joueur vont à la défausse. Si la pioche est vide, la défausse est mélangée.
+• Nouvelles cartes : « Pillage » (vole un équipement, 2 ex.) et « Coffre au trésor » (usage unique, +4 pièces, 3 ex.).
+  Le deck compte 96 cartes.
+
+Navires
+• PV de départ = ceux du navire (+1 pour le Capitaine), comme l'indique la fiche navire.
+• Caravelle : 1 carte gratuite chaque tour, que le joueur pioche OU prenne des pièces (dans la limite de la main).
+• Brick : pioche 1 carte dès qu'il est attaqué, même si l'attaque est bloquée.
+• Clipper : bonus de 1 pièce en FIN de tour, seulement s'il n'a pas joué d'attaque (il active le pouvoir avant).
+
+Événements adaptés au numérique
+• Sirènes : les mains de 4+ cartes défaussent 1 carte au hasard. Mutinerie : la carte donnée est tirée au hasard.
+
+Salons
+• Minuteur de tour (90 s par défaut, réglable ou désactivable). 3 tours ratés d'affilée = le joueur est retiré.
+• Spectateurs : on rejoint une partie en cours en regardant (information publique seulement) ; chat libre pour tous.
+• Revanche : après la fin, un joueur relance le salon avec les mêmes joueurs et navires.

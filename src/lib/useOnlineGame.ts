@@ -107,9 +107,12 @@ export function useOnlineGame() {
     try { await callGame({ op: 'leave', roomCode: code }) } catch { /* déjà parti côté client */ }
   }
   const act = (action: Action) => run(() => sendAction(roomCode.value, action))
+  const chat = (text: string) => callGame({ op: 'chat', roomCode: roomCode.value, text }).then(handle)
+  const rematch = () => run(() => callGame({ op: 'rematch', roomCode: roomCode.value }))
+  const sit = () => run(() => callGame({ op: 'sit', roomCode: roomCode.value }))
 
   // ----- notifications de tour -----
-  const myTurn = computed(() => !!game.value && game.value.status === 'playing' && game.value.currentPlayerId === game.value.youId && !game.value.pending)
+  const myTurn = computed(() => !!game.value && !game.value.isSpectator && game.value.status === 'playing' && game.value.currentPlayerId === game.value.youId && !game.value.pending)
   const mustReact = computed(() => game.value?.pending?.kind === 'attack' && game.value.pending.youMustRespond)
   const baseTitle = document.title
   watch([myTurn, mustReact], ([turn, react], [prevTurn, prevReact]) => {
@@ -129,6 +132,6 @@ export function useOnlineGame() {
 
   return {
     userId, roomCode, view, lobby, game, booting, busy, error, realtimeUp, serverNow,
-    boot, create, join, seat, settings, kick, start, leave, act, sync, leaveLocal
+    boot, create, join, seat, settings, kick, start, leave, act, chat, rematch, sit, sync, leaveLocal
   }
 }

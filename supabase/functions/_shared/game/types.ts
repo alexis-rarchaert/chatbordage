@@ -74,6 +74,8 @@ export interface PlayerState {
   powerUsedThisGame?: boolean
   noAttackThisTurn?: boolean
   idleStrikes?: number
+  /** Clipper : bonus de fin de tour armé (perdu si le joueur attaque). */
+  clipperArmed?: boolean
 }
 
 export type GamePhase = 'lobby' | 'event' | 'draw' | 'action' | 'reaction' | 'power' | 'end' | 'finished'
@@ -129,4 +131,18 @@ export interface GameState {
   turnSeconds: number
   reactionSeconds: number
   turnDeadline?: number
+}
+
+/** Message du chat libre d'un salon (joueurs et spectateurs). */
+export interface RoomChatMessage {
+  id: number
+  userId: string
+  name: string
+  text: string
+  ts: number
+}
+
+export interface Spectator {
+  userId: string
+  name: string
 }

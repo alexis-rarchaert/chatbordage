@@ -229,7 +229,7 @@
       "capitaine": "Captain — last standing.",
       "contrebandier": "Smuggler — 15 coins accumulated.",
       "chasseur": "Bounty hunter — 2 ships sunk.",
-      "duo": "Captain and Protector — surviving duo."
+      "duo": "Captain — survives the final duel (with the Protector if alive)."
     }
   },
   "rulesPage": {
@@ -324,12 +324,12 @@
   "roles": {
     "capitaine": {
       "name": "The Captain",
-      "mission": "Survive and ensure that only himself and his Protector (whom he does not know!) remain at the end. +1 starting HP.",
+      "mission": "Survive until the final duel: you win as soon as only one other player is left alive besides you (your Protector, whom you don't know, wins with you if still alive). +1 starting HP.",
       "desc": "Survive until the final duel."
     },
     "protecteur": {
       "name": "The Protector",
-      "mission": "Keep the Captain alive until the end of the game. If the Captain survives and the Protector is alive, both win together!",
+      "mission": "Keep the Captain alive until the end of the game. If the Captain survives to the final duel and you are still alive, you win together!",
       "desc": "Keep the Captain alive until the end."
     },
     "chasseur": {
@@ -689,7 +689,7 @@
     "aubaine": "Bargain: −1 coin",
     "shopEmpty": "The shop is empty.",
     "logTitle": "Ship's log",
-    "chatTitle": "Quick reaction",
+    "chatTitle": "Chat",
     "chat": {
       "traitor": "Traitor!",
       "gg": "Well played!",
@@ -722,7 +722,8 @@
       "scry": "Decide the card's fate.",
       "waiting": "{name}'s turn…",
       "resources": "Draw cards or take coins.",
-      "action": "Play your cards, then end your turn. An attack ends the turn!"
+      "action": "Play your cards, then end your turn. An attack ends the turn!",
+      "watching": "You are watching — {name}'s turn."
     },
     "next": "Next",
     "letsGo": "Board!",
@@ -737,7 +738,8 @@
       "network": "Can't connect. Check your connection and try again.",
       "auth_disabled": "Anonymous sign-ins are disabled on the server (Supabase > Authentication).",
       "offline_unavailable": "Online mode is not configured on this site.",
-      "too_many_rooms": "You already have several open rooms. Finish them or wait a bit before creating a new one."
+      "too_many_rooms": "You already have several open rooms. Finish them or wait a bit before creating a new one.",
+      "slow_down": "Easy, matey: one message per second."
     },
     "tuto": {
       "goal": {
@@ -754,7 +756,7 @@
       },
       "roles": {
         "title": "Secret roles",
-        "text": "<strong>Captain</strong> + <strong>Protector</strong>: be the last two standing.<br><strong>Bounty Hunter</strong>: sink 2 ships.<br><strong>Renegade</strong>: last survivor.<br><strong>Smuggler</strong>: 15 coins.<br>Only you can see your role (🎭 button)."
+        "text": "<strong>Captain</strong>: survive to the final duel (2 players left) — the <strong>Protector</strong> wins with them if alive.<br><strong>Bounty Hunter</strong>: sink 2 ships.<br><strong>Renegade</strong>: last survivor.<br><strong>Smuggler</strong>: 15 coins.<br>The first mission completed ends the game. An eliminated player's role is revealed to all."
       },
       "shop": {
         "title": "Shop & secret info",
@@ -762,9 +764,22 @@
       },
       "tips": {
         "title": "Good to know",
-        "text": "⏳ A timer prevents endless turns. 💬 Use <strong>quick reactions</strong> to bluff or accuse. You can close the tab: come back and your game is still there."
+        "text": "⏳ A timer prevents endless turns. 💬 Chat or use quick reactions to bluff. 👁 You can join a game in progress as a spectator. You can close the tab: come back and your game is still there."
       }
     },
-    "backHome": "Back to home"
+    "backHome": "Back to home",
+    "chatEmpty": "No messages yet. Say hi!",
+    "chatPlaceholder": "Write a message…",
+    "spectatorsList": "Spectators: {names}",
+    "spectatorLobby": "You are watching this room. Take a seat to play.",
+    "takeSeat": "Take a seat",
+    "shipFull": "The ship is full",
+    "caravelleFree": "Caravel: 1 extra free card, whichever you choose.",
+    "discardOne": "Discard",
+    "soundOn": "Sound on",
+    "soundOff": "Sound off",
+    "rematch": "Rematch!",
+    "rematchHint": "Everyone returns to the room with their ships.",
+    "spectatorBanner": "You are watching the game"
   }
 }

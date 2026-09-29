@@ -179,9 +179,10 @@ test('salon : rejoindre, navires uniques, lancement à 4 joueurs minimum', () =>
   assert.ok(startRoom(room, 'u1').ok)
   assert.equal(room.status, 'playing')
   assert.equal(room.state!.players.find(p => p.id === 'u2')!.shipId, 'galion')
-  assert.equal(joinRoom(room, 'u9', 'Zed').ok, false, 'partie commencée')
+  assert.equal(viewForUser(room, 'u9'), null, 'un inconnu ne voit rien')
+  assert.ok(joinRoom(room, 'u9', 'Zed').ok, 'partie commencée : on rejoint en spectateur')
+  assert.equal(room.seats.some(s => s.userId === 'u9'), false)
   assert.ok(joinRoom(room, 'u2', 'Bob').ok, 'reconnexion autorisée')
-  assert.equal(viewForUser(room, 'u9'), null)
   assert.equal((viewForUser(room, 'u2') as any).status, 'playing')
 })
 

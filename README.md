@@ -51,7 +51,7 @@ Le moteur de jeu (`supabase/functions/_shared/game/`) est partagé entre le navi
 
 ### Mise en route
 
-1. Appliquer la migration : `supabase db push` (fichier `supabase/migrations/20260929000000_online_game.sql`).
+1. Appliquer les migrations : `supabase db push` (fichiers de `supabase/migrations/`). Sans passer par la CLI, exécuter dans le SQL Editor, dans l'ordre, `20260929000000_online_game.sql` puis `20260929010000_online_game_chat_spectators.sql`.
 2. Dashboard Supabase → *Authentication → Sign In / Providers* → activer **Allow anonymous sign-ins**
    (les joueurs n'ont pas de compte : leur identité anonyme permet la reconnexion).
 3. Déployer la fonction : `supabase functions deploy game`.

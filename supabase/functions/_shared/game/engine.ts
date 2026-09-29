@@ -15,6 +15,25 @@ export const defaultCtx = (): Ctx => ({ rand: Math.random, now: Date.now() })
 
 export type Res = { ok: true } | { ok: false; error: string }
 export const isFinished = (s: GameState) => s.phase === 'finished'
+
+/** Termine la partie si une mission est accomplie (ou si plus personne ne survit). */
+export function evaluateVictory(state: GameState) {
+  if (isFinished(state)) return
+  const victory = checkVictory(state)
+  if (victory) {
+    state.phase = 'finished'
+    state.pending = undefined
+    state.turnDeadline = undefined
+    state.winnerIds = victory.winners.map(w => w.id)
+    state.log.push(`Victoire — ${victory.reason}`)
+  } else if (!state.players.some(p => p.isAlive)) {
+    state.phase = 'finished'
+    state.pending = undefined
+    state.turnDeadline = undefined
+    state.winnerIds = []
+    state.log.push('Tout l\'équipage a sombré : match nul.')
+  }
+}
 export const ok = (): Res => ({ ok: true })
 export const fail = (error: string): Res => ({ ok: false, error })
 
@@ -209,7 +228,6 @@ export function drawCards(state: GameState, playerId: string, ctx: Ctx = default
   if (state.phase !== 'draw') return fail('Tu as déjà pris tes ressources ce tour.')
 
   let toDraw = 2
-  if (player.shipId === 'caravelle') toDraw += 1
   if (state.currentEvent?.id === 'vents') toDraw += 1
 
   const space = Math.max(0, handMax(player) - player.hand.length)
@@ -218,10 +236,19 @@ export function drawCards(state: GameState, playerId: string, ctx: Ctx = default
 
   state.phase = 'action'
   state.log.push(`${player.name} pioche ${drawn.length} carte(s).`)
+  caravelleBonus(state, player, ctx)
   return ok()
 }
 
-export function gainCoins(state: GameState, playerId: string): Res {
+/** Caravelle : 1 carte gratuite chaque tour (dans la limite de la main), que le joueur pioche ou prenne des pièces. */
+function caravelleBonus(state: GameState, player: PlayerState, ctx: Ctx) {
+  if (player.shipId !== 'caravelle' || player.hand.length >= handMax(player)) return
+  const drawn = drawFromDeck(state, 1, ctx)
+  player.hand.push(...drawn)
+  if (drawn.length) state.log.push(`${player.name} pioche 1 carte gratuite (Caravelle).`)
+}
+
+export function gainCoins(state: GameState, playerId: string, ctx: Ctx = defaultCtx()): Res {
   const player = currentPlayer(state)
   if (!player || player.id !== playerId) return fail('Ce n\'est pas ton tour.')
   if (state.phase !== 'draw') return fail('Tu as déjà pris tes ressources ce tour.')
@@ -229,6 +256,20 @@ export function gainCoins(state: GameState, playerId: string): Res {
   player.coins += gain
   state.phase = 'action'
   state.log.push(`${player.name} prend ${gain} pièce(s).`)
+  caravelleBonus(state, player, ctx)
+  return ok()
+}
+
+/** Défausse volontaire d'une carte, à tout moment du tour (livret de règles). */
+export function discardCard(state: GameState, playerId: string, cardId: string): Res {
+  const player = currentPlayer(state)
+  if (!player || player.id !== playerId) return fail('Ce n\'est pas ton tour.')
+  if ((state.phase !== 'draw' && state.phase !== 'action') || state.pending) return fail('Tu ne peux pas défausser maintenant.')
+  const idx = player.hand.findIndex(c => c.id === cardId)
+  if (idx === -1) return fail('Carte introuvable dans ta main.')
+  const [card] = player.hand.splice(idx, 1)
+  state.discard.push(card!)
+  state.log.push(`${player.name} défausse une carte.`)
   return ok()
 }
 
@@ -243,7 +284,8 @@ export function playCard(state: GameState, playerId: string, cardId: string, opt
   if (idx === -1) return fail('Carte introuvable dans ta main.')
   const card = player.hand[idx]!
 
-  const target = opts.targetId ? state.players.find(p => p.id === opts.targetId && p.isAlive && p.id !== player.id) : undefined
+  // Les Rumeurs peuvent viser n'importe quel joueur vivant, soi-même compris (livret de règles).
+  const target = opts.targetId ? state.players.find(p => p.id === opts.targetId && p.isAlive) : undefined
 
   // ----- validations avant de consommer la carte -----
   if (card.family === 'VOILE') return fail('Une Voile se joue en réaction à une attaque.')
@@ -285,6 +327,14 @@ export function playCard(state: GameState, playerId: string, cardId: string, opt
       state.log.push(`${player.name} joue ${card.name} et pioche ${drawn.length} carte(s).`)
     }
     if (card.effect === 'NO_ATTACK_TURN') player.noAttackThisTurn = true
+    state.discard.push(card)
+    return ok()
+  }
+
+  // ----- Trésor à usage unique -----
+  if (card.family === 'TRESOR' && card.effect === 'COINS_4') {
+    player.coins += 4
+    state.log.push(`${player.name} ouvre un coffre : +4 pièces.`)
     state.discard.push(card)
     return ok()
   }
@@ -334,6 +384,24 @@ function applyRumor(state: GameState, player: PlayerState, target: PlayerState, 
         state.log.push(`${target.name} défausse 1 carte (Pavillon noir).`)
       }
       break
+    case 'STEAL_TREASURE': {
+      const candidates = target.permanents.filter(c => !player.permanents.some(o => o.name === c.name))
+      if (target.id === player.id || !candidates.length) {
+        state.log.push(`${player.name} tente un pillage sur ${target.name}, sans rien à emporter.`)
+        break
+      }
+      const loot = candidates[Math.floor(ctx.rand() * candidates.length)]!
+      target.permanents = target.permanents.filter(c => c.id !== loot.id)
+      player.permanents.push(loot)
+      if (loot.effect === 'PERM_MAXHP_1') {
+        target.maxHp = Math.max(1, target.maxHp - 1)
+        target.hp = Math.min(target.hp, target.maxHp)
+        player.maxHp += 1
+        player.hp += 1
+      }
+      state.log.push(`${player.name} pille ${loot.name} chez ${target.name}.`)
+      break
+    }
     case 'DESTROY_TREASURE':
       if (target.shipId === 'trois-mats') {
         state.log.push(`Le Trois-Mâts protège les équipements de ${target.name}.`)
@@ -452,9 +520,12 @@ function resolveAttack(state: GameState, ctx: Ctx) {
   state.phase = 'action'
   state.log.push(`${card.name} : ${dmg} dégât(s) de base.`)
 
+  const attacked: string[] = []
   for (const id of pending.targetIds) {
+    if (isFinished(state)) break
     const target = getPlayer(state, id)!
     if (!target.isAlive) continue
+    attacked.push(id)
     const response = pending.responses[id] ?? {}
     let dealt = dmg
 
@@ -492,15 +563,23 @@ function resolveAttack(state: GameState, ctx: Ctx) {
     state.log.push(`${target.name} subit ${dealt} dégât(s).`)
     // Un assaillant tué en cours de route (renvoi) ne touche plus de butin.
     applyDamage(state, target, dealt, attacker.isAlive ? attacker : undefined)
-    if (target.shipId === 'brick' && target.isAlive) {
-      target.hand.push(...drawFromDeck(state, 1, ctx))
+  }
+
+  // Brick : pioche 1 carte dès qu'il est attaqué, même si l'attaque est bloquée ou esquivée.
+  if (!isFinished(state)) {
+    for (const id of attacked) {
+      const t = getPlayer(state, id)!
+      if (t.shipId === 'brick' && t.isAlive) {
+        t.hand.push(...drawFromDeck(state, 1, ctx))
+        state.log.push(`${t.name} pioche 1 carte (Brick).`)
+      }
     }
   }
 
   state.discard.push(card)
   state.hasPlayedAttack = true
 
-  if (state.currentEvent?.id === 'kraken' && attacker.isAlive) {
+  if (!isFinished(state) && state.currentEvent?.id === 'kraken' && attacker.isAlive) {
     state.log.push(`Le Kraken punit ${attacker.name} de 2 dégâts.`)
     applyDamage(state, attacker, 2)
   }
@@ -524,21 +603,27 @@ export function applyDamage(state: GameState, target: PlayerState, amount: numbe
   }
 
   target.isAlive = false
-  state.log.push(`${target.name} est éliminé.`)
+  // Le rôle d'un joueur éliminé est révélé à tous.
+  state.log.push(`${target.name} est éliminé — il était ${roleName(target)}.`)
+  state.discard.push(...target.permanents)
+  target.permanents = []
+
   if (!attacker) {
     // Mort sans assaillant (Kraken…) : les cartes partent à la défausse.
     state.discard.push(...target.hand)
     target.hand = []
     target.coins = 0
-    return
+  } else {
+    attacker.eliminationsCount += 1
+    attacker.hand.push(...target.hand)
+    attacker.coins += target.coins
+    target.hand = []
+    target.coins = 0
+    if (attacker.shipId === 'fregate') attacker.hp = Math.min(attacker.maxHp, attacker.hp + 1)
+    if (attacker.shipId === 'brigantin') attacker.hand.push(...drawFromDeck(state, 2))
   }
-  attacker.eliminationsCount += 1
-  attacker.hand.push(...target.hand)
-  attacker.coins += target.coins
-  target.hand = []
-  target.coins = 0
-  if (attacker.shipId === 'fregate') attacker.hp = Math.min(attacker.maxHp, attacker.hp + 1)
-  if (attacker.shipId === 'brigantin') attacker.hand.push(...drawFromDeck(state, 2))
+  // La première mission accomplie, dans l'ordre réel des actions, termine la partie.
+  evaluateVictory(state)
 }
 
 // ============ POUVOIRS DE NAVIRE ============
@@ -587,9 +672,8 @@ export function useShipPower(state: GameState, playerId: string, opts: PowerOpts
       break
     }
     case 'clipper':
-      if (state.hasPlayedAttack) return fail('Tu as déjà attaqué ce tour.')
-      player.coins += 1
-      state.log.push(`${player.name} gagne 1 pièce (Clipper).`)
+      player.clipperArmed = true
+      state.log.push(`${player.name} prépare son bonus Clipper (1 pièce s'il n'attaque pas).`)
       break
     default:
       return fail('Pouvoir inconnu.')
@@ -660,6 +744,13 @@ export function endTurn(state: GameState, ctx: Ctx = defaultCtx(), discardIds: s
     }
     while (player.hand.length > max) state.discard.push(player.hand.pop()!)
 
+    if (player.clipperArmed) {
+      player.clipperArmed = false
+      if (player.isAlive && !state.hasPlayedAttack) {
+        player.coins += 1
+        state.log.push(`${player.name} gagne 1 pièce (Clipper).`)
+      }
+    }
     if (player.isAlive && player.permanents.some(p => p.effect === 'PERM_COIN_PER_TURN')) player.coins += 1
     if (player.truceTurnsLeft && player.truceTurnsLeft > 0) player.truceTurnsLeft -= 1
   }
@@ -680,10 +771,20 @@ export function forfeit(state: GameState, playerId: string, ctx: Ctx = defaultCt
   const wasCurrent = currentPlayer(state)?.id === p.id
   p.isAlive = false
   p.hp = 0
-  state.discard.push(...p.hand)
+  state.log.push(`${p.name} quitte la partie — il était ${roleName(p)}.`)
+  // Traité comme éliminé : ses cartes et pièces vont au joueur suivant (livret de règles).
+  const heir = state.players[nextAlive(state, state.players.indexOf(p))]
+  if (heir && heir.isAlive && heir.id !== p.id) {
+    heir.hand.push(...p.hand)
+    heir.coins += p.coins
+    if (p.hand.length || p.coins) state.log.push(`${heir.name} récupère ses cartes et ses pièces.`)
+  } else {
+    state.discard.push(...p.hand)
+  }
   p.hand = []
   p.coins = 0
-  state.log.push(`${p.name} quitte la partie.`)
+  state.discard.push(...p.permanents)
+  p.permanents = []
 
   // Une attaque en cours ne l'attend plus / n'a plus d'assaillant.
   const pending = state.pending

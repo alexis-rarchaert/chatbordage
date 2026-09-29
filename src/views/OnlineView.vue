@@ -25,7 +25,7 @@ const inRoom = computed(() => !!g.view.value)
 const errorText = computed(() => {
   const e = g.error.value
   if (!e) return ''
-  const known = ['network', 'auth_disabled', 'offline_unavailable', 'too_many_rooms']
+  const known = ['network', 'auth_disabled', 'offline_unavailable', 'too_many_rooms', 'slow_down']
   return known.includes(e) ? t('online.err.' + e) : e
 })
 
@@ -68,12 +68,12 @@ watch(showHowTo, v => { if (!v) safeSet('chatbordage.tutoSeen', '1') })
     <template v-else-if="inRoom">
       <OnlineLobby
         v-if="g.lobby.value" :lobby="g.lobby.value" :busy="g.busy.value"
-        @seat="g.seat" @kick="g.kick" @start="g.start" @leave="leave" @settings="g.settings"
+        @seat="g.seat" @kick="g.kick" @start="g.start" @leave="leave" @settings="g.settings" @chat="g.chat" @sit="g.sit"
       />
       <OnlineTable
         v-else-if="g.game.value" :game="g.game.value" :server-now="g.serverNow.value" :busy="g.busy.value"
         :realtime-up="g.realtimeUp.value"
-        @act="g.act" @leave="leave" @howto="showHowTo = true"
+        @act="g.act" @leave="leave" @howto="showHowTo = true" @chat="g.chat" @rematch="g.rematch"
       />
     </template>
 

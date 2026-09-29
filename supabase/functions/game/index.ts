@@ -5,8 +5,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import {
   type Action, type Room, type Res, type Ctx,
-  applyAction, processTimers, forfeit, advance,
-  newRoom, joinRoom, updateSeat, updateSettings, leaveLobby, kickFromLobby, startRoom, viewForUser,
+  applyAction, processTimers,
+  newRoom, joinRoom, sitDown, leaveRoom, postChat, startRematch, updateSeat, updateSettings, kickFromLobby, startRoom, viewForUser,
   cleanName
 } from '../_shared/game/index.ts'
 
@@ -35,10 +35,12 @@ const ctx = (): Ctx => ({ rand: Math.random, now: Date.now() })
 type RoomRow = {
   id: string; code: string; host_id: string; status: Room['status']
   seats: Room['seats']; settings: Room['settings']; state: Room['state']; version: number
+  spectators: Room['spectators'] | null; chat: Room['chat'] | null
 }
 
 const toRoom = (r: RoomRow): Room => ({
-  code: r.code, hostId: r.host_id, status: r.status, seats: r.seats, settings: r.settings, state: r.state
+  code: r.code, hostId: r.host_id, status: r.status, seats: r.seats, settings: r.settings, state: r.state,
+  spectators: r.spectators ?? [], chat: r.chat ?? []
 })
 
 async function loadRoom(code: string): Promise<RoomRow | null> {
@@ -54,7 +56,7 @@ async function saveRoom(row: RoomRow, room: Room, removedUserIds: string[] = [])
     .from('game_rooms')
     .update({
       host_id: room.hostId, status: room.status, seats: room.seats, settings: room.settings,
-      state: room.state, version, updated_at: new Date().toISOString()
+      state: room.state, spectators: room.spectators, chat: room.chat, version, updated_at: new Date().toISOString()
     })
     .eq('id', row.id).eq('version', row.version)
     .select('id')
@@ -62,7 +64,7 @@ async function saveRoom(row: RoomRow, room: Room, removedUserIds: string[] = [])
   if (!data?.length) return false
 
   const now = ctx()
-  const views = room.seats.map(s => ({
+  const views = [...room.seats, ...room.spectators].map(s => ({
     room_id: row.id, user_id: s.userId, view: versioned(viewForUser(room, s.userId, now), version), version,
     updated_at: new Date().toISOString()
   }))
@@ -87,17 +89,18 @@ async function mutate(
     const row = await loadRoom(code)
     if (!row) return { error: 'Salon introuvable.' }
     const room = toRoom(row)
-    if (opts.requireSeat !== false && !room.seats.some(s => s.userId === userId)) {
+    const present = (id: string) => room.seats.some(s => s.userId === id) || room.spectators.some(s => s.userId === id)
+    if (opts.requireSeat !== false && !present(userId)) {
       return { error: 'Tu ne fais pas partie de ce salon.' }
     }
-    const before = room.seats.map(s => s.userId)
+    const before = [...room.seats, ...room.spectators].map(s => s.userId)
     let version = row.version
     const res = fn(room)
     if (typeof res === 'object' && !res.ok) return { error: res.error }
     const changed = res !== false
     if (changed) {
-      const removed = before.filter(id => !room.seats.some(s => s.userId === id))
-      if (!room.seats.length) {
+      const removed = before.filter(id => !present(id))
+      if (!room.seats.length && !room.spectators.length) {
         await admin.from('game_rooms').delete().eq('id', row.id)
         return { roomCode: room.code }
       }
@@ -180,15 +183,20 @@ Deno.serve(async (req: Request) => {
         out = await mutate(code, userId, room => startRoom(room, userId, ctx()))
         break
 
+      case 'chat':
+        out = await mutate(code, userId, room => postChat(room, userId, body.text, ctx()))
+        break
+
+      case 'sit':
+        out = await mutate(code, userId, room => sitDown(room, userId))
+        break
+
+      case 'rematch':
+        out = await mutate(code, userId, room => startRematch(room, userId))
+        break
+
       case 'leave':
-        out = await mutate(code, userId, room => {
-          if (room.status === 'lobby') return leaveLobby(room, userId)
-          if (room.state && room.status === 'playing') {
-            forfeit(room.state, userId, ctx())
-            advance(room.state, ctx())
-          }
-          return true
-        })
+        out = await mutate(code, userId, room => leaveRoom(room, userId, ctx()))
         if (!out.error) {
           // Le joueur n'a plus de vue à suivre dans un salon qu'il a quitté.
           const row = await loadRoom(code)
