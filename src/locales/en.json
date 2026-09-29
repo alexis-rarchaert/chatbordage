@@ -103,15 +103,6 @@
     "error": "Something went wrong. Please try again later."
   },
   "game": {
-    "unlock": {
-      "title": "Restricted Access",
-      "desc": "Please enter the secret code found in your ChatBordage game box to unlock the companion app.",
-      "placeholder": "e.g. A1B2-C3D4-E5F6-G7H8",
-      "submit": "Unlock",
-      "validating": "Checking...",
-      "cancel": "Back to Home",
-      "error": "Invalid code, matey! Look closely at the bottom of your game box."
-    },
     "lobby": {
       "title": "Crew Preparation",
       "player": "Player",
@@ -623,7 +614,6 @@
     "joinBtn": "Join",
     "create": "Create a room",
     "createBtn": "Create game",
-    "codeExplain": "Enter the secret code from your ChatBordage box to create a room. Your friends don't need one: they join with the room code.",
     "tabletMode": "Tablet mode (physical cards)",
     "howto": "How to play",
     "loading2": "…",
@@ -728,7 +718,7 @@
       "network": "Can't connect. Check your connection and try again.",
       "auth_disabled": "Anonymous sign-ins are disabled on the server (Supabase > Authentication).",
       "offline_unavailable": "Online mode is not configured on this site.",
-      "invalid_code": "Invalid code, matey! Look at the bottom of your game box."
+      "too_many_rooms": "You already have several open rooms. Finish them or wait a bit before creating a new one."
     },
     "tuto": {
       "goal": {
@@ -755,6 +745,7 @@
         "title": "Good to know",
         "text": "⏳ A timer prevents endless turns. 💬 Use <strong>quick reactions</strong> to bluff or accuse. You can close the tab: come back and your game is still there."
       }
-    }
+    },
+    "backHome": "Back to home"
   }
 }

@@ -8,8 +8,7 @@ export type CallResult = { ok: true; roomCode?: string; view?: RoomView; left?: 
 
 export const STORAGE = {
   room: 'chatbordage.room',
-  name: 'chatbordage.name',
-  code: 'game_code'
+  name: 'chatbordage.name'
 }
 
 export const safeGet = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }

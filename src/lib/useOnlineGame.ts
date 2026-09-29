@@ -88,9 +88,9 @@ export function useOnlineGame() {
   })
 
   // ----- opérations de salon -----
-  const create = (name: string, activationCode: string, settings?: Record<string, number>) => {
+  const create = (name: string, settings?: Record<string, number>) => {
     view.value = null
-    return run(() => callGame({ op: 'create', name, activationCode, settings }))
+    return run(() => callGame({ op: 'create', name, settings }))
   }
   const join = (code: string, name: string) => {
     view.value = null

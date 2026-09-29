@@ -17,31 +17,21 @@ const g = useOnlineGame()
 
 const name = ref(safeGet(STORAGE.name) ?? '')
 const joinCode = ref(String(route.query.join ?? '').toUpperCase().slice(0, 4))
-const activationCode = ref(safeGet(STORAGE.code) ?? '')
-const needCode = ref(false)
 const showHowTo = ref(false)
 
 const cleanName = computed(() => name.value.trim().slice(0, 16))
 const inRoom = computed(() => !!g.view.value)
 
-function formatCode(e: Event) {
-  const raw = (e.target as HTMLInputElement).value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 16)
-  activationCode.value = (raw.match(/.{1,4}/g) ?? []).join('-')
-}
-
 const errorText = computed(() => {
   const e = g.error.value
   if (!e) return ''
-  const known = ['network', 'auth_disabled', 'offline_unavailable', 'invalid_code']
+  const known = ['network', 'auth_disabled', 'offline_unavailable', 'too_many_rooms']
   return known.includes(e) ? t('online.err.' + e) : e
 })
 
 async function createRoom() {
   safeSet(STORAGE.name, cleanName.value)
-  if (!activationCode.value) { needCode.value = true; return }
-  const ok = await g.create(cleanName.value, activationCode.value)
-  if (!ok && g.error.value === 'invalid_code') { safeSet(STORAGE.code, null); needCode.value = true }
-  else if (ok) { safeSet(STORAGE.code, activationCode.value); needCode.value = false }
+  await g.create(cleanName.value)
 }
 
 async function joinRoom() {
@@ -107,18 +97,14 @@ watch(showHowTo, v => { if (!v) safeSet('chatbordage.tutoSeen', '1') })
 
       <div class="block">
         <h2>{{ $t('online.create') }}</h2>
-        <template v-if="needCode || !activationCode">
-          <p class="mini">{{ $t('online.codeExplain') }}</p>
-          <input :value="activationCode" class="code-input wide" placeholder="A1B2-C3D4-E5F6-G7H8" @input="formatCode" />
-        </template>
-        <button class="btn-gold" :disabled="g.busy.value || !cleanName || (needCode && activationCode.length < 19)" @click="createRoom">{{ $t('online.createBtn') }}</button>
+        <button class="btn-gold" :disabled="g.busy.value || !cleanName" @click="createRoom">{{ $t('online.createBtn') }}</button>
       </div>
 
       <p v-if="errorText" class="error" role="alert">{{ errorText }}</p>
 
       <div class="links">
         <button class="link" @click="showHowTo = true">📖 {{ $t('online.howto') }}</button>
-        <RouterLink class="link" to="/">← {{ $t('game.unlock.cancel') }}</RouterLink>
+        <RouterLink class="link" to="/">← {{ $t('online.backHome') }}</RouterLink>
         <RouterLink class="link" to="/game">🎲 {{ $t('online.tabletMode') }}</RouterLink>
       </div>
     </div>
@@ -143,7 +129,6 @@ input:focus { outline: none; border-color: var(--color-gold); }
 .block { width: 100%; padding: 14px; border-radius: 16px; background: rgba(26, 15, 16, .55); border: 1px solid rgba(200, 162, 74, .3); display: flex; flex-direction: column; gap: 8px; }
 .join-row { display: flex; gap: 8px; }
 .code-input { text-transform: uppercase; letter-spacing: .3em; text-align: center; font-family: var(--font-display); font-size: 1.6rem; }
-.code-input.wide { letter-spacing: .1em; font-size: 1.15rem; }
 .mini { font-size: .8rem; color: var(--color-text-muted); margin: 0; }
 .error { color: #ff8a80; margin: 0; }
 .links { display: flex; flex-direction: column; gap: 6px; align-items: center; }

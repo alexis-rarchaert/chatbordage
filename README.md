@@ -58,7 +58,7 @@ Le moteur de jeu (`supabase/functions/_shared/game/`) est partagé entre le navi
 4. Renseigner `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` (voir `.env.example`).
 5. Optionnel : planifier `select public.purge_old_game_rooms()` avec `pg_cron` pour supprimer les salons abandonnés.
 
-Créer un salon exige un code d'activation valide (table `activation_codes`) ; rejoindre n'en exige pas.
+Le jeu est gratuit et ouvert à tous : aucun code n'est requis. Un joueur ne peut pas avoir plus de 3 salons actifs à la fois (garde-fou anti-abus).
 
 ### Tests du moteur
 

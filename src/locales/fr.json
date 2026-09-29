@@ -103,15 +103,6 @@
     "error": "Une erreur est survenue. Réessayez plus tard."
   },
   "game": {
-    "unlock": {
-      "title": "Accès Réservé",
-      "desc": "Veuillez entrer le code secret inscrit dans votre boîte de jeu ChatBordage pour débloquer l'application compagnon.",
-      "placeholder": "Ex: A1B2-C3D4-E5F6-G7H8",
-      "submit": "Débloquer",
-      "validating": "Vérification...",
-      "cancel": "Retour à l'accueil",
-      "error": "Code invalide, moussaillon ! Regardez bien au fond de votre boîte de jeu."
-    },
     "lobby": {
       "title": "Préparation de l'équipage",
       "player": "Joueur",
@@ -623,7 +614,6 @@
     "joinBtn": "Rejoindre",
     "create": "Créer un salon",
     "createBtn": "Créer la partie",
-    "codeExplain": "Entre le code secret de ta boîte ChatBordage pour créer un salon. Tes amis, eux, n'ont pas besoin de code : ils rejoignent avec le code du salon.",
     "tabletMode": "Mode tablette (cartes physiques)",
     "howto": "Comment jouer",
     "loading2": "…",
@@ -728,7 +718,7 @@
       "network": "Connexion impossible. Vérifie ta connexion et réessaie.",
       "auth_disabled": "Les connexions anonymes sont désactivées sur le serveur (Supabase > Authentication).",
       "offline_unavailable": "Le mode en ligne n'est pas configuré sur ce site.",
-      "invalid_code": "Code invalide, moussaillon ! Regarde au fond de ta boîte de jeu."
+      "too_many_rooms": "Tu as déjà plusieurs salons ouverts. Termine-les ou patiente un peu avant d'en créer un nouveau."
     },
     "tuto": {
       "goal": {
@@ -755,6 +745,7 @@
         "title": "Bon à savoir",
         "text": "⏳ Un minuteur évite les tours interminables. 💬 Utilise les <strong>réactions rapides</strong> pour bluffer ou accuser. Tu peux fermer l'onglet : reviens sur la page et tu retrouves ta partie."
       }
-    }
+    },
+    "backHome": "Retour à l'accueil"
   }
 }

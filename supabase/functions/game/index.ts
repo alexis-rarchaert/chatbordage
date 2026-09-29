@@ -22,6 +22,7 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
 
+const MAX_ACTIVE_ROOMS = 3
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ' // sans I ni O
 const randomCode = () =>
   Array.from({ length: 4 }, () => CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)]).join('')
@@ -108,14 +109,6 @@ async function mutate(
   return { error: 'Le salon est très animé, réessaie.' }
 }
 
-async function verifyActivationCode(raw: unknown): Promise<boolean> {
-  const code = String(raw ?? '').trim().toUpperCase()
-  if (!/^[A-Z0-9-]{8,32}$/.test(code)) return false
-  const { data, error } = await admin.from('activation_codes').select('code').eq('code', code).maybeSingle()
-  if (error) { console.error('[game] activation_codes', error); return false }
-  return !!data
-}
-
 async function userFromRequest(req: Request): Promise<string | null> {
   const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '')
   if (!token) return null
@@ -141,8 +134,12 @@ Deno.serve(async (req: Request) => {
       case 'create': {
         const name = cleanName(body.name)
         if (!name) return json({ ok: false, error: 'Choisis un pseudo.' })
-        if (!(await verifyActivationCode(body.activationCode))) {
-          return json({ ok: false, error: 'invalid_code' })
+        // Garde-fou anti-abus : quelques salons actifs par joueur (le jeu est gratuit et ouvert à tous).
+        const since = new Date(Date.now() - 2 * 3600 * 1000).toISOString()
+        const { count } = await admin.from('game_rooms').select('id', { count: 'exact', head: true })
+          .eq('host_id', userId).neq('status', 'finished').gt('updated_at', since)
+        if ((count ?? 0) >= MAX_ACTIVE_ROOMS) {
+          return json({ ok: false, error: 'too_many_rooms' })
         }
         let created: Room | null = null
         for (let i = 0; i < 8 && !created; i++) {
