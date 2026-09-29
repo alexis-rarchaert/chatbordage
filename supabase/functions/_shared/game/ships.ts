@@ -1,4 +1,4 @@
-import type { Ship } from './types'
+import type { Ship } from './types.ts'
 
 export const SHIPS: Ship[] = [
   {

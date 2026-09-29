@@ -5,7 +5,8 @@
     "theGame": "The Game",
     "rules": "Rules",
     "shop": "Shop",
-    "companion": "Companion"
+    "companion": "Companion",
+    "online": "Play online"
   },
   "hero": {
     "title": "ChatBordage",
@@ -75,7 +76,8 @@
     "app": "The <strong>central app</strong> manages randomness and secrets for a smooth experience",
     "events": "Sea Events: Each turn, a <strong>random</strong> event applies to all (storm, fog, treasure island)",
     "shop": "The <strong>Shop</strong>: Spend your coins to buy powerful and unique bonuses (like revealing a player's role, healing, or getting +2 damage on an attack). Once bought, the item disappears for everyone!",
-    "playLink": "Launch Companion App"
+    "playLink": "Launch Companion App",
+    "onlineLink": "Play online with friends"
   },
   "cta": {
     "buy": "BUY",
@@ -344,12 +346,24 @@
     "preorderLink": "Pre-register",
     "preorderNoteEnd": " to be notified first.",
     "items": {
-      "reparations": { "name": "Emergency Repairs" },
-      "poudre": { "name": "Black Powder" },
-      "coffre": { "name": "Contraband Chest" },
-      "longue-vue": { "name": "Traitor's Spyglass" },
-      "treve": { "name": "Truce Flag" },
-      "revivre": { "name": "Revive Once" }
+      "reparations": {
+        "name": "Emergency Repairs"
+      },
+      "poudre": {
+        "name": "Black Powder"
+      },
+      "coffre": {
+        "name": "Contraband Chest"
+      },
+      "longue-vue": {
+        "name": "Traitor's Spyglass"
+      },
+      "treve": {
+        "name": "Truce Flag"
+      },
+      "revivre": {
+        "name": "Revive Once"
+      }
     }
   },
   "product": {
@@ -596,6 +610,150 @@
       "withdrawal": {
         "title": "5. Right of Withdrawal",
         "content": "In accordance with current legislation, you have a 14-day right of withdrawal starting from the receipt of your products."
+      }
+    }
+  },
+  "online": {
+    "title": "Online game",
+    "subtitle": "One phone per player — no physical cards needed.",
+    "loading": "The ship is setting sail…",
+    "yourName": "Your nickname",
+    "namePlaceholder": "Captain Whiskers",
+    "join": "Join a room",
+    "joinBtn": "Join",
+    "create": "Create a room",
+    "createBtn": "Create game",
+    "codeExplain": "Enter the secret code from your ChatBordage box to create a room. Your friends don't need one: they join with the room code.",
+    "tabletMode": "Tablet mode (physical cards)",
+    "howto": "How to play",
+    "loading2": "…",
+    "lobbyTitle": "Waiting room",
+    "roomCode": "Room code",
+    "invite": "Invite",
+    "copied": "Link copied",
+    "host": "host",
+    "waitingPlayer": "Waiting for a player…",
+    "kick": "Kick",
+    "chooseShip": "Choose your ship",
+    "random": "Random",
+    "turnTimer": "Turn timer",
+    "noTimer": "No timer",
+    "enableNotifs": "Enable notifications",
+    "startGame": "Weigh anchor!",
+    "needPlayers": "At least {n} players are required.",
+    "notAllReady": "Everyone must be ready.",
+    "imReady": "I'm ready",
+    "notReady": "Not ready",
+    "leave": "Leave",
+    "you": "you",
+    "captain": "Captain",
+    "opponents": "Opponents",
+    "deck": "Deck",
+    "discard": "Discard",
+    "secret": "Secret info",
+    "nextAttack": "on your next attack",
+    "reviveReady": "Revive ready",
+    "emptyHand": "Your hand is empty.",
+    "drawN": "Draw {n} cards",
+    "coinsN": "Take {n} coins",
+    "pickCard": "Pick a card",
+    "play": "Play {name}",
+    "voileHint": "A Sail is played as a reaction",
+    "shop": "Shop",
+    "power": "Power",
+    "endTurn": "End turn",
+    "noAttackTurn": "Rest in port: no attacking this turn.",
+    "corvetteHint": "The Corvette's dodge triggers when you are attacked.",
+    "powerUsed": "Power already used.",
+    "permanent": "Permanent",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "confirmTargets": "Confirm ({n}/{max})",
+    "noTarget": "No target available.",
+    "close": "Close",
+    "pickTarget": "Target for “{name}”",
+    "cotrePick": "Steal a card from…",
+    "revealPick": "Spy on the role of…",
+    "sloopPick": "Card to swap with the deck",
+    "discardPick": "Discard {n} card(s) (hand limit)",
+    "shopHint": "Each item exists once: the first buyer removes it for everyone.",
+    "aubaine": "Bargain: −1 coin",
+    "shopEmpty": "The shop is empty.",
+    "logTitle": "Ship's log",
+    "chatTitle": "Quick reaction",
+    "chat": {
+      "traitor": "Traitor!",
+      "gg": "Well played!",
+      "hurry": "Hurry up!",
+      "innocent": "I'm innocent!"
+    },
+    "roleSecret": "Keep it secret… unless you want to bluff.",
+    "equipment": "Equipment",
+    "truce": "Truce flag: {n} turn(s) left",
+    "noNotes": "Nothing yet.",
+    "secretHint": "What you discovered: only you can see it.",
+    "underAttack": "You are under attack!",
+    "dodge": "Dodge (Corvette)",
+    "takeHit": "Take the hit",
+    "scryTitle": "Junk: the top card",
+    "scryKeep": "Keep it on top",
+    "scryBottom": "Put it at the bottom",
+    "roleGateTitle": "Your secret role",
+    "roleGateText": "Make sure nobody is watching your screen, then hold the card to reveal it.",
+    "holdToSee": "Hold to see",
+    "understood": "Got it",
+    "victory": "Victory!",
+    "defeat": "Defeat…",
+    "draw": "Draw",
+    "winners": "Winner(s): {names}",
+    "backToMenu": "Back to menu",
+    "hint": {
+      "spectating": "You are eliminated: you are watching the rest of the game.",
+      "reaction": "{who} attacks! Waiting for reactions…",
+      "scry": "Decide the card's fate.",
+      "waiting": "{name}'s turn…",
+      "resources": "Draw cards or take coins.",
+      "action": "Play your cards, then end your turn. An attack ends the turn!"
+    },
+    "next": "Next",
+    "letsGo": "Board!",
+    "family": {
+      "abordage": "Boarding",
+      "voile": "Sail",
+      "maree": "Tide",
+      "rumeur": "Rumor",
+      "tresor": "Treasure"
+    },
+    "err": {
+      "network": "Can't connect. Check your connection and try again.",
+      "auth_disabled": "Anonymous sign-ins are disabled on the server (Supabase > Authentication).",
+      "offline_unavailable": "Online mode is not configured on this site.",
+      "invalid_code": "Invalid code, matey! Look at the bottom of your game box."
+    },
+    "tuto": {
+      "goal": {
+        "title": "Goal of the game",
+        "text": "Each player sails a <strong>ship</strong> everyone can see and follows a <strong>secret mission</strong>. Only the <strong>Captain</strong> is known to all. Find your ally, spot your enemy… or bluff!"
+      },
+      "turn": {
+        "title": "Your turn",
+        "text": "1. A <strong>sea event</strong> hits everyone.<br>2. Choose: <strong>draw 2 cards</strong> or <strong>take 2 coins</strong> (hand limit 5).<br>3. Play as many cards as you like, use your ship power, shop.<br>4. End your turn."
+      },
+      "attack": {
+        "title": "Attacks & defenses",
+        "text": "<strong>Boarding</strong> cards deal damage… and <strong>end your turn</strong>: play them last! The target can react with a <strong>Sail</strong> (or the Corvette's dodge) for a few seconds. At 0 HP a player is out: the attacker takes their cards and coins."
+      },
+      "roles": {
+        "title": "Secret roles",
+        "text": "<strong>Captain</strong> + <strong>Protector</strong>: be the last two standing.<br><strong>Bounty Hunter</strong>: sink 2 ships.<br><strong>Renegade</strong>: last survivor.<br><strong>Smuggler</strong>: 15 coins.<br>Only you can see your role (🎭 button)."
+      },
+      "shop": {
+        "title": "Shop & secret info",
+        "text": "Spend coins in the shop: each item is unique for the whole game. Spying results (spyglass, Whisper…) land in <strong>🔎 Secret info</strong>, visible only to you."
+      },
+      "tips": {
+        "title": "Good to know",
+        "text": "⏳ A timer prevents endless turns. 💬 Use <strong>quick reactions</strong> to bluff or accuse. You can close the tab: come back and your game is still there."
       }
     }
   }

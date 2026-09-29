@@ -29,6 +29,11 @@ const router = createRouter({
       component: GameView
     },
     {
+      path: '/online',
+      name: 'online',
+      component: () => import('../views/OnlineView.vue')
+    },
+    {
       path: '/preinscription',
       name: 'preinscription',
       component: FormulaireView

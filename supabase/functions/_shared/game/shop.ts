@@ -1,4 +1,4 @@
-import type { ShopItem } from './types'
+import type { ShopItem } from './types.ts'
 
 export const SHOP_ITEMS: ShopItem[] = [
   {

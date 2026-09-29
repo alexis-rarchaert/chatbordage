@@ -1,4 +1,8 @@
-import type { Role, RoleId, PlayerState, GameState } from './types'
+import type { Role, RoleId, PlayerState, GameState } from './types.ts'
+import { shuffle } from './cards.ts'
+
+export const MIN_PLAYERS = 4
+export const MAX_PLAYERS = 8
 
 export const ROLES: Role[] = [
   {
@@ -57,27 +61,32 @@ export function getRole(id: RoleId): Role {
 /**
  * Assigne 1 Capitaine + 1 Protecteur + 1 rôle "spoiler" tiré au sort,
  * et complète avec les rôles restants jusqu'à couvrir tous les joueurs.
- * À 4 joueurs : Capitaine + Protecteur + 2 rôles spoilers. À 6 joueurs : les 5 + un doublon.
+ * À 4 joueurs : Capitaine + Protecteur + 2 rôles spoilers. Au-delà de 5 joueurs, des rôles spoilers sont dupliqués.
  */
 export function assignRoles(playerCount: number, rand: () => number = Math.random): RoleId[] {
-  if (playerCount < 4 || playerCount > 6) {
-    throw new Error('ChatBordage se joue de 4 à 6 joueurs.')
+  if (playerCount < MIN_PLAYERS || playerCount > MAX_PLAYERS) {
+    throw new Error(`ChatBordage se joue de ${MIN_PLAYERS} à ${MAX_PLAYERS} joueurs.`)
   }
 
   // Toujours 1 Capitaine et 1 Protecteur, puis on tire dans les "rôles libres"
   const free: RoleId[] = ['chasseur', 'renegat', 'contrebandier']
-  const shuffled = [...free].sort(() => rand() - 0.5)
+  const shuffled = shuffle(free, rand)
   const ids: RoleId[] = ['capitaine', 'protecteur', ...shuffled.slice(0, playerCount - 2)]
 
   // Si plus de joueurs que de rôles disponibles, on duplique un rôle spoiler aléatoire
   while (ids.length < playerCount) {
-    ids.push(shuffled[Math.floor(rand() * shuffled.length)])
+    ids.push(shuffled[Math.floor(rand() * shuffled.length)]!)
   }
 
   // On mélange l'attribution finale aux sièges
-  return ids.sort(() => rand() - 0.5)
+  return shuffle(ids, rand)
 }
 
+/**
+ * Départage quand plusieurs missions sont accomplies au même instant (règle validée) :
+ * Contrebandier > Chasseur de primes > Capitaine + Protecteur > dernier survivant (Renégat / Capitaine).
+ * L'ordre des blocs ci-dessous EST la priorité.
+ */
 /** Renvoie l'id du joueur gagnant (ou liste de gagnants) si une condition est remplie. */
 export function checkVictory(state: GameState): { winners: PlayerState[]; reason: string } | null {
   const alive = state.players.filter(p => p.isAlive)
@@ -107,7 +116,7 @@ export function checkVictory(state: GameState): { winners: PlayerState[]; reason
 
   // Renégat : seul survivant
   if (alive.length === 1) {
-    const last = alive[0]
+    const last = alive[0]!
     if (last.roleId === 'renegat') {
       return { winners: [last], reason: `${last.name} (Renégat) est le dernier survivant.` }
     }
@@ -115,6 +124,8 @@ export function checkVictory(state: GameState): { winners: PlayerState[]; reason
     if (last.roleId === 'capitaine') {
       return { winners: [last], reason: `${last.name} (Capitaine) reste le dernier debout.` }
     }
+    // Tout autre dernier survivant l'emporte : la partie ne peut pas rester bloquée.
+    return { winners: [last], reason: `${last.name} est le dernier survivant.` }
   }
 
   return null

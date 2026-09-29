@@ -7,6 +7,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('[Supabase] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY missing — preinscription will be mocked.')
 }
 
+export const supabaseConfigured = !!(supabaseUrl && supabaseAnonKey)
+
 export const supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseAnonKey || 'placeholder-anon-key')
 
 export type Preinscription = {

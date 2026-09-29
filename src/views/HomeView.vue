@@ -178,7 +178,8 @@
             <li v-html="$t('digital.shop')"></li>
           </ul>
           <div class="digital-actions">
-            <RouterLink to="/game" class="btn-primary">{{ $t('digital.playLink') }}</RouterLink>
+            <RouterLink to="/online" class="btn-primary">{{ $t('digital.onlineLink') }}</RouterLink>
+            <RouterLink to="/game" class="btn-secondary">{{ $t('digital.playLink') }}</RouterLink>
           </div>
         </div>
       </div>

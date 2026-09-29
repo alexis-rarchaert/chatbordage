@@ -40,3 +40,28 @@ npm run dev
 ```sh
 npm run build
 ```
+
+## Parties en ligne (un téléphone par joueur)
+
+Route `/online` : salons de 4 à 8 joueurs, sans cartes physiques. Le serveur (Edge Function
+`supabase/functions/game`) fait autorité : l'état complet (rôles cachés, mains, pioche) n'est jamais
+envoyé aux clients, qui reçoivent uniquement leur **vue filtrée** (`game_views`, protégée par RLS) en temps réel.
+
+Le moteur de jeu (`supabase/functions/_shared/game/`) est partagé entre le navigateur et l'Edge Function.
+
+### Mise en route
+
+1. Appliquer la migration : `supabase db push` (fichier `supabase/migrations/20260929000000_online_game.sql`).
+2. Dashboard Supabase → *Authentication → Sign In / Providers* → activer **Allow anonymous sign-ins**
+   (les joueurs n'ont pas de compte : leur identité anonyme permet la reconnexion).
+3. Déployer la fonction : `supabase functions deploy game`.
+4. Renseigner `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` (voir `.env.example`).
+5. Optionnel : planifier `select public.purge_old_game_rooms()` avec `pg_cron` pour supprimer les salons abandonnés.
+
+Créer un salon exige un code d'activation valide (table `activation_codes`) ; rejoindre n'en exige pas.
+
+### Tests du moteur
+
+```sh
+npm test
+```

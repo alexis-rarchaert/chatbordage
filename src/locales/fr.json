@@ -5,7 +5,8 @@
     "theGame": "Le Jeu",
     "rules": "Règlement",
     "shop": "Boutique",
-    "companion": "Compagnon"
+    "companion": "Compagnon",
+    "online": "Jouer en ligne"
   },
   "hero": {
     "title": "ChatBordage",
@@ -75,7 +76,8 @@
     "app": "L'<strong>application centrale</strong> gère l'aléatoire et les secrets pour une expérience fluide",
     "events": "Événements de mer : À chaque tour, un événement <strong>aléatoire</strong> s'applique à tous (tempête, brume, île au trésor)",
     "shop": "La <strong>Boutique</strong> : Dépensez vos pièces pour acheter des bonus puissants et uniques (comme révéler le rôle d'un joueur, se soigner, ou obtenir +2 dégâts sur une attaque). Une fois acheté, l'objet disparaît pour tout le monde !",
-    "playLink": "Lancer l'Application Compagnon"
+    "playLink": "Lancer l'Application Compagnon",
+    "onlineLink": "Jouer en ligne avec mes amis"
   },
   "cta": {
     "buy": "ACHETER",
@@ -344,12 +346,24 @@
     "preorderLink": "Préinscris-toi",
     "preorderNoteEnd": " pour être prévenu en premier.",
     "items": {
-      "reparations": { "name": "Réparations d'urgence" },
-      "poudre": { "name": "Poudre noire" },
-      "coffre": { "name": "Coffre de contrebande" },
-      "longue-vue": { "name": "Longue-vue du traître" },
-      "treve": { "name": "Drapeau de trêve" },
-      "revivre": { "name": "Revivre une fois" }
+      "reparations": {
+        "name": "Réparations d'urgence"
+      },
+      "poudre": {
+        "name": "Poudre noire"
+      },
+      "coffre": {
+        "name": "Coffre de contrebande"
+      },
+      "longue-vue": {
+        "name": "Longue-vue du traître"
+      },
+      "treve": {
+        "name": "Drapeau de trêve"
+      },
+      "revivre": {
+        "name": "Revivre une fois"
+      }
     }
   },
   "product": {
@@ -596,6 +610,150 @@
       "withdrawal": {
         "title": "5. Droit de rétractation",
         "content": "Conformément à la législation en vigueur, vous disposez d'un droit de rétractation de 14 jours à compter de la réception de vos produits."
+      }
+    }
+  },
+  "online": {
+    "title": "Partie en ligne",
+    "subtitle": "Un téléphone par joueur — sans cartes physiques.",
+    "loading": "Le navire appareille…",
+    "yourName": "Ton pseudo",
+    "namePlaceholder": "Capitaine Moustache",
+    "join": "Rejoindre un salon",
+    "joinBtn": "Rejoindre",
+    "create": "Créer un salon",
+    "createBtn": "Créer la partie",
+    "codeExplain": "Entre le code secret de ta boîte ChatBordage pour créer un salon. Tes amis, eux, n'ont pas besoin de code : ils rejoignent avec le code du salon.",
+    "tabletMode": "Mode tablette (cartes physiques)",
+    "howto": "Comment jouer",
+    "loading2": "…",
+    "lobbyTitle": "Salon d'attente",
+    "roomCode": "Code du salon",
+    "invite": "Inviter",
+    "copied": "Lien copié",
+    "host": "hôte",
+    "waitingPlayer": "En attente d'un joueur…",
+    "kick": "Exclure",
+    "chooseShip": "Choisis ton navire",
+    "random": "Au hasard",
+    "turnTimer": "Minuteur de tour",
+    "noTimer": "Sans minuteur",
+    "enableNotifs": "Activer les notifications",
+    "startGame": "Lever l'ancre !",
+    "needPlayers": "Il faut au moins {n} joueurs.",
+    "notAllReady": "Tout le monde doit être prêt.",
+    "imReady": "Je suis prêt",
+    "notReady": "Pas encore prêt",
+    "leave": "Quitter",
+    "you": "toi",
+    "captain": "Capitaine",
+    "opponents": "Adversaires",
+    "deck": "Pioche",
+    "discard": "Défausse",
+    "secret": "Infos secrètes",
+    "nextAttack": "sur ta prochaine attaque",
+    "reviveReady": "Revivre prêt",
+    "emptyHand": "Ta main est vide.",
+    "drawN": "Piocher {n} cartes",
+    "coinsN": "Prendre {n} pièces",
+    "pickCard": "Choisis une carte",
+    "play": "Jouer {name}",
+    "voileHint": "Une Voile se joue en réaction",
+    "shop": "Boutique",
+    "power": "Pouvoir",
+    "endTurn": "Fin du tour",
+    "noAttackTurn": "Repos au port : pas d'attaque ce tour.",
+    "corvetteHint": "L'esquive de la Corvette se déclenche quand tu es attaqué.",
+    "powerUsed": "Pouvoir déjà utilisé.",
+    "permanent": "Permanent",
+    "cancel": "Annuler",
+    "confirm": "Valider",
+    "confirmTargets": "Valider ({n}/{max})",
+    "noTarget": "Aucune cible disponible.",
+    "close": "Fermer",
+    "pickTarget": "Cible pour « {name} »",
+    "cotrePick": "Voler une carte à…",
+    "revealPick": "Espionner le rôle de…",
+    "sloopPick": "Carte à échanger avec la pioche",
+    "discardPick": "Défausse {n} carte(s) (limite de main)",
+    "shopHint": "Chaque article n'existe qu'une fois : le premier qui l'achète le retire pour tous.",
+    "aubaine": "Aubaine : −1 pièce",
+    "shopEmpty": "La boutique est vide.",
+    "logTitle": "Journal de bord",
+    "chatTitle": "Réaction rapide",
+    "chat": {
+      "traitor": "Traître !",
+      "gg": "Bien joué !",
+      "hurry": "Dépêche-toi !",
+      "innocent": "Je suis innocent !"
+    },
+    "roleSecret": "Garde-le secret… sauf si tu veux bluffer.",
+    "equipment": "Équipement",
+    "truce": "Drapeau de trêve : encore {n} tour(s)",
+    "noNotes": "Rien pour l'instant.",
+    "secretHint": "Ce que tu as découvert : toi seul le vois.",
+    "underAttack": "Tu es attaqué !",
+    "dodge": "Esquiver (Corvette)",
+    "takeHit": "Encaisser",
+    "scryTitle": "Jonque : la carte du dessus",
+    "scryKeep": "La garder dessus",
+    "scryBottom": "La mettre dessous",
+    "roleGateTitle": "Ton rôle secret",
+    "roleGateText": "Assure-toi que personne ne regarde ton écran, puis maintiens la carte pour la découvrir.",
+    "holdToSee": "Maintiens pour voir",
+    "understood": "C'est noté",
+    "victory": "Victoire !",
+    "defeat": "Défaite…",
+    "draw": "Match nul",
+    "winners": "Gagnant(s) : {names}",
+    "backToMenu": "Retour au menu",
+    "hint": {
+      "spectating": "Tu es éliminé : tu observes la fin de la partie.",
+      "reaction": "{who} attaque ! En attente des réactions…",
+      "scry": "Décide du sort de la carte.",
+      "waiting": "Tour de {name}…",
+      "resources": "Pioche ou prends des pièces.",
+      "action": "Joue tes cartes, puis termine ton tour. Une attaque met fin au tour !"
+    },
+    "next": "Suivant",
+    "letsGo": "À l'abordage !",
+    "family": {
+      "abordage": "Abordage",
+      "voile": "Voile",
+      "maree": "Marée",
+      "rumeur": "Rumeur",
+      "tresor": "Trésor"
+    },
+    "err": {
+      "network": "Connexion impossible. Vérifie ta connexion et réessaie.",
+      "auth_disabled": "Les connexions anonymes sont désactivées sur le serveur (Supabase > Authentication).",
+      "offline_unavailable": "Le mode en ligne n'est pas configuré sur ce site.",
+      "invalid_code": "Code invalide, moussaillon ! Regarde au fond de ta boîte de jeu."
+    },
+    "tuto": {
+      "goal": {
+        "title": "Le but du jeu",
+        "text": "Chaque joueur pilote un <strong>navire</strong> visible de tous et poursuit une <strong>mission secrète</strong>. Seul le <strong>Capitaine</strong> est connu de tous. Trouve qui est ton allié, qui est ton ennemi… ou bluffe !"
+      },
+      "turn": {
+        "title": "Ton tour",
+        "text": "1. Un <strong>événement de mer</strong> touche tout le monde.<br>2. Choisis : <strong>piocher 2 cartes</strong> ou <strong>prendre 2 pièces</strong> (main limitée à 5).<br>3. Joue autant de cartes que tu veux, utilise ton pouvoir de navire, fais des achats.<br>4. Termine ton tour."
+      },
+      "attack": {
+        "title": "Attaques et défenses",
+        "text": "Les cartes <strong>Abordage</strong> font des dégâts… et <strong>mettent fin à ton tour</strong> : joue-les en dernier ! La cible peut réagir avec une <strong>Voile</strong> (ou l'esquive de la Corvette) pendant quelques secondes. À 0 PV, on est éliminé : l'assaillant récupère ses cartes et ses pièces."
+      },
+      "roles": {
+        "title": "Les rôles secrets",
+        "text": "<strong>Capitaine</strong> + <strong>Protecteur</strong> : finir seuls ensemble.<br><strong>Chasseur de primes</strong> : couler 2 navires.<br><strong>Renégat</strong> : dernier survivant.<br><strong>Contrebandier</strong> : 15 pièces.<br>Ton rôle n'est visible que par toi (bouton 🎭)."
+      },
+      "shop": {
+        "title": "Boutique et infos secrètes",
+        "text": "Dépense tes pièces en boutique : chaque article est unique pour toute la partie. Les résultats d'espionnage (longue-vue, Murmure…) arrivent dans <strong>🔎 Infos secrètes</strong>, visibles de toi seul."
+      },
+      "tips": {
+        "title": "Bon à savoir",
+        "text": "⏳ Un minuteur évite les tours interminables. 💬 Utilise les <strong>réactions rapides</strong> pour bluffer ou accuser. Tu peux fermer l'onglet : reviens sur la page et tu retrouves ta partie."
       }
     }
   }
