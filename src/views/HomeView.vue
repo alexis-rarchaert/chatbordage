@@ -16,9 +16,9 @@
         </div>
       </div>
       <div class="hero-deck hero-animate-deck" aria-hidden="true">
-        <div class="card-mini card-mini-1">{{ $t('cards.card') }}</div>
-        <div class="card-mini card-mini-2">{{ $t('cards.card') }}</div>
-        <div class="card-mini card-mini-3">{{ $t('cards.card') }}</div>
+        <img src="/cartes/roles/Fichier 79@10x.png" :alt="$t('cardsPreview.roles.alt')" class="hero-card-img hero-card-1" />
+        <img src="/cartes/navires/Fichier 67@10x.png" :alt="$t('cardsPreview.navires.alt')" class="hero-card-img hero-card-2" />
+        <img src="/cartes/attaques/Fichier 88@10x.png" :alt="$t('cardsPreview.attaques.alt')" class="hero-card-img hero-card-3" />
       </div>
     </section>
 
@@ -132,6 +132,40 @@
       </div>
     </section>
 
+    <!-- ============ APERÇU DES CARTES ============ -->
+    <div class="section-banner">
+      <h2>{{ $t('sections.cards') }}</h2>
+    </div>
+    <section class="section-cards-preview">
+      <div class="container">
+        <p class="cards-preview-intro" v-reveal>{{ $t('cardsPreview.intro') }}</p>
+
+        <div class="cards-preview-grid">
+          <article
+            v-for="(group, idx) in cardGroups"
+            :key="group.key"
+            class="cards-preview-col"
+            v-reveal="'zoom'"
+            :style="{ transitionDelay: `${idx * 120}ms` }"
+          >
+            <h3 class="cards-preview-title">{{ $t(`cardsPreview.${group.key}.title`) }}</h3>
+            <div class="cards-fan">
+              <img
+                v-for="(src, i) in group.cards"
+                :key="src"
+                :src="src"
+                :alt="$t(`cardsPreview.${group.key}.alt`)"
+                class="fan-card"
+                :class="`fan-card-${i}`"
+                loading="lazy"
+              />
+            </div>
+            <p class="cards-preview-desc">{{ $t(`cardsPreview.${group.key}.desc`) }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ MÉCANIQUE IMPITOYABLE ============ -->
     <div class="section-banner">
       <h2>{{ $t('sections.mechanics') }}</h2>
@@ -213,6 +247,33 @@ import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 
 const { t } = useI18n()
+
+const cardGroups = [
+  {
+    key: 'roles',
+    cards: [
+      '/cartes/roles/Fichier 79@10x.png',
+      '/cartes/roles/Fichier 76@10x.png',
+      '/cartes/roles/Fichier 78@10x.png'
+    ]
+  },
+  {
+    key: 'navires',
+    cards: [
+      '/cartes/navires/Fichier 60@10x.png',
+      '/cartes/navires/Fichier 67@10x.png',
+      '/cartes/navires/Fichier 74@10x.png'
+    ]
+  },
+  {
+    key: 'attaques',
+    cards: [
+      '/cartes/attaques/Fichier 82@10x.png',
+      '/cartes/attaques/Fichier 88@10x.png',
+      '/cartes/attaques/Fichier 99@10x.png'
+    ]
+  }
+]
 
 const roles = [
   {
@@ -355,8 +416,27 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
   z-index: 1;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
 }
+
+/* ========= HERO REAL CARDS ========= */
+.hero-card-img {
+  height: clamp(180px, 22vw, 280px);
+  width: auto;
+  max-width: 36%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+}
+.hero-card-1 { transform: rotate(-10deg) translateY(8px); z-index: 1; }
+.hero-card-2 { transform: translateY(-8px) rotate(0deg); z-index: 3; margin: 0 -18px; }
+.hero-card-3 { transform: rotate(10deg) translateY(8px); z-index: 2; }
+.hero-deck:hover .hero-card-1 { transform: rotate(-14deg) translate(-8px, 4px); }
+.hero-deck:hover .hero-card-2 { transform: translateY(-22px) scale(1.06); z-index: 4; box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6); }
+.hero-deck:hover .hero-card-3 { transform: rotate(14deg) translate(8px, 4px); }
 
 /* ========= CARDS MINI ========= */
 .card-mini {
@@ -639,6 +719,93 @@ const prevShip = () => { shipIdx.value = (shipIdx.value - 1 + ships.length) % sh
 .concept-text :deep(strong) {
   color: var(--color-gold);
   font-weight: 600;
+}
+
+/* ========= CARTES PREVIEW ========= */
+.section-cards-preview {
+  padding: var(--section-py) 0;
+}
+.cards-preview-intro {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto clamp(40px, 5vw, 56px);
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text-light);
+}
+.cards-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(24px, 3vw, 48px);
+}
+.cards-preview-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.cards-preview-title {
+  font-family: var(--font-display);
+  color: var(--color-gold);
+  font-size: clamp(28px, 3vw, 34px);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 var(--color-burgundy-dark);
+  text-align: center;
+}
+.cards-fan {
+  position: relative;
+  width: 100%;
+  height: clamp(320px, 32vw, 400px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+}
+.fan-card {
+  position: absolute;
+  height: 92%;
+  width: auto;
+  max-width: 70%;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.35));
+}
+.fan-card-0 {
+  transform: translateX(-32%) rotate(-10deg);
+  z-index: 1;
+}
+.fan-card-1 {
+  transform: translateY(-12px) rotate(0deg);
+  z-index: 2;
+}
+.fan-card-2 {
+  transform: translateX(32%) rotate(10deg);
+  z-index: 1;
+}
+.cards-preview-col:hover .fan-card-0 {
+  transform: translateX(-48%) rotate(-16deg) translateY(-6px);
+}
+.cards-preview-col:hover .fan-card-1 {
+  transform: translateY(-26px) rotate(0deg) scale(1.05);
+  z-index: 3;
+  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6);
+}
+.cards-preview-col:hover .fan-card-2 {
+  transform: translateX(48%) rotate(16deg) translateY(-6px);
+}
+.cards-preview-desc {
+  text-align: center;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 320px;
+}
+
+@media (max-width: 900px) {
+  .cards-preview-grid { grid-template-columns: 1fr; gap: 56px; }
+  .cards-fan { height: 340px; }
 }
 
 /* ========= SHIPS ========= */
