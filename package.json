@@ -17,6 +17,7 @@
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^25.9.3",
     "@vitejs/plugin-vue": "^6.0.6",

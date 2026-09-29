@@ -280,6 +280,22 @@
       "hp": "HP",
       "coins": "Coins",
       "done": "OK"
+    },
+    "unlock": {
+      "title": "Restricted Access",
+      "desc": "The companion goes with the physical card game. Enter the secret code from your ChatBordage box to activate it (one code works on 3 devices).",
+      "placeholder": "e.g. A1B2-C3D4-E5F6-G7H8",
+      "submit": "Unlock",
+      "validating": "Checking...",
+      "cancel": "Back to Home",
+      "playOnline": "No box? Play online (free)",
+      "err": {
+        "invalid_code": "Invalid code, matey! Look closely at the bottom of your game box.",
+        "code_used_up": "This code has already been used on 3 devices. If the box is second-hand, contact us.",
+        "too_many_attempts": "Too many attempts. Wait fifteen minutes before trying again.",
+        "network": "Can't connect. Check your network and try again.",
+        "auth_disabled": "The server doesn't accept anonymous sign-ins yet (Supabase > Authentication)."
+      }
     }
   },
   "rulesPage": {

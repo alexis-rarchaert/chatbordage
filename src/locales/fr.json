@@ -280,6 +280,22 @@
       "hp": "PV",
       "coins": "Pièces",
       "done": "OK"
+    },
+    "unlock": {
+      "title": "Accès Réservé",
+      "desc": "Le compagnon accompagne le jeu de cartes physique. Entrez le code secret de votre boîte ChatBordage pour l'activer (un code fonctionne sur 3 appareils).",
+      "placeholder": "Ex: A1B2-C3D4-E5F6-G7H8",
+      "submit": "Débloquer",
+      "validating": "Vérification...",
+      "cancel": "Retour à l'accueil",
+      "playOnline": "Pas de boîte ? Jouer en ligne (gratuit)",
+      "err": {
+        "invalid_code": "Code invalide, moussaillon ! Regardez bien au fond de votre boîte de jeu.",
+        "code_used_up": "Ce code a déjà été utilisé sur 3 appareils. Si la boîte est d'occasion, contactez-nous.",
+        "too_many_attempts": "Trop d'essais. Patientez un quart d'heure avant de réessayer.",
+        "network": "Connexion impossible. Vérifiez votre réseau et réessayez.",
+        "auth_disabled": "Le serveur n'accepte pas encore les connexions anonymes (Supabase > Authentication)."
+      }
     }
   },
   "rulesPage": {

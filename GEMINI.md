@@ -278,3 +278,6 @@ Deux façons de jouer (septembre 2026)
   pouvoirs de navire et victoire. Elle ne connaît pas les cartes : elle demande le résultat (dégâts, défense de la cible).
 • Le compagnon partage avec le jeu en ligne le moteur de règles (événements, rôles, PV des navires, conditions de
   victoire) ; il ajoute un panneau « Ajuster PV et pièces » pour les effets des cartes physiques (Rhum, Cale, Coffre…).
+• Accès : le mode en ligne est gratuit et sans code. Le compagnon exige le code unique de la boîte (3 appareils par
+  code, vérifié côté serveur). Revente d'une boîte : le code reste valable tant qu'il lui reste des places ; sinon,
+  réinitialisation manuelle par le support (voir README).
