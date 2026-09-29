@@ -107,11 +107,11 @@ test('attaque : la cible peut bloquer avec une Voile, le tour passe ensuite', ()
   const t = s.players.find(p => p.id !== a.id)!
   a.hand = [CARDS.find(c => c.name === 'Coup de sabre')!]
   t.hand = [CARDS.find(c => c.name === 'Voile rapide')!]
-  applyAction(s, a.id, { type: 'coins' })
+  applyAction(s, a.id, { type: 'coins' }, { rand, now: 0 })
   const hp = t.hp
-  assert.ok(applyAction(s, a.id, { type: 'play', cardId: a.hand[0]!.id, targetId: t.id }).ok)
+  assert.ok(applyAction(s, a.id, { type: 'play', cardId: a.hand[0]!.id, targetId: t.id }, { rand, now: 0 }).ok)
   assert.equal(s.phase, 'reaction')
-  assert.ok(applyAction(s, t.id, { type: 'react', defenseCardId: t.hand[0]!.id }).ok)
+  assert.ok(applyAction(s, t.id, { type: 'react', defenseCardId: t.hand[0]!.id }, { rand, now: 0 }).ok)
   assert.equal(t.hp, hp)
   assert.notEqual(currentPlayer(s)!.id, a.id, 'le tour doit passer')
 })
@@ -124,9 +124,9 @@ test('attaque sans réaction possible : résolue immédiatement', () => {
   const t = s.players.find(p => p.id !== a.id)!
   a.hand = [CARDS.find(c => c.name === 'Tir de canon')!]
   t.hand = []
-  applyAction(s, a.id, { type: 'coins' })
+  applyAction(s, a.id, { type: 'coins' }, { rand, now: 0 })
   const hp = t.hp
-  applyAction(s, a.id, { type: 'play', cardId: a.hand[0]!.id, targetId: t.id })
+  applyAction(s, a.id, { type: 'play', cardId: a.hand[0]!.id, targetId: t.id }, { rand, now: 0 })
   assert.ok(t.hp < hp)
   assert.notEqual(s.phase, 'reaction')
 })
@@ -200,8 +200,8 @@ test('abandon du joueur actif pendant une réaction ne bloque pas la partie', ()
   const t = s.players.find(p => p.id !== a.id)!
   a.hand = [CARDS.find(c => c.name === 'Coup de sabre')!]
   t.hand = [CARDS.find(c => c.name === 'Voile rapide')!]
-  applyAction(s, a.id, { type: 'coins' })
-  applyAction(s, a.id, { type: 'play', cardId: a.hand[0]!.id, targetId: t.id })
+  applyAction(s, a.id, { type: 'coins' }, { rand, now: 0 })
+  applyAction(s, a.id, { type: 'play', cardId: a.hand[0]!.id, targetId: t.id }, { rand, now: 0 })
   forfeit(s, a.id)
   advance(s, { rand, now: 0 })
   assert.notEqual(s.phase, 'reaction')
