@@ -92,11 +92,12 @@
     }
   },
   "digital": {
-    "app": "The <strong>central app</strong> manages randomness and secrets for a smooth experience",
-    "events": "Sea Events: Each turn, a <strong>random</strong> event applies to all (storm, fog, treasure island)",
+    "app": "The <strong>companion app</strong> goes with your physical cards: it handles secret roles, events and the shop.",
+    "events": "Sea events: each turn a <strong>random</strong> event affects everyone (storm, fog, Kraken, bargain…)",
     "shop": "The <strong>Shop</strong>: Spend your coins to buy powerful and unique bonuses (like revealing a player's role, healing, or getting +2 damage on an attack). Once bought, the item disappears for everyone!",
     "playLink": "Launch Companion App",
-    "onlineLink": "Play online with friends"
+    "onlineLink": "Play online with friends",
+    "onlineNote": "No game box? Play <strong>100% online</strong> with your friends, each on their own phone: the whole game is in the app, for free."
   },
   "cta": {
     "buy": "BUY",
@@ -132,7 +133,9 @@
       "chooseCat": "Choose Captain",
       "start": "START GAME",
       "youArePlayer": "You are player {num}",
-      "alreadyTaken": "Already taken!"
+      "alreadyTaken": "Already taken!",
+      "companionNote": "The companion goes with the physical card game: you play your cards, the app handles secret roles, events, the shop, HP and coins.",
+      "noBox": "No box? Play 100% online."
     },
     "roulette": {
       "title": "Designation of the Captain",
@@ -152,7 +155,7 @@
       "confirm": "Confirm",
       "activePlayer": "Player's Turn",
       "shipPower": "Ship Power",
-      "howManyHp": "How many HP to remove?",
+      "howManyHp": "Card damage?",
       "cancel": "Cancel",
       "useSpyglass": "Spyglass",
       "selectSpyglassTarget": "Choose a target to spy on!"
@@ -222,14 +225,61 @@
       "spyglass": {
         "title": "Traitor's Spyglass",
         "message": "{name}'s secret role is: {role}"
-      }
+      },
+      "caravelle": {
+        "title": "Caravel",
+        "message": "Draw 1 extra free card, whichever you chose."
+      },
+      "clipper": {
+        "title": "Clipper",
+        "message": "You didn't attack: +1 bonus coin!"
+      },
+      "kraken": {
+        "title": "The Kraken!",
+        "message": "{name} takes 2 damage for attacking."
+      },
+      "eliminated": {
+        "title": "Ship sunk!",
+        "message": "{name} is eliminated — they were {role}.",
+        "loot": "{taker} takes their hand and coins; their equipment goes to the discard pile.",
+        "discard": "Their cards and equipment go to the discard pile."
+      },
+      "ghostShield": "{name}'s Ghost Ship scrambles the spyglass: their role stays secret."
     },
     "victory": {
       "renegat": "Renegade — last survivor.",
       "capitaine": "Captain — last standing.",
       "contrebandier": "Smuggler — 15 coins accumulated.",
       "chasseur": "Bounty hunter — 2 ships sunk.",
-      "duo": "Captain — survives the final duel (with the Protector if alive)."
+      "duo": "Captain — survives the final duel (with the Protector if alive).",
+      "last": "Last survivor."
+    },
+    "attack": {
+      "hint": "Enter the card's damage (including equipment bonuses like the Standard). The app adds what comes from the ship, the event and powers.",
+      "mode": {
+        "single": "One target",
+        "two": "Volley (2)",
+        "all": "Grapeshot (all)"
+      },
+      "pierce": "Ignores Sails",
+      "hintShort": "equipment bonuses included"
+    },
+    "defense": {
+      "title": "{name}, do you defend?",
+      "desc": "{attacker} attacks you: {dmg} damage. Play a Sail card from your hand… or take the hit.",
+      "none": "No defense",
+      "block": "Quick sail (cancels)",
+      "reflect": "Cat dodge (cancels + 1 damage)",
+      "reduce": "Fog cape (−2 damage)",
+      "dodge": "Corvette: dodge (1×/game)",
+      "pierceNote": "Claw strike: Sails have no effect."
+    },
+    "edit": {
+      "open": "Adjust HP and coins",
+      "desc": "Did a physical card change something (Rum, Hold, Treasure chest, equipment…)? Fix it here.",
+      "hp": "HP",
+      "coins": "Coins",
+      "done": "OK"
     }
   },
   "rulesPage": {
@@ -495,21 +545,45 @@
     }
   },
   "events": {
+    "calme": {
+      "name": "Calm seas",
+      "desc": "A quiet day at sea. No special effect."
+    },
     "tempete": {
       "name": "Storm!",
-      "desc": "The sea goes wild. Attacks inflict +1 Damage this turn."
+      "desc": "The sea rages: every player loses 1 HP (never below 1). The app already applied it."
     },
     "brume": {
       "name": "Thick fog",
-      "desc": "Impossible to aim straight. Attacks have a 50% chance of failing this turn."
+      "desc": "Hard to aim: attacks deal 1 less damage this turn (minimum 1). The app calculates it."
     },
     "tresor": {
       "name": "Treasure island",
-      "desc": "An island full of riches! Each player draws 1 additional card this turn."
+      "desc": "Every player gains 1 coin! The app already added it."
     },
-    "calme": {
-      "name": "Calm sea",
-      "desc": "A calm day at sea. No special effects."
+    "vents": {
+      "name": "Fair winds",
+      "desc": "The active player draws 1 extra card if they choose to draw."
+    },
+    "sirenes": {
+      "name": "Siren song",
+      "desc": "Everyone reveals or discards 1 card from their hand (their choice), out loud."
+    },
+    "mutinerie": {
+      "name": "Mutiny",
+      "desc": "The active player must give 1 card from their hand to the neighbour on their left."
+    },
+    "reflux": {
+      "name": "Ebb tide",
+      "desc": "Everyone heals 1 HP. The app already applied it."
+    },
+    "kraken": {
+      "name": "The Kraken passes",
+      "desc": "The active player takes 2 damage if they play an Attack card this turn. The app handles it."
+    },
+    "aubaine": {
+      "name": "Bargain",
+      "desc": "Shop prices are reduced by 1 coin this turn (minimum 1). The app applies it."
     }
   },
   "products": {

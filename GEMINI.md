@@ -269,3 +269,12 @@ Salons
 • Minuteur de tour (90 s par défaut, réglable ou désactivable). 3 tours ratés d'affilée = le joueur est retiré.
 • Spectateurs : on rejoint une partie en cours en regardant (information publique seulement) ; chat libre pour tous.
 • Revanche : après la fin, un joueur relance le salon avec les mêmes joueurs et navires.
+
+Deux façons de jouer (septembre 2026)
+• En ligne (/online) : le jeu COMPLET, sans boîte ni cartes physiques, un téléphone par joueur, gratuit et ouvert à tous.
+• Compagnon (/game) : COMPLÉMENT du jeu de cartes physique (section 9). Les joueurs gardent leurs cartes en main ;
+  l'appli gère ce qui doit rester caché, aléatoire ou centralisé : rôles secrets, événements de mer (un à chaque tour,
+  les mêmes 10 que le jeu en ligne), boutique (articles uniques, remise « Aubaine »), PV, pièces, éliminations,
+  pouvoirs de navire et victoire. Elle ne connaît pas les cartes : elle demande le résultat (dégâts, défense de la cible).
+• Le compagnon partage avec le jeu en ligne le moteur de règles (événements, rôles, PV des navires, conditions de
+  victoire) ; il ajoute un panneau « Ajuster PV et pièces » pour les effets des cartes physiques (Rhum, Cale, Coffre…).

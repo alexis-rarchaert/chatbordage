@@ -291,3 +291,10 @@
   .footer-links { flex-direction: row; gap: 3rem; margin-top: 1rem; }
   .footer-links a { font-size: 1.1rem; }
 }
+.digital-note {
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--color-turquoise);
+  background: rgba(58, 170, 176, 0.12);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}

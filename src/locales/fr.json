@@ -92,11 +92,12 @@
     }
   },
   "digital": {
-    "app": "L'<strong>application centrale</strong> gère l'aléatoire et les secrets pour une expérience fluide",
-    "events": "Événements de mer : À chaque tour, un événement <strong>aléatoire</strong> s'applique à tous (tempête, brume, île au trésor)",
+    "app": "L'<strong>application compagnon</strong> accompagne vos cartes physiques : elle gère les rôles secrets, les événements et la boutique.",
+    "events": "Événements de mer : à chaque tour, un événement <strong>aléatoire</strong> s'applique à tous (tempête, brume, Kraken, aubaine…)",
     "shop": "La <strong>Boutique</strong> : Dépensez vos pièces pour acheter des bonus puissants et uniques (comme révéler le rôle d'un joueur, se soigner, ou obtenir +2 dégâts sur une attaque). Une fois acheté, l'objet disparaît pour tout le monde !",
     "playLink": "Lancer l'Application Compagnon",
-    "onlineLink": "Jouer en ligne avec mes amis"
+    "onlineLink": "Jouer en ligne avec mes amis",
+    "onlineNote": "Pas de boîte de jeu ? Jouez <strong>100 % en ligne</strong> avec vos amis, chacun sur son téléphone : tout le jeu est dans l'appli, gratuitement."
   },
   "cta": {
     "buy": "ACHETER",
@@ -132,7 +133,9 @@
       "chooseCat": "Choisir le Capitaine",
       "start": "LANCER LA PARTIE",
       "youArePlayer": "Vous êtes le joueur {num}",
-      "alreadyTaken": "Déjà pris !"
+      "alreadyTaken": "Déjà pris !",
+      "companionNote": "Le compagnon accompagne le jeu de cartes physique : vous jouez vos cartes, l'appli gère les rôles secrets, les événements, la boutique, les PV et les pièces.",
+      "noBox": "Pas de boîte ? Jouez 100 % en ligne."
     },
     "roulette": {
       "title": "Désignation du Capitaine",
@@ -152,7 +155,7 @@
       "confirm": "Confirmer",
       "activePlayer": "Tour du Joueur",
       "shipPower": "Pouvoir Navire",
-      "howManyHp": "Combien de PV retirer ?",
+      "howManyHp": "Dégâts de la carte ?",
       "cancel": "Annuler",
       "useSpyglass": "Longue-vue",
       "selectSpyglassTarget": "Choisis une cible à espionner !"
@@ -222,14 +225,61 @@
       "spyglass": {
         "title": "Longue-vue du Traître",
         "message": "Le rôle secret de {name} est : {role}"
-      }
+      },
+      "caravelle": {
+        "title": "Caravelle",
+        "message": "Pioche 1 carte gratuite en plus, quel que soit ton choix."
+      },
+      "clipper": {
+        "title": "Clipper",
+        "message": "Tu n'as pas attaqué : +1 pièce de bonus !"
+      },
+      "kraken": {
+        "title": "Le Kraken !",
+        "message": "{name} subit 2 dégâts pour avoir attaqué."
+      },
+      "eliminated": {
+        "title": "Navire coulé !",
+        "message": "{name} est éliminé — il était {role}.",
+        "loot": "{taker} récupère ses cartes en main et ses pièces ; ses équipements vont à la défausse.",
+        "discard": "Ses cartes et ses équipements vont à la défausse."
+      },
+      "ghostShield": "Le Vaisseau Fantôme de {name} brouille la longue-vue : son rôle reste secret."
     },
     "victory": {
       "renegat": "Renégat — dernier survivant.",
       "capitaine": "Capitaine — dernier debout.",
       "contrebandier": "Contrebandier — 15 pièces accumulées.",
       "chasseur": "Chasseur de primes — 2 navires coulés.",
-      "duo": "Capitaine — survit au duel final (avec son Protecteur s'il est en vie)."
+      "duo": "Capitaine — survit au duel final (avec son Protecteur s'il est en vie).",
+      "last": "Dernier survivant."
+    },
+    "attack": {
+      "hint": "Saisis les dégâts de la carte (avec les bonus d'équipement, comme l'Étendard). L'appli ajoute ce qui vient du navire, de l'événement et des pouvoirs.",
+      "mode": {
+        "single": "Une cible",
+        "two": "Tir groupé (2)",
+        "all": "Mitraille (tous)"
+      },
+      "pierce": "Ignore les Voiles",
+      "hintShort": "bonus d'équipement inclus"
+    },
+    "defense": {
+      "title": "{name}, tu te défends ?",
+      "desc": "{attacker} t'attaque : {dmg} dégât(s). Joue une carte Voile de ta main… ou encaisse.",
+      "none": "Aucune défense",
+      "block": "Voile rapide (annule)",
+      "reflect": "Esquive féline (annule + 1 dégât)",
+      "reduce": "Cape de brume (−2 dégâts)",
+      "dodge": "Corvette : esquive (1×/partie)",
+      "pierceNote": "Coup de griffe : les Voiles sont sans effet."
+    },
+    "edit": {
+      "open": "Ajuster PV et pièces",
+      "desc": "Une carte physique a changé quelque chose (Rhum, Cale, Coffre au trésor, équipement…) ? Corrige ici.",
+      "hp": "PV",
+      "coins": "Pièces",
+      "done": "OK"
     }
   },
   "rulesPage": {
@@ -495,21 +545,45 @@
     }
   },
   "events": {
-    "tempete": {
-      "name": "Tempête !",
-      "desc": "La mer se déchaîne. Les attaques infligent +1 Dégât ce tour-ci."
-    },
-    "brume": {
-      "name": "Brume épaisse",
-      "desc": "Impossible de viser juste. Les attaques ont 50% de chances d'échouer ce tour-ci."
-    },
-    "tresor": {
-      "name": "Île au trésor",
-      "desc": "Une île regorgeant de richesses ! Chaque joueur pioche 1 carte supplémentaire ce tour-ci."
-    },
     "calme": {
       "name": "Mer d'huile",
       "desc": "Une journée calme en mer. Aucun effet particulier."
+    },
+    "tempete": {
+      "name": "Tempête !",
+      "desc": "La mer se déchaîne : chaque joueur perd 1 PV (jamais en dessous de 1). L'appli l'a déjà appliqué."
+    },
+    "brume": {
+      "name": "Brume épaisse",
+      "desc": "Impossible de viser juste : les attaques infligent 1 dégât de moins ce tour-ci (minimum 1). L'appli le calcule."
+    },
+    "tresor": {
+      "name": "Île au trésor",
+      "desc": "Chaque joueur gagne 1 pièce ! L'appli l'a déjà ajoutée."
+    },
+    "vents": {
+      "name": "Vents favorables",
+      "desc": "Le joueur actif pioche 1 carte supplémentaire s'il choisit de piocher."
+    },
+    "sirenes": {
+      "name": "Chant des sirènes",
+      "desc": "Tout le monde révèle ou défausse 1 carte de sa main (au choix), à voix haute."
+    },
+    "mutinerie": {
+      "name": "Mutinerie",
+      "desc": "Le joueur actif doit donner 1 carte de sa main à son voisin de gauche."
+    },
+    "reflux": {
+      "name": "Reflux",
+      "desc": "Tout le monde se soigne de 1 PV. L'appli l'a déjà appliqué."
+    },
+    "kraken": {
+      "name": "Le Kraken passe",
+      "desc": "Le joueur actif subit 2 dégâts s'il joue une carte Attaque ce tour. L'appli s'en charge."
+    },
+    "aubaine": {
+      "name": "Aubaine",
+      "desc": "Les prix de la boutique sont réduits de 1 pièce ce tour (minimum 1). L'appli l'applique."
     }
   },
   "products": {

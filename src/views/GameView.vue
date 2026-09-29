@@ -6,12 +6,13 @@
         <!-- Titres dupliqués pour les deux côtés de la table -->
         <div class="lobby-titles">
           <h1 class="lobby-title title-top">{{ $t('game.lobby.title') }}</h1>
+          <p class="companion-note">{{ $t('game.lobby.companionNote') }} <RouterLink to="/online">{{ $t('game.lobby.noBox') }}</RouterLink></p>
           
           <!-- SÉLECTEUR DE NOMBRE DE JOUEURS -->
           <div v-if="!allReady" class="player-count-selector">
             <span class="count-label">{{ $t('game.lobby.playerCount') }}</span>
             <div class="count-controls">
-              <button @click="playerCount = Math.max(2, playerCount - 1)" :disabled="playerCount <= 2">-</button>
+              <button @click="playerCount = Math.max(4, playerCount - 1)" :disabled="playerCount <= 4">-</button>
               <span class="count-value">{{ playerCount }}</span>
               <button @click="playerCount = Math.min(6, playerCount + 1)" :disabled="playerCount >= 6">+</button>
             </div>
@@ -129,7 +130,7 @@
         <div class="pair-container">
           <div class="avatar-box">
             <div v-if="currentTurn === index && player.hp > 0" class="turn-actions-floating">
-              <button class="action-button finish-turn-btn" @click.stop="nextTurn">
+              <button class="action-button finish-turn-btn" @click.stop="finishTurn">
                 {{ $t('game.turn.finish') }}
               </button>
               <button class="action-button attack-btn" @click.stop="initiateAttack">
@@ -143,7 +144,7 @@
                 {{ $t('game.turn.useSpyglass') }}
               </button>
               <button
-                v-if="allBoats[player.boatIndex].type === 'actif' && !player.abilityUsed"
+                v-if="allBoats[player.boatIndex].type === 'actif' && allBoats[player.boatIndex].abilityId !== 'corvette' && !player.abilityUsed"
                 class="action-button ability-btn"
                 :title="$t('ships.' + allBoats[player.boatIndex].abilityId + '.ability')"
                 @click.stop="useBoatAbility(index)"
@@ -157,6 +158,7 @@
 
             <div v-if="isAttacking && currentTurn === index" class="attack-prompt">
               {{ $t('game.turn.selectTarget') }} (-{{ selectedDamage }})
+              <span v-if="wantedTargets > 1"> {{ selectedTargets.length }}/{{ wantedTargets }}</span>
             </div>
 
             <div v-if="isRevealingRole && currentTurn === index" class="attack-prompt">
@@ -165,12 +167,21 @@
 
             <div v-if="showDamageModal && currentTurn === index" class="damage-modal" @click.stop>
               <div class="damage-modal-content">
-                <div class="damage-modal-title">{{ $t('game.turn.howManyHp') }}</div>
+                <div class="damage-modal-title" :title="$t('game.attack.hint')">{{ $t('game.turn.howManyHp') }}<small class="damage-sub">{{ $t('game.attack.hintShort') }}</small></div>
+
                 <div class="damage-input-row">
                   <button class="damage-step minus" @click.stop="decreaseDamage">-</button>
                   <input type="number" min="1" v-model="damageInput" class="damage-input" />
                   <button class="damage-step plus" @click.stop="increaseDamage">+</button>
                 </div>
+                <div class="attack-modes">
+                  <button v-for="m in ['single', 'two', 'all']" :key="m" class="mode-btn" :class="{ on: attackMode === m }" @click.stop="attackMode = m">
+                    {{ $t('game.attack.mode.' + m) }}
+                  </button>
+                </div>
+                <label class="pierce-row" @click.stop>
+                  <input type="checkbox" v-model="attackPierce" /> {{ $t('game.attack.pierce') }}
+                </label>
                 <div class="damage-modal-actions">
                   <button class="action-button attack-confirm" @click.stop="confirmDamage">{{ $t('game.turn.attack') }}</button>
                   <button class="action-button cancel-button" @click.stop="cancelDamage">{{ $t('game.turn.cancel') }}</button>
@@ -184,7 +195,7 @@
             <div v-if="currentTurn === index" class="turn-badge">{{ $t('game.turn.yourTurn') }}</div>
           </div>
           
-          <div class="player-stats">
+          <div class="player-stats" :title="$t('game.edit.open')" @click.stop="openEdit(index)">
             <div class="stat-item hp">
               <span class="stat-icon">❤️</span>
               <span class="stat-value">{{ player.hp }}</span>
@@ -268,13 +279,13 @@
               v-for="item in availableShopItems" 
               :key="item.id" 
               class="shop-item"
-              :class="{ 'disabled': players[currentTurn].gold < item.price }"
+              :class="{ 'disabled': players[currentTurn].gold < priceOf(item) }"
               @click="buyItem(item)"
             >
               <div class="item-icon">{{ item.icon }}</div>
               <div class="item-info">
                 <span class="item-label">{{ $t('shop.items.' + item.id + '.name') }}</span>
-                <span class="item-price">{{ item.price }} <img src="/coin.png" class="price-coin" /></span>
+                <span class="item-price">{{ priceOf(item) }} <img src="/coin.png" class="price-coin" /></span>
               </div>
             </div>
             <div v-if="availableShopItems.length === 0" class="empty-shop">
@@ -283,6 +294,47 @@
           </div>
         </div>
       </div>
+      <!-- --- MODALE DÉFENSE : la cible répond avec ses cartes physiques --- -->
+      <div v-if="defenseIdx !== null && attackRun" class="resource-overlay">
+        <div class="resource-content defense-content">
+          <h2 class="resource-title">🛡 {{ $t('game.defense.title', { name: allCats[players[defenseIdx].catIndex].name }) }}</h2>
+          <p class="resource-desc">
+            {{ $t('game.defense.desc', { attacker: allCats[players[attackRun.attackerIdx].catIndex].name, dmg: finalDamage(attackRun.attackerIdx, defenseIdx, attackRun.base) }) }}
+          </p>
+          <div class="defense-actions">
+            <button class="resource-button" @click="applyHit(defenseIdx, 'none')">💥 {{ $t('game.defense.none') }}</button>
+            <template v-if="!attackRun.pierce">
+              <button class="resource-button" @click="applyHit(defenseIdx, 'block')">⛵ {{ $t('game.defense.block') }}</button>
+              <button class="resource-button" @click="applyHit(defenseIdx, 'reflect')">🐈 {{ $t('game.defense.reflect') }}</button>
+              <button class="resource-button" @click="applyHit(defenseIdx, 'reduce')">🌫️ {{ $t('game.defense.reduce') }}</button>
+            </template>
+            <button v-if="canDodge(players[defenseIdx])" class="resource-button" @click="applyHit(defenseIdx, 'dodge')">🚢 {{ $t('game.defense.dodge') }}</button>
+          </div>
+          <p v-if="attackRun.pierce" class="damage-hint">{{ $t('game.defense.pierceNote') }}</p>
+        </div>
+      </div>
+
+      <!-- --- MODALE AJUSTEMENT MANUEL (PV / pièces) --- -->
+      <div v-if="editIdx !== null" class="resource-overlay" @click.self="closeEdit">
+        <div class="resource-content edit-content">
+          <h2 class="resource-title">{{ allCats[players[editIdx].catIndex].name }} — {{ $t('ships.' + allBoats[players[editIdx].boatIndex].abilityId + '.name') }}</h2>
+          <p class="resource-desc">{{ $t('game.edit.desc') }}</p>
+          <div class="edit-row">
+            <span>❤️ {{ $t('game.edit.hp') }}</span>
+            <button class="damage-step minus" @click="adjustHp(-1)">-</button>
+            <b class="edit-val">{{ players[editIdx].hp }}</b>
+            <button class="damage-step plus" @click="adjustHp(1)">+</button>
+          </div>
+          <div class="edit-row">
+            <span><img src="/coin.png" class="coin-img-icon" /> {{ $t('game.edit.coins') }}</span>
+            <button class="damage-step minus" @click="adjustGold(-1)">-</button>
+            <b class="edit-val">{{ players[editIdx].gold }}</b>
+            <button class="damage-step plus" @click="adjustGold(1)">+</button>
+          </div>
+          <button class="resource-button" @click="closeEdit">{{ $t('game.edit.done') }}</button>
+        </div>
+      </div>
+
       <!-- --- MODALE FIN DE PARTIE --- -->
       <div v-if="isGameOver" class="end-overlay">
         <div class="end-content">
@@ -333,7 +385,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { SHOP_ITEMS as GAME_SHOP_ITEMS } from '../game';
+import { SHOP_ITEMS as GAME_SHOP_ITEMS, SEA_EVENTS, SHIPS, assignRoles, checkVictory as sharedCheckVictory } from '../game';
 
 const { t } = useI18n();
 
@@ -419,23 +471,33 @@ const nextRoleReveal = () => {
       roleRevealStep.value = 'pass';
       playUiTap();
     } else {
-      // Tous les joueurs ont vu leur rôle → premier tour, pas d'événement
+      // Tous les joueurs ont vu leur rôle → premier tour, avec son événement de mer
       showRoleReveal.value = false;
-      showResourcePhase.value = true;
+      startRound();
     }
   }
 };
 
-const seaEvents = [
-  { id: 'tempete', name: 'Tempête !', desc: 'La mer se déchaîne. Les attaques infligent +1 Dégât ce tour-ci.', icon: '🌪️' },
-  { id: 'brume', name: 'Brume épaisse', desc: 'Impossible de viser juste. Les attaques ont 50% de chances d\'échouer ce tour-ci.', icon: '🌫️' },
-  { id: 'tresor', name: 'Île au trésor', desc: 'Une île regorgeant de richesses ! Chaque joueur pioche 1 carte supplémentaire ce tour-ci.', icon: '🏝️' },
-  { id: 'calme', name: 'Mer d\'huile', desc: 'Une journée calme en mer. Aucun effet particulier.', icon: '☀️' }
-];
+const EVENT_ICONS = {
+  calme: '☀️', tempete: '🌪️', brume: '🌫️', tresor: '🏝️', vents: '💨',
+  sirenes: '🧜', mutinerie: '🏴‍☠️', reflux: '🌊', kraken: '🐙', aubaine: '🏷️'
+};
 
+// Effets que l'appli applique elle-même (PV, pièces) ; les autres sont des rappels pour la table.
+const applyEventEffects = (ev) => {
+  players.value.forEach(p => {
+    if (p.hp <= 0) return;
+    if (ev.id === 'tempete' && p.hp > 1) p.hp -= 1;
+    if (ev.id === 'tresor') p.gold += 1;
+    if (ev.id === 'reflux') p.hp = Math.min(p.maxHp ?? p.hp + 1, p.hp + 1);
+  });
+};
+
+// Un événement de mer est tiré à CHAQUE tour (document de conception, section 3).
 const startRound = () => {
-  const randomEvent = seaEvents[Math.floor(Math.random() * seaEvents.length)];
-  currentEvent.value = randomEvent;
+  const ev = SEA_EVENTS[Math.floor(Math.random() * SEA_EVENTS.length)];
+  currentEvent.value = { id: ev.id, icon: EVENT_ICONS[ev.id] ?? '🌊' };
+  applyEventEffects(ev);
   // Garantir qu'on repasse par event → ressources même si flags traînaient
   showShop.value = false;
   showResourcePhase.value = false;
@@ -444,6 +506,7 @@ const startRound = () => {
   cardBeingPlayed.value = null;
   showEventPhase.value = true;
   playRevealSound();
+  evaluateVictory();
 };
 
 const isAttacking = ref(false);
@@ -460,34 +523,20 @@ const acknowledgeEvent = () => {
 const isGameOver = ref(false);
 const winner = ref(null);
 
+// Mêmes règles que le jeu en ligne (moteur partagé) : on lui présente les joueurs sous sa forme habituelle.
 const checkVictory = () => {
-  const alive = players.value.filter(p => p.hp > 0);
-
-  // Contrebandier : 15 pièces atteintes
-  for (const p of players.value) {
-    if (p.roleId === 'contrebandier' && p.gold >= 15) {
-      return { winners: [p], reasonKey: 'contrebandier' };
-    }
-  }
-  // Chasseur de primes : 2 éliminations
-  for (const p of players.value) {
-    if (p.roleId === 'chasseur' && (p.eliminations || 0) >= 2) {
-      return { winners: [p], reasonKey: 'chasseur' };
-    }
-  }
-  // Capitaine + Protecteur : seuls survivants
-  if (alive.length === 2) {
-    const cap = alive.find(p => p.roleId === 'capitaine');
-    const prot = alive.find(p => p.roleId === 'protecteur');
-    if (cap && prot) return { winners: [cap, prot], reasonKey: 'duo' };
-  }
-  // Renégat / Capitaine seul
-  if (alive.length === 1) {
-    const last = alive[0];
-    if (last.roleId === 'renegat') return { winners: [last], reasonKey: 'renegat' };
-    if (last.roleId === 'capitaine') return { winners: [last], reasonKey: 'capitaine' };
-  }
-  return null;
+  const view = {
+    players: players.value.map((p, i) => ({
+      id: String(i), name: allCats[p.catIndex].name, roleId: p.roleId,
+      isAlive: p.hp > 0, coins: p.gold, eliminationsCount: p.eliminations || 0
+    }))
+  };
+  const v = sharedCheckVictory(view);
+  if (!v) return null;
+  const winners = v.winners.map(w => players.value[Number(w.id)]);
+  const reasonKey = winners.length > 1 ? 'duo'
+    : ['contrebandier', 'chasseur', 'capitaine', 'renegat'].includes(winners[0].roleId) ? winners[0].roleId : 'last';
+  return { winners, reasonKey };
 };
 
 const victoryReason = ref('');
@@ -529,6 +578,10 @@ const restartGame = () => {
   isAttacking.value = false;
   isRevealingRole.value = false;
   showDamageModal.value = false;
+  attackRun.value = null;
+  defenseIdx.value = null;
+  editIdx.value = null;
+  selectedTargets.value = [];
 
   currentTurn.value = 0;
   currentRound.value = 1;
@@ -537,6 +590,7 @@ const restartGame = () => {
   // Reset des players (sans toucher au navire/chat)
   players.value.forEach(p => {
     p.hp = getBaseHp(p.boatIndex);
+    p.maxHp = p.hp;
     p.gold = 0;
     p.ready = false;
     p.roleId = null;
@@ -572,14 +626,13 @@ const nextTurn = () => {
     next = (next + 1) % total;
   }
 
-  // Détecte si on reboucle vers le début (fin du tour du dernier joueur)
-  const isEndOfRound = next <= currentTurn.value;
-  if (isEndOfRound) currentRound.value += 1;
+  // Compte les tours de table (le premier joueur revient)
+  if (next <= currentTurn.value) currentRound.value += 1;
   currentTurn.value = next;
 
   // Reset des pouvoirs actifs 1x/tour pour le joueur qui va jouer
   const ship = allBoats[players.value[next].boatIndex];
-  if (ship && (ship.abilityId === 'sloop' || ship.abilityId === 'jonque' || ship.abilityId === 'clipper')) {
+  if (ship && (ship.abilityId === 'sloop' || ship.abilityId === 'jonque')) {
     players.value[next].abilityUsed = false;
   }
 
@@ -588,13 +641,19 @@ const nextTurn = () => {
 
   playUiTap();
 
-  if (isEndOfRound) {
-    // Fin du dernier tour du round → événement de mer d'abord
-    startRound();
-  } else {
-    // Tour intermédiaire → directement la phase de ressources
-    showResourcePhase.value = true;
+  // Chaque tour commence par un événement de mer, puis le choix cartes / pièces.
+  startRound();
+};
+
+// Le Clipper gagne 1 pièce en fin de tour s'il n'a pas attaqué (une attaque termine le tour autrement).
+const finishTurn = () => {
+  const p = players.value[currentTurn.value];
+  if (p.hp > 0 && allBoats[p.boatIndex].abilityId === 'clipper') {
+    p.gold += 1;
+    triggerPopup(t('game.popup.clipper.title'), t('game.popup.clipper.message'));
+    playSuccessChime();
   }
+  nextTurn();
 };
 
 const useBoatAbility = (playerIndex) => {
@@ -607,43 +666,42 @@ const useBoatAbility = (playerIndex) => {
   playSuccessChime();
 };
 
+// Caravelle : 1 carte gratuite par tour, que le joueur pioche OU prenne des pièces (livret de règles).
+const caravelleReminder = (player) => {
+  if (allBoats[player.boatIndex].abilityId === 'caravelle') {
+    triggerPopup(t('game.popup.caravelle.title'), t('game.popup.caravelle.message'));
+  }
+};
+
 const chooseGold = () => {
   const player = players.value[currentTurn.value];
   const boat = allBoats[player.boatIndex];
-  
+
   let goldGained = 2;
   // Pouvoir passif: La Gabare (+1 pièce)
   if (boat.abilityId === 'gabare') {
     goldGained += 1;
   }
-  
+
   player.gold += goldGained;
   showResourcePhase.value = false;
   playSuccessChime();
+  caravelleReminder(player);
   // Le Contrebandier peut gagner dès qu'il atteint 15 pièces
   evaluateVictory();
 };
 
 const cardsToDrawAmount = computed(() => {
-  if (!players.value || players.value.length === 0) return 2;
-  const player = players.value[currentTurn.value];
-  if (!player) return 2;
-  
-  const boat = allBoats[player.boatIndex];
-  let amount = 2;
-  
-  // Bonus navire
-  if (boat.abilityId === 'caravelle') amount += 1;
-  // Bonus événement
-  if (currentEvent.value && currentEvent.value.id === 'tresor') amount += 1;
-  
-  return amount;
+  // Vents favorables : +1 carte piochée. (La carte gratuite de la Caravelle est indépendante du choix.)
+  return 2 + (currentEvent.value && currentEvent.value.id === 'vents' ? 1 : 0);
 });
 
 const chooseCards = () => {
   const amount = cardsToDrawAmount.value;
   if (amount > 2) {
     triggerPopup(t('game.popup.bonusDraw.title'), t('game.popup.bonusDraw.message', { amount }));
+  } else {
+    caravelleReminder(players.value[currentTurn.value]);
   }
   showResourcePhase.value = false;
   playSuccessChime();
@@ -668,14 +726,16 @@ const shopItems = ref(GAME_SHOP_ITEMS.map(it => ({
 })));
 
 const availableShopItems = computed(() => shopItems.value.filter(item => !item.purchased));
+// Événement « Aubaine » : −1 pièce sur tous les articles ce tour (minimum 1).
+const priceOf = (item) => Math.max(1, item.price - (currentEvent.value && currentEvent.value.id === 'aubaine' ? 1 : 0));
 
 const buyItem = (item) => {
   const player = players.value[currentTurn.value];
-  if (player.gold < item.price || item.purchased) {
+  if (player.gold < priceOf(item) || item.purchased) {
     playHitSound();
     return;
   }
-  player.gold -= item.price;
+  player.gold -= priceOf(item);
   item.purchased = true;
 
   // Effets boutique (livret de règles)
@@ -705,11 +765,23 @@ const buyItem = (item) => {
 };
 const selectedDamage = ref(1);
 const damageInput = ref(String(selectedDamage.value));
+const attackMode = ref('single');   // 'single' | 'two' (Tir groupé) | 'all' (Mitraille)
+const attackPierce = ref(false);    // Coup de griffe : ignore les Voiles
+const selectedTargets = ref([]);
+const attackRun = ref(null);        // { targets, i, base, attackerIdx, pierce }
+const defenseIdx = ref(null);       // joueur ciblé qui doit répondre (Voile, Corvette…)
+const editIdx = ref(null);          // joueur dont on ajuste PV / pièces à la main
+
+const livingOthers = () => players.value.map((_, i) => i).filter(i => i !== currentTurn.value && players.value[i].hp > 0);
+const wantedTargets = computed(() => (attackMode.value === 'two' ? Math.min(2, livingOthers().length) : 1));
 
 const initiateAttack = () => {
   showDamageModal.value = true;
   selectedDamage.value = 1;
   damageInput.value = "1";
+  attackMode.value = 'single';
+  attackPierce.value = false;
+  selectedTargets.value = [];
   playUiTap();
 };
 const decreaseDamage = () => {
@@ -727,6 +799,7 @@ const increaseDamage = () => {
 const cancelDamage = () => {
   showDamageModal.value = false;
   isAttacking.value = false;
+  selectedTargets.value = [];
   playUiTap();
 };
 const confirmDamage = () => {
@@ -734,8 +807,13 @@ const confirmDamage = () => {
   if (isNaN(val) || val < 1) val = 1;
   selectedDamage.value = val;
   showDamageModal.value = false;
-  isAttacking.value = true;
+  selectedTargets.value = [];
   playUiTap();
+  if (attackMode.value === 'all') {
+    if (livingOthers().length) startAttack(livingOthers());
+  } else {
+    isAttacking.value = true;
+  }
 };
 
 const initiateRevealRole = () => {
@@ -745,13 +823,19 @@ const initiateRevealRole = () => {
 
 const performRevealRole = (targetIdx) => {
   const target = players.value[targetIdx];
-  const roleName = t('roles.' + target.roleId + '.name');
-  triggerPopup(
-    t('game.popup.spyglass.title'), 
-    t('game.popup.spyglass.message', { name: allCats[target.catIndex].name, role: roleName })
-  );
+  const buyer = players.value[currentTurn.value];
+  const catName = allCats[target.catIndex].name;
+  // Vaisseau Fantôme : son rôle ne peut jamais être révélé par l'ennemi
+  if (allBoats[target.boatIndex].abilityId === 'fantome') {
+    triggerPopup(t('game.popup.spyglass.title'), t('game.popup.ghostShield', { name: catName }));
+  } else {
+    triggerPopup(
+      t('game.popup.spyglass.title'),
+      t('game.popup.spyglass.message', { name: catName, role: t('roles.' + target.roleId + '.name') })
+    );
+  }
   // Consommer la longue-vue
-  players.value[currentTurn.value].canRevealRole = false;
+  buyer.canRevealRole = false;
   isRevealingRole.value = false;
   playSuccessChime();
 };
@@ -761,97 +845,177 @@ const handlePlayerClick = (index) => {
     if (index !== currentTurn.value && players.value[index].hp > 0) {
       performRevealRole(index);
     }
-  } else {
-    performAttack(index);
+  } else if (isAttacking.value) {
+    pickTarget(index);
   }
-};const performAttack = (targetIdx) => {
+};
+
+// ---- Attaque : choix des cibles → défense de chaque cible → dégâts (mêmes règles que le jeu en ligne) ----
+const pickTarget = (targetIdx) => {
   if (!isAttacking.value || targetIdx === currentTurn.value) return;
-  // Ne pas attaquer un joueur déjà éliminé
-  if (players.value[targetIdx].hp <= 0) return;
-
-  // Désactive immédiatement l'attaque pour éviter les double-clics sur d'autres cibles
-  isAttacking.value = false;
-
-  const attacker = players.value[currentTurn.value];
   const target = players.value[targetIdx];
-  const attackerBoat = allBoats[attacker.boatIndex];
-  const targetBoat = allBoats[target.boatIndex];
+  if (target.hp <= 0 || selectedTargets.value.includes(targetIdx)) return;
 
-  // Trêve : impossible d'attaquer une cible sous protection
+  // Trêve : cible intouchable, on garde le tour pour choisir quelqu'un d'autre
   if (target.truceTurnsLeft && target.truceTurnsLeft > 0) {
     triggerPopup(t('game.popup.truce.title'), t('game.popup.truce.message', { name: allCats[target.catIndex].name }));
-    // Carte non consommée — on garde le tour pour rejouer
-    isAttacking.value = true;
     playHitSound();
     return;
   }
 
-  // Calculer les dégâts (prendre en compte la tempête)
-  let actualDamage = selectedDamage.value;
-  if (currentEvent.value && currentEvent.value.id === 'tempete') {
-    actualDamage += 1;
+  selectedTargets.value.push(targetIdx);
+  playUiTap();
+  if (selectedTargets.value.length >= wantedTargets.value) {
+    isAttacking.value = false;
+    startAttack([...selectedTargets.value]);
   }
+};
 
-  // Buff Poudre noire (achat boutique)
+const startAttack = (targets) => {
+  const attacker = players.value[currentTurn.value];
+  let base = selectedDamage.value;
+  // Poudre noire (boutique) : +2 sur la prochaine attaque, consommée une fois
   if (attacker.buffNextAttack) {
-    actualDamage += attacker.buffNextAttack;
+    base += attacker.buffNextAttack;
     attacker.buffNextAttack = 0;
   }
+  attackRun.value = { targets, i: 0, base, attackerIdx: currentTurn.value, pierce: attackPierce.value };
+  resolveNext();
+};
 
-  // Pouvoir passif: La Felouque (+1 dégât si la cible a plus de PV)
-  if (attackerBoat.abilityId === 'felouque' && target.hp > attacker.hp) {
-    actualDamage += 1;
-  }
+const canDodge = (player) => allBoats[player.boatIndex].abilityId === 'corvette' && !player.abilityUsed;
 
-  // Pouvoir passif: Le Cuirassé (-1 dégât reçu, minimum 1)
-  if (targetBoat.abilityId === 'cuirasse') {
-    actualDamage = Math.max(1, actualDamage - 1);
-  }
+// Dégâts finaux sur une cible : bonus du navire, brume, Felouque, Cuirassé.
+const finalDamage = (attackerIdx, targetIdx, base) => {
+  const attacker = players.value[attackerIdx];
+  const target = players.value[targetIdx];
+  let dmg = base + (getShipDamage(attacker.boatIndex) - 1);
+  if (currentEvent.value && currentEvent.value.id === 'brume') dmg = Math.max(1, dmg - 1);
+  if (allBoats[attacker.boatIndex].abilityId === 'felouque' && target.hp > attacker.hp) dmg += 1;
+  if (allBoats[target.boatIndex].abilityId === 'cuirasse') dmg = Math.max(1, dmg - 1);
+  return dmg;
+};
 
-  // Gérer la brume (50% de chance d'échec)
-  if (currentEvent.value && currentEvent.value.id === 'brume' && Math.random() < 0.5) {
-    triggerPopup(t('game.popup.failedAttack.title'), t('game.popup.failedAttack.message'));
-    playHitSound(); // Bruit d'échec
-  } else {
-    // Appliquer le dégât choisi par l'attaquant
-    target.hp = Math.max(0, target.hp - actualDamage);
-    playShopSound();
-    playHitSound();
-
-    // Pouvoir passif: Le Brick (pioche 1 carte physique quand attaqué)
-    if (targetBoat.abilityId === 'brick' && target.hp > 0) {
-      triggerPopup(t('game.popup.brickPower.title'), t('game.popup.brickPower.message', { name: t('ships.' + allBoats[target.boatIndex].abilityId + '.name') }));
+const resolveNext = () => {
+  const run = attackRun.value;
+  if (!run || isGameOver.value) return;
+  while (run.i < run.targets.length) {
+    const ti = run.targets[run.i];
+    const target = players.value[ti];
+    if (target.hp <= 0) { run.i++; continue; }
+    if (target.truceTurnsLeft && target.truceTurnsLeft > 0) {
+      triggerPopup(t('game.popup.truce.title'), t('game.popup.truce.message', { name: allCats[target.catIndex].name }));
+      run.i++;
+      continue;
     }
+    // Une attaque « perforante » ignore les Voiles, mais pas l'esquive de la Corvette.
+    if (run.pierce && !canDodge(target)) { applyHit(ti, 'none'); return; }
+    defenseIdx.value = ti; // on attend la réponse de la cible (elle a ses cartes en main)
+    return;
   }
+  finishAttack();
+};
 
-  // Pouvoir passif: Le Brigantin (pioche 2 cartes si on élimine un joueur)
-  if (target.hp === 0) {
+const applyHit = (ti, choice) => {
+  const run = attackRun.value;
+  if (!run) return;
+  defenseIdx.value = null;
+  const target = players.value[ti];
+  let dmg = finalDamage(run.attackerIdx, ti, run.base);
+  if (choice === 'reduce') dmg = Math.max(1, dmg - 2);           // Cape de brume
+  if (choice === 'dodge') target.abilityUsed = true; // Corvette : 1x / partie
+  const blocked = choice === 'block' || choice === 'reflect' || choice === 'dodge';
+
+  if (blocked) {
+    playSuccessChime();
+  } else {
+    playShopSound();
+    damageTo(ti, dmg, run.attackerIdx);
+  }
+  // Esquive féline : renvoie 1 dégât à l'assaillant
+  if (choice === 'reflect') damageTo(run.attackerIdx, 1, ti);
+
+  // Brick : pioche 1 carte dès qu'il est attaqué, même si l'attaque est bloquée
+  if (allBoats[target.boatIndex].abilityId === 'brick' && target.hp > 0 && !isGameOver.value) {
+    triggerPopup(t('game.popup.brickPower.title'), t('game.popup.brickPower.message', { name: t('ships.brick.name') }));
+  }
+  run.i++;
+  resolveNext();
+};
+
+const finishAttack = () => {
+  const run = attackRun.value;
+  attackRun.value = null;
+  defenseIdx.value = null;
+  if (!run || isGameOver.value) return;
+  // Le Kraken punit l'assaillant de 2 dégâts
+  if (currentEvent.value && currentEvent.value.id === 'kraken' && players.value[run.attackerIdx].hp > 0) {
+    triggerPopup(t('game.popup.kraken.title'), t('game.popup.kraken.message', { name: allCats[players.value[run.attackerIdx].catIndex].name }));
+    damageTo(run.attackerIdx, 2, null);
+    if (isGameOver.value) return;
+  }
+  playUiTap();
+  // RÈGLE : Jouer une carte attaque met fin au tour immédiatement
+  nextTurn();
+};
+
+// Applique des dégâts à un joueur (attaque, renvoi, Kraken, ajustement manuel) et gère son élimination.
+const damageTo = (ti, amount, attackerIdx) => {
+  const target = players.value[ti];
+  if (target.hp <= 0) return;
+  target.hp = Math.max(0, target.hp - amount);
+  playHitSound();
+  if (target.hp > 0) return;
+
+  const catName = allCats[target.catIndex].name;
   // Revivre une fois : la cible revient avec 1 PV au lieu d'être éliminée
   if (target.revivePending) {
     target.revivePending = false;
     target.hp = 1;
-    triggerPopup(t('game.popup.revive.title'), t('game.popup.revive.message', { name: allCats[target.catIndex].name }));
+    triggerPopup(t('game.popup.revive.title'), t('game.popup.revive.message', { name: catName }));
+    return;
+  }
+
+  const attacker = attackerIdx !== null && attackerIdx !== undefined ? players.value[attackerIdx] : null;
+  let message = t('game.popup.eliminated.message', { name: catName, role: t('roles.' + target.roleId + '.name') });
+  if (attacker && attacker.hp > 0) {
+    attacker.eliminations += 1;
+    attacker.gold += target.gold;
+    message += ' ' + t('game.popup.eliminated.loot', { taker: allCats[attacker.catIndex].name });
+    // La Frégate regagne 1 PV, le Brigantin pioche 2 cartes physiques
+    if (allBoats[attacker.boatIndex].abilityId === 'fregate') attacker.hp = Math.min(attacker.maxHp ?? attacker.hp + 1, attacker.hp + 1);
+    if (allBoats[attacker.boatIndex].abilityId === 'brigantin') message += ' ' + t('game.popup.brigantinPower.message');
   } else {
-  attacker.eliminations += 1;
-  // Pouvoir passif: Le Brigantin (pioche 2 cartes physiques à l'élimination)
-  if (attackerBoat.abilityId === 'brigantin') {
-    triggerPopup(t('game.popup.brigantinPower.title'), t('game.popup.brigantinPower.message'));
+    message += ' ' + t('game.popup.eliminated.discard');
   }
-  // Transfert des pièces du joueur éliminé
-  attacker.gold += target.gold;
   target.gold = 0;
-  // Pouvoir passif: La Frégate (+1 PV si on élimine un joueur)
-  if (attackerBoat.abilityId === 'fregate') {
-    attacker.hp += 1;
-  }
-  }
-  }
+  // Le rôle d'un joueur éliminé est révélé à tous.
+  triggerPopup(t('game.popup.eliminated.title'), message);
+  evaluateVictory();
+};
 
-
-
+// Ajustement manuel : les cartes physiques (Rhum, Cale, Coffre, équipements…) changent PV et pièces.
+const openEdit = (index) => {
+  if (isGameOver.value || attackRun.value || showRoleReveal.value) return;
+  if (isAttacking.value || isRevealingRole.value) { handlePlayerClick(index); return; }
+  editIdx.value = index;
   playUiTap();
-  // RÈGLE : Jouer une carte attaque met fin au tour immédiatement (et relance startRound pour le prochain)
-  nextTurn();
+};
+const closeEdit = () => { editIdx.value = null; };
+const adjustHp = (delta) => {
+  const p = players.value[editIdx.value];
+  if (!p || p.hp <= 0) return;
+  if (delta < 0) damageTo(editIdx.value, -delta, null);
+  else p.hp += delta;
+  if (p.hp <= 0) closeEdit();
+  playUiTap();
+};
+const adjustGold = (delta) => {
+  const p = players.value[editIdx.value];
+  if (!p) return;
+  p.gold = Math.max(0, p.gold + delta);
+  evaluateVictory();
+  playUiTap();
 };
 
 const openShop = (rotation) => {
@@ -1104,36 +1268,33 @@ const spinRoulette = () => {
   }, spinDuration);
 };
 
-const getBaseHp = (boatIndex) => {
-  const boatId = allBoats[boatIndex].abilityId;
-  if (boatId === 'fregate' || boatId === 'troismats') return 6;
-  if (boatId === 'cuirasse') return 7;
-  if (['corvette', 'sloop', 'jonque', 'felouque', 'brigantin', 'clipper'].includes(boatId)) return 4;
-  return 5;
+// Les identifiants du moteur (trois-mats) diffèrent de ceux de l'interface (troismats).
+const shipOf = (boatIndex) => {
+  const id = allBoats[boatIndex].abilityId;
+  return SHIPS.find(sh => sh.id === (id === 'troismats' ? 'trois-mats' : id));
 };
+const getBaseHp = (boatIndex) => shipOf(boatIndex)?.hp ?? 5;
+const getShipDamage = (boatIndex) => shipOf(boatIndex)?.damage ?? 1;
 
 const confirmCaptain = () => {
   if (winnerIndex.value !== null) {
     // Le Capitaine reçoit le rôle 'capitaine'
     players.value[winnerIndex.value].roleId = 'capitaine';
 
-    // Distribuer les autres rôles aux autres joueurs
-    const availableHiddenRoles = allRoles.filter(r => r.id !== 'capitaine').map(r => r.id);
-    // Mélanger les rôles cachés
-    for (let i = availableHiddenRoles.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [availableHiddenRoles[i], availableHiddenRoles[j]] = [availableHiddenRoles[j], availableHiddenRoles[i]];
-    }
+    // Distribuer les autres rôles : toujours 1 Capitaine + 1 Protecteur, le reste tiré comme en ligne
+    const hiddenRoles = assignRoles(players.value.length);
+    hiddenRoles.splice(hiddenRoles.indexOf('capitaine'), 1);
 
     let roleIndex = 0;
     players.value.forEach((player, idx) => {
       if (idx !== winnerIndex.value) {
-        player.roleId = availableHiddenRoles[roleIndex % availableHiddenRoles.length];
+        player.roleId = hiddenRoles[roleIndex];
         roleIndex++;
       }
-      
-      // Assigner le PV de départ correct selon le bateau (plus bonus Capitaine)
+
+      // PV de départ du navire (plus bonus Capitaine)
       player.hp = getBaseHp(player.boatIndex) + (idx === winnerIndex.value ? 1 : 0);
+      player.maxHp = player.hp;
     });
 
     isRouletteVisible.value = false;
@@ -1223,6 +1384,19 @@ onUnmounted(() => {
   overflow: hidden;
   --ppcm: v-bind(pixelsPerCm);
 }
+
+/* --- COMPAGNON : attaque, défense, ajustement --- */
+.companion-note { margin: 4px auto 0; max-width: 34rem; text-align: center; font-size: .9rem; color: var(--color-text-muted); }
+.companion-note a { color: var(--color-turquoise); }
+.damage-hint { font-size: .8rem; opacity: .85; margin: 4px 0; max-width: 18rem; }
+.attack-modes { display: flex; gap: 4px; justify-content: center; margin: 4px 0 2px; flex-wrap: wrap; }
+.mode-btn { padding: 3px 7px; border-radius: 999px; border: 2px solid rgba(200, 162, 74, .6); background: transparent; color: inherit; cursor: pointer; font-size: .7rem; }
+.damage-sub { display: block; font-size: .68rem; opacity: .8; font-weight: normal; }
+.mode-btn.on { background: var(--color-gold); color: var(--color-ink); }
+.pierce-row { display: flex; align-items: center; gap: 6px; justify-content: center; font-size: .72rem; margin-bottom: 2px; }
+.defense-actions { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.edit-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0; }
+.edit-val { min-width: 2.2rem; text-align: center; font-size: 1.6rem; }
 
 /* --- LOBBY STYLES --- */
 .lobby-overlay {
@@ -1632,10 +1806,11 @@ onUnmounted(() => {
   background: rgba(93, 42, 24, 0.98);
   border: 2px solid #f1d3a1;
   border-radius: 8px;
-  padding: 15px;
+  padding: 10px 12px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.8);
   z-index: 250;
   width: 220px;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
   gap: 15px;

@@ -41,6 +41,12 @@ npm run dev
 npm run build
 ```
 
+## Deux modes de jeu
+
+- **Jouer en ligne** (`/online`) : le jeu complet, sans boîte, un téléphone par joueur. Gratuit.
+- **Compagnon** (`/game`) : complément du jeu de cartes physique. Vous gardez vos cartes, l'appli gère les rôles secrets,
+  les événements, la boutique, les PV, les pièces et la victoire. Il partage le moteur de règles du mode en ligne.
+
 ## Parties en ligne (un téléphone par joueur)
 
 Route `/online` : salons de 4 à 8 joueurs, sans cartes physiques. Le serveur (Edge Function
