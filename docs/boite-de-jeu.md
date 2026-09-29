@@ -58,7 +58,8 @@ Format de carte recommandé : **63 × 88 mm** (« poker »), le plus courant et 
 
 ✅ **Décision** : le mode en ligne reste gratuit et sans code ; le compagnon exige le code de la boîte.
 
-**Fonctionnement** (`supabase/migrations/20260929020000_companion_activation.sql`)
+**Fonctionnement** (3 fichiers `supabase/migrations/2026092902*_companion_activation*.sql`, à exécuter dans l'ordre ;
+le SQL Editor du dashboard tronque toute requête de plus de 100 lignes, donc un fichier à la fois)
 
 - Un code unique par boîte (16 caractères sans I/O/0/1, ≈ 80 bits), généré par
   `select * from public.generate_activation_codes(500);` dans le SQL Editor (droits administrateur).

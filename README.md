@@ -51,7 +51,8 @@ npm run build
 ## Codes d'activation du compagnon
 
 Le mode en ligne est libre. Le compagnon exige un code unique par boîte, vérifié **côté serveur** (fonctions SQL
-`redeem_activation_code` / `has_companion_access` de `supabase/migrations/20260929020000_companion_activation.sql` :
+`redeem_activation_code` / `has_companion_access`, dans les 3 fichiers `supabase/migrations/2026092902*_companion_activation*.sql`,
+à exécuter dans l'ordre, un par un dans le SQL Editor (il tronque toute requête de plus de 100 lignes) :
 le navigateur n'a aucun accès à la table des codes). Un code active **3 appareils** au maximum (une boîte se
 partage à une table) ; l'appareil est identifié par son compte anonyme Supabase.
 

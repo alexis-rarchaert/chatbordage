@@ -8,7 +8,11 @@ import { pgcrypto } from '@electric-sql/pglite/contrib/pgcrypto'
  * Teste la migration du code d'activation du compagnon sur un vrai PostgreSQL (PGlite), avec des rôles
  * anon / authenticated comme dans Supabase. Point de départ : l'ancienne table, lisible par tout le monde.
  */
-const MIGRATION = new URL('../supabase/migrations/20260929020000_companion_activation.sql', import.meta.url)
+const MIGRATIONS = [
+  '20260929020000_companion_activation.sql',
+  '20260929020100_companion_activation_redeem.sql',
+  '20260929020200_companion_activation_codes.sql'
+].map(f => new URL(`../supabase/migrations/${f}`, import.meta.url))
 const U = (i: number) => `00000000-0000-0000-0000-00000000000${i}`
 
 async function setup() {
@@ -27,7 +31,8 @@ async function setup() {
     grant select on public.activation_codes to anon, authenticated;
     insert into public.activation_codes values ('OLDD-CODE-0000-1111');
   `)
-  await db.exec(readFileSync(MIGRATION, 'utf8'))
+  // Chaque fichier est exécuté séparément et dans l'ordre, comme dans le SQL Editor du dashboard.
+  for (const file of MIGRATIONS) await db.exec(readFileSync(file, 'utf8'))
   const as = async <T>(user: string | null, fn: () => Promise<T>): Promise<T> => {
     await db.exec(`set request.jwt.claim.sub = '${user ?? ''}'`)
     await db.exec(`set role ${user ? 'authenticated' : 'anon'}`)
@@ -43,6 +48,10 @@ async function setup() {
     (await db.query<{ generate_activation_codes: string }>(`select * from public.generate_activation_codes(${n})`)).rows.map(r => r.generate_activation_codes)
   return { db, redeem, access, denied, generate }
 }
+
+test('chaque fichier de migration reste sous 100 lignes (le SQL Editor tronque au-delà)', () => {
+  for (const file of MIGRATIONS) assert.ok(readFileSync(file, 'utf8').split('\n').length < 100, file.pathname)
+})
 
 test('les codes ne sont ni listables ni générables depuis le navigateur', async () => {
   const { db, denied } = await setup()
