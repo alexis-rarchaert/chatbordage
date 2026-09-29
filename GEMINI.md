@@ -232,3 +232,14 @@ effets précis (~100 cartes).
 9. Définir la règle de départage en cas de missions accomplies simultanément.
 10. Définir l'identité visuelle détaillée (chats, navires, factions visuelles) pour accompagner
 la DA pirate.
+
+---
+Mise à jour — mode en ligne (septembre 2026)
+• Le jeu se joue de 4 à 8 joueurs, un téléphone par joueur (route /online), sans cartes physiques.
+• Règle de départage (missions accomplies simultanément), validée : Contrebandier > Chasseur de primes > Capitaine + Protecteur > dernier survivant.
+• Un dernier survivant sans mission correspondante l'emporte (la partie ne peut pas rester bloquée).
+• Attaque : la cible dispose de ~20 s pour réagir (Voile, ou esquive de la Corvette) ; sans réponse elle encaisse.
+• Minuteur de tour (90 s par défaut, réglable ou désactivable par l'hôte). 3 tours ratés d'affilée = le joueur est retiré de la partie.
+• Événement « Chant des sirènes » adapté au numérique : les mains de 4+ cartes défaussent 1 carte au hasard.
+• Événement « Mutinerie » : la carte donnée au voisin de gauche est tirée au hasard.
+• Si la pioche est vide, la défausse est mélangée pour la reconstituer.

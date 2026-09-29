@@ -407,6 +407,8 @@ const validateCode = async () => {
     if (isValid) {
       isUnlocked.value = true;
       localStorage.setItem('game_unlocked', 'true');
+      // Le code sert aussi à créer un salon en ligne (vérifié côté serveur).
+      localStorage.setItem('game_code', boxCode.value);
     } else {
       unlockError.value = true;
     }

@@ -1,4 +1,4 @@
-import type { SeaEvent } from './types'
+import type { SeaEvent } from './types.ts'
 
 export const SEA_EVENTS: SeaEvent[] = [
   { id: 'calme', name: 'Mer calme', description: 'Aucun effet. Le tour se déroule normalement.', rarity: 'commun' },
@@ -14,5 +14,5 @@ export const SEA_EVENTS: SeaEvent[] = [
 ]
 
 export function drawSeaEvent(rand: () => number = Math.random): SeaEvent {
-  return SEA_EVENTS[Math.floor(rand() * SEA_EVENTS.length)]
+  return SEA_EVENTS[Math.floor(rand() * SEA_EVENTS.length)]!
 }

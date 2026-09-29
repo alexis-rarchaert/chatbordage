@@ -1,7 +1,3 @@
-export * from './types'
-export * from './ships'
-export * from './roles'
-export * from './events'
-export * from './shop'
-export * from './cards'
-export { setupGame, applyDamage, drawCards, gainCoins, playCard, useShipPower, buyShopItem, endTurn } from './engine'
+// Le moteur vit dans supabase/functions/_shared/game : il est partagé entre le navigateur
+// et l'Edge Function qui fait autorité sur les parties en ligne.
+export * from '../../supabase/functions/_shared/game/index.ts'

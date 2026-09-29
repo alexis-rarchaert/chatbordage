@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "type-check": "vue-tsc --build"
+    "type-check": "vue-tsc --build",
+    "test": "node --test tests/game.test.ts"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",

@@ -72,9 +72,40 @@ export interface PlayerState {
   revivePending?: boolean
   powerUsedThisTurn?: boolean
   powerUsedThisGame?: boolean
+  noAttackThisTurn?: boolean
+  idleStrikes?: number
 }
 
-export type GamePhase = 'lobby' | 'event' | 'draw' | 'action' | 'power' | 'end' | 'finished'
+export type GamePhase = 'lobby' | 'event' | 'draw' | 'action' | 'reaction' | 'power' | 'end' | 'finished'
+
+/** Réaction d'une cible à une attaque : carte Voile, esquive de la Corvette, ou rien (absent = pas encore répondu). */
+export interface AttackResponse {
+  defenseCardId?: string
+  dodge?: boolean
+}
+
+export interface PendingAttack {
+  kind: 'attack'
+  attackerId: string
+  card: Card
+  targetIds: string[]
+  responses: Record<string, AttackResponse>
+  deadline: number
+}
+
+/** Jonque : le joueur a vu la carte du dessus et doit décider de la garder ou de la remettre dessous. */
+export interface PendingScry {
+  kind: 'scry'
+  playerId: string
+}
+
+export type Pending = PendingAttack | PendingScry
+
+export interface ChatMessage {
+  id: number
+  playerId: string
+  key: string
+}
 
 export interface GameState {
   id: string
@@ -89,4 +120,13 @@ export interface GameState {
   hasPlayedAttack: boolean
   winnerIds?: string[]
   log: string[]
+  pending?: Pending
+  /** Informations privées (résultat d'une longue-vue, d'une Jonque…), indexées par joueur. */
+  notes: Record<string, string[]>
+  chat: ChatMessage[]
+  turnNumber: number
+  /** Durée d'un tour / d'une réaction en secondes. 0 = pas de minuteur. */
+  turnSeconds: number
+  reactionSeconds: number
+  turnDeadline?: number
 }
