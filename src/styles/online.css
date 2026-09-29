@@ -30,3 +30,6 @@
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slide-up { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Les liens (RouterLink) stylés en boutons ne doivent pas être soulignés. */
+a.btn-gold, a.btn-ghost, a.btn-danger { text-decoration: none; display: inline-block; text-align: center; }

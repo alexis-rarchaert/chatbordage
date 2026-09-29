@@ -115,7 +115,14 @@ watch(showHowTo, v => { if (!v) safeSet('chatbordage.tutoSeen', '1') })
 </template>
 
 <style scoped>
-.online-page { min-height: 100dvh; position: relative; }
+/* Fond propre : la texture de parchemin du site se répète en grosses tuiles visibles sur grand écran. */
+.online-page {
+  min-height: 100dvh; position: relative;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(200, 162, 74, .14) 0%, transparent 55%),
+    linear-gradient(180deg, #6b1922 0%, #4f1219 100%) fixed;
+  background-color: var(--color-burgundy-dark);
+}
 .center-box { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .loading { font-family: var(--font-display); font-size: 1.8rem; color: var(--color-gold); animation: pulse 1.4s infinite; }
 .panel { max-width: 460px; margin: 0 auto; padding: 24px 18px; gap: 12px; text-align: center; }
